@@ -20,8 +20,8 @@ for file in bam_files:
     # If the index file is missing we copy the bam file first, to avoid permission issues.
     if not os.path.isfile(file + '.bai'):
         print('indexing')
-        subprocess.call('samtools index -@ 20 ' + file, shell=True)
-    print('bamCoverage -b ' + file + ' -p 20 --binSize 20 --normalizeUsing CPM --effectiveGenomeSize '
+        subprocess.call('samtools index ' + file, shell=True)
+    subprocess.call('bamCoverage -b ' + file + ' -p 20 --binSize 20 --normalizeUsing CPM --effectiveGenomeSize '
                     + args.effectiveGenomeSize + ' -o ' + args.out_folder + '/' +
-                    file.split('/')[-1].replace('.bam', '.bw'))#, shell=True)
+                    file.split('/')[-1].replace('.bam', '.bw'), shell=True)
 

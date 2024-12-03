@@ -21,6 +21,12 @@ two_contrasts = [['#E1BE6A', '#40B0A6'],  # orange, teal
 # “Colour displays for categorical images”, Color Research & Application 32.4: 304-309.
 categ_colours = cc.glasbey_bw_minc_20
 del categ_colours[19]  # The yellow colour is almost invisible.
+glasbey_palettes = {'glasbey': categ_colours,
+                    'glasbey_cool': cc.glasbey_cool,
+                    'glasbey_warm': cc.glasbey_warm,
+                    'glasbey_dark': cc.glasbey_dark,
+                    'glasbey_light': cc.glasbey_light}
+
 
 # Own palettes
 red_colours = ['#2e0000', '#a11b1b', '#ed6109', '#ffd86b', '#ffc400']
@@ -35,5 +41,6 @@ gabc_avghic = ['#033e61', '#84d7e3', '#fab30f'] * 2
 # CARE the following shapes are not plotted for whatever reason: ['1', '2', '3', '4', '+', 'x']
 marker_shapes = ['o', 'D', 'P', 's', '*', 'X', '<', 'p', 'd', '^', 'v', '>', 'H', '$O$', '$D$', '$U$', '$Y$', '$N$']
 
+hatches = ['/', '\\', '|', '-', '+', 'x', 'o', 'O', '.', '*']
 
 

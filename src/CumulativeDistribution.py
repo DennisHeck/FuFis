@@ -64,9 +64,14 @@ def cumu_plot(plot_df, fetch_col, grouping_name, output_path, table_width=0.3, t
             hue_order.append(str(gene_set_cols[i]) + ' (#' + str(sum(p_df[grouping_name] == x)) + ')')
         for i, x in enumerate(gene_set_cols):
             p_df.loc[p_df[grouping_name] == x, grouping_name] = gene_set_cols_num[i]
+    if different_groups == 2:
+        palette = ColoursAndShapes.two_contrasts[0]
+    elif different_groups <= len(ColoursAndShapes.tol_vibrant):
+        palette = ColoursAndShapes.tol_vibrant[:different_groups]
+    else:
+        palette = [to_hex(c) for c in ColoursAndShapes.glasbey_palettes['glasbey']][:different_groups]
     cumu = sns.displot(p_df, x=fetch_col, hue=grouping_name, kind='ecdf', hue_order=hue_order,
-                       palette=ColoursAndShapes.two_contrasts[0] if different_groups == 2 else ColoursAndShapes.tol_vibrant[:different_groups],
-                       height=8, aspect=1.3, zorder=12)
+                       palette=palette, height=8, aspect=1.3, zorder=12)
     # cumu._legend.set_title('')
     cumu.fig.subplots_adjust(top=0.93)
     cumu.fig.suptitle('Cumulative distribution of ' + fetch_col if not title else title, size=24, x=0.28, y=1.01)
@@ -80,19 +85,23 @@ def cumu_plot(plot_df, fetch_col, grouping_name, output_path, table_width=0.3, t
         cumu.ax.lines[a].set_linestyle(linestyles[a % len(linestyles)])
         cumu.ax.lines[a].set_linewidth('4')
     colour_dict = {x: i for i, x in enumerate(colours_order)}
+    print(colour_dict)
+    print(different_groups)
     for a in range(len(cumu.ax.lines)):
-        cumu.legend.get_lines()[a].set_linestyle(linestyles[colour_dict[to_hex(cumu.legend.get_lines()[a].get_color())] % len(linestyles)])
-        cumu.legend.get_lines()[a].set_linewidth('3')
+        if to_hex(cumu.legend.get_lines()[a].get_color()) in colour_dict:  # Legend has it even if there was no data.
+            cumu.legend.get_lines()[a].set_linestyle(linestyles[colour_dict[to_hex(cumu.legend.get_lines()[a].get_color())] % len(linestyles)])
+            cumu.legend.get_lines()[a].set_linewidth('3')
     for spine in cumu.ax.spines.values():  # Increase spline width.
         spine.set_linewidth(3)
     p_nested, p_background, samples = ks_test(p_df, grouping_name, fetch_col)
     samples = [str(x).split('(')[0][:int(len(str(x).split('(')[0]) / 2)] + '\n' + str(x).split('(')[0][int(len(str(x).split('(')[0]) / 2):]
                for x in samples]
-    ks_table = plt.table(cellText=np.asarray(p_nested).T, cellColours=np.asarray(p_background).T,
-                         rowLabels=list(reversed(samples))[:-1], colLabels=samples[:-1], loc='bottom right',
-                         cellLoc='center', rowLoc='center', zorder=12, bbox=[table_x_pos, -0.11, table_width, 0.35])
-    ks_table.auto_set_font_size(False)
-    ks_table.set_fontsize(10)
+    if len(samples) > 1:
+        ks_table = plt.table(cellText=np.asarray(p_nested).T, cellColours=np.asarray(p_background).T,
+                             rowLabels=list(reversed(samples))[:-1], colLabels=samples[:-1], loc='bottom right',
+                             cellLoc='center', rowLoc='center', zorder=12, bbox=[table_x_pos, -0.11, table_width, 0.35])
+        ks_table.auto_set_font_size(False)
+        ks_table.set_fontsize(10)
 
     cumu.ax.grid(True, axis='both', color='#c7c7c7', linewidth=1, which='major')
     cumu.ax.set_facecolor('white')

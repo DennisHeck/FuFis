@@ -1,0 +1,74 @@
+import os
+import numpy as np
+import gzip
+import pandas as pd
+from timeit import default_timer as clock
+from multiprocessing import Pool
+
+
+def score_summer(args):
+    """Get the vector of summed activities across genes, ordered by gene_idx.
+    Placed on the highest level to be parallelizable."""
+    mode, run, file, gene_idx = args
+    run_scores = np.zeros([len(gene_idx)])
+    with gzip.open(file, 'rt') as abc_in:
+        abc_head = {x: i for i, x in enumerate(abc_in.readline().strip().split('\t'))}
+        for entry in abc_in:
+            entry = entry.strip().split('\t')
+            this_gene = entry[abc_head['Ensembl ID']].split('.')[0]
+            if mode == 'AdapxC':
+                run_scores[gene_idx[this_gene]] += (
+                            float(entry[abc_head['adaptedActivity']]) * float(entry[abc_head['Contact']]))
+            elif mode == 'SumA':
+                run_scores[gene_idx[this_gene]] += float(entry[abc_head['signalValue']])
+            elif mode == 'AxC':
+                run_scores[gene_idx[this_gene]] += (
+                        float(entry[abc_head['signalValue']]) * float(entry[abc_head['Contact']]))
+    return run_scores
+
+
+def abc_gene_activities(interaction_files, annotation, mode='AdapxC', cores=1, id_idx=-1):
+    """Build a matrix of genes * samples with an activity value as entry, which is based on the interactions
+    mapped to the gene in a sample. The activity value is the sum of adaptedActivity * contact of all enhancers mapped
+    to a gene.
+    @param interaction_files: Path to the ABC-files. All files containing ABCpp_scoredInteractions and are
+    gzipped are used. They are identified via their column string meaning *_ABCpp_scoredInteractions_IDENTIFIER.txt.gz.
+    Alternatively give a dictionary of {run_tag: ABC-file}.
+    @param annotation: gtf-file that was used for the ABC-scoring. Is used to get the list of genes that can possibly
+    be in the matrix. Can be gzipped or uncompressed. Version suffixes are removed.
+    @param mode: Can be SumA for summing the signalValue column, AdapxC for summing the product of adaptedActivity and
+    contact, or AxC for summing the product of signalValue and contact.
+    @param id_idx: Which entry of filename.split('_') to take as identifier.
+    @return gene_scores_df: Pandas Dataframe of genes * samples including Ensembl IDs as index and the column string
+    of the ABC runs as columns. Note that there is no normalization done, a direct comparison between runs is not
+    advised, unless the activity and contact measurements were comparable."""
+    start = clock()
+    if mode not in ['AdapxC', 'SumA', 'AxC']:
+        print("ERROR: unknown mode")
+        return
+    # First get the vector of possible genes.
+    if annotation.endswith('.gz'):
+        anno_opener = gzip.open(annotation, 'rt')
+    else:
+        anno_opener = open(annotation, 'r')
+    genes = list(set([x.split('\t')[8].split('gene_id "')[-1].split('"; ')[0].split('.')[0]
+                      for x in anno_opener.readlines() if not x.startswith('#') and x.split('\t')[2] == 'gene']))
+    gene_idx = {g: i for i, g in enumerate(genes)}
+
+    # Now get the samples/ABC runs for the other dimension.
+    if not type(interaction_files) == dict:
+        abc_runs = {x.split('.txt')[0].split('_')[id_idx]: interaction_files + '/' + x
+                    for x in os.listdir(interaction_files) if "ABCpp_scoredInteractions" in x and x.endswith('.gz')}
+    else:
+        abc_runs = interaction_files
+
+    process_pool = Pool(processes=cores)
+    pool_summer = process_pool.map(score_summer, [[mode, run, file, gene_idx] for run, file in abc_runs.items()])
+    process_pool.close()
+
+    # Convert to a dataframe to add the gene IDs and run tags again.
+    gene_scores_df = pd.DataFrame(pool_summer, columns=gene_idx.keys(), index=abc_runs.keys()).T
+    print("ABC scores summed", clock() - start)
+
+    return gene_scores_df
+

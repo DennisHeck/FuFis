@@ -21,12 +21,18 @@ def genome_lifter(region_list, input_version, output_version):
     lifted_regions = []
     for region in region_list:
         chro, start, end = region[:3]
-        new_start = converter[chro][int(start)]
-        new_end = converter[chro][int(end)]
+        chro = str(chro)
+        if '_' in chro:  # For those fun scaffold like chrUn_KI270467v1.
+            continue
+        try:
+            new_start = converter[chro][int(float(start))]
+            new_end = converter[chro][int(float(end))]
+        except KeyError:  # In cases where we got the weird scaffolds.
+            continue
         # The conversion failed if one position is not liftable and when the strands differ. We add as condition
         # that the lifted region does not exceed a size of twice the original region, and that it's on the same chr.
         if len(new_start) > 0 and len(new_end) > 0 and new_start[0][2] == new_end[0][2] and abs(
-                new_end[0][1] - new_start[0][1]) <= 2 * (int(end) - int(start)) \
+                new_end[0][1] - new_start[0][1]) <= 2 * (int(float(end)) - int(float(start))) \
                 and chro.replace('chr', '') == new_start[0][0].replace('chr', '') \
                 and chro.replace('chr', '') == new_end[0][0].replace('chr', ''):
             if new_end[0][1] > new_start[0][1]:  # The conversion sometimes maps to the minus strand, mixing locs.
