@@ -42,7 +42,8 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.mathjax',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.githubpages']
+    'sphinx.ext.githubpages',
+    'sphinx.ext.napoleon']
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
