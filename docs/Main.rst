@@ -15,7 +15,7 @@ Test
 .. autofunction:: TEST.test1
 
 
-.. autofunction:: BasicPlotter.basic_hist
+.. autofunction:: BasicPlotter.test1
 
 
 Below doc

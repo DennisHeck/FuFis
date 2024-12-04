@@ -21,6 +21,11 @@ from adjustText import adjust_text
 import seaborn as sns
 import scipy.stats
 
+def test1(fu):
+    """SCHABRACKENTAPIR
+    :param fu: IT NEEDS STRIPES"""
+    print(fu)
+    return
 
 def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None, title=None, output_path='', y_label='',
                x_size=8, y_size=6, rotation=None, palette=None, legend=True, font_s=14, legend_out=False, ylim=None,
