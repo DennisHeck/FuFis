@@ -12,7 +12,11 @@ Test
    :rtype: list[str]
 
 
+.. autofunction:: TEST.test1
+
+
 .. autofunction:: BasicPlotter.basic_hist
+
 
 Below doc
 
