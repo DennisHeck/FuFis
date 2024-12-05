@@ -45,10 +45,16 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon']
 
-autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'matplotlib.patches', 'numpy', 'matplotlib.ticker',
-                        'matplotlib.colors', 'matplotlib.lines', 'matplotlib.patches', 'math', 'matplotlib_venn',
-                        'itertools', 'upsetplot', 'collections',
-                        'adjustText', 'seaborn', 'scipy.stats', 'ColoursAndShapes', 'pandas.api.types']
+# autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'matplotlib.patches', 'numpy', 'matplotlib.ticker',
+#                         'matplotlib.colors', 'matplotlib.lines', 'matplotlib.patches', 'math', 'matplotlib_venn',
+#                         'itertools', 'upsetplot', 'collections',
+#                         'adjustText', 'seaborn', 'scipy.stats', 'ColoursAndShapes', 'pandas.api.types']
+autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
+                        'Patch', 'matplotlib_venn', 'matplotlib.ticker', 'MultipleLocator', 'matplotlib.colors', 'to_hex',
+                        'LinearSegmentedColormap', 'itertools', 'chain', 'upsetplot', 'collections', 'Counter',
+                        'pandas.api.types', 'is_string_dtype', 'matplotlib.lines', 'Line2D', 'mpatches', 'adjustText',
+                        'adjust_text', 'seaborn', 'scipy.stats', 'scipy', 'ColoursAndShapes']
+
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
