@@ -46,8 +46,8 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.napoleon']
 
 autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
-                        'Patch', 'matplotlib_venn', 'matplotlib.ticker', 'MultipleLocator', 'matplotlib.colors',
-                        'LinearSegmentedColormap', 'itertools', 'chain', 'upsetplot', 'collections', 'Counter',
+                        'Patch', 'matplotlib_venn', 'matplotlib.ticker', 'matplotlib.colors',
+                        'itertools', 'chain', 'upsetplot', 'collections', 'Counter',
                         'pandas.api.types', 'is_string_dtype', 'matplotlib.lines', 'Line2D', 'mpatches', 'adjustText',
                         'adjust_text', 'seaborn', 'scipy.stats', 'scipy', 'ColoursAndShapes', 'to_hex']
 

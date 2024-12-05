@@ -8,11 +8,9 @@ import math
 import ColoursAndShapes
 from matplotlib.patches import Patch
 import matplotlib_venn
-from matplotlib.ticker import MultipleLocator
-from matplotlib.colors import to_hex, LinearSegmentedColormap
+from matplotlib.colors import to_hex
 from itertools import chain
 import upsetplot
-import venn
 from collections import Counter
 from pandas.api.types import is_string_dtype
 from matplotlib.lines import Line2D
