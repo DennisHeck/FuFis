@@ -5,7 +5,6 @@ from matplotlib import cm
 import matplotlib as mpl
 import numpy as np
 import math
-import ColoursAndShapes
 from matplotlib.patches import Patch
 import matplotlib_venn
 from matplotlib.ticker import MultipleLocator
@@ -20,6 +19,7 @@ import matplotlib.patches as mpatches
 from adjustText import adjust_text
 import seaborn as sns
 import scipy.stats
+# import ColoursAndShapes
 
 def test1(fu):
     """Basic SCHABRACKENTAPIR
