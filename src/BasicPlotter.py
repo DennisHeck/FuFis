@@ -1,25 +1,25 @@
 import copy
 import pandas as pd
-from matplotlib import pyplot as plt
-from matplotlib import cm
-import matplotlib as mpl
+# from matplotlib import pyplot as plt
+# from matplotlib import cm
+# import matplotlib as mpl
 import numpy as np
 import math
-from matplotlib.patches import Patch
-import matplotlib_venn
-from matplotlib.ticker import MultipleLocator
-from matplotlib.colors import to_hex, LinearSegmentedColormap
+# from matplotlib.patches import Patch
+# import matplotlib_venn
+# from matplotlib.ticker import MultipleLocator
+# from matplotlib.colors import to_hex, LinearSegmentedColormap
 from itertools import chain
-import upsetplot
-# import venn
+# import upsetplot
+# # import venn
 from collections import Counter
-from pandas.api.types import is_string_dtype
-from matplotlib.lines import Line2D
-import matplotlib.patches as mpatches
-from adjustText import adjust_text
+# from pandas.api.types import is_string_dtype
+# from matplotlib.lines import Line2D
+# import matplotlib.patches as mpatches
+# from adjustText import adjust_text
 import seaborn as sns
-import scipy.stats
-import ColoursAndShapes
+# import scipy.stats
+# import ColoursAndShapes
 
 def test1(fu):
     """Basic SCHABRACKENTAPIR
