@@ -19,7 +19,7 @@ import matplotlib.patches as mpatches
 from adjustText import adjust_text
 import seaborn as sns
 import scipy.stats
-# import ColoursAndShapes
+import ColoursAndShapes
 
 def test1(fu):
     """Basic SCHABRACKENTAPIR

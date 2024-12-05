@@ -21,8 +21,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
 sys.path.insert(0, os.path.abspath('../src/'))
-# from pathlib import Path
-# sys.path.insert(0, str(Path('..', 'src').resolve()))
+from pathlib import Path
+sys.path.insert(0, str(Path('..', 'src').resolve()))
 import sphinx_rtd_theme
 
 # -- General configuration ------------------------------------------------
@@ -44,6 +44,9 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.intersphinx',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon']
+
+autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'numpy', 'math', 'matplotlib_venn', 'itertools',
+                        'upsetplot', 'collections', 'adjustText', 'seaborn', 'scipy']
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
