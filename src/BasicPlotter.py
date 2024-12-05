@@ -25,8 +25,7 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
                formats=['pdf']):
     """
     Plots a basic barplot, allows to select hue levels.
-    :param y_col: Can be list, then the df will be transformed long format and var_name set to hue_col. Use y_label to
-    have an appropriate y-axis label.
+    :param y_col: Can be list, then the df will be transformed long format and var_name set to hue_col. Use y_label to have an appropriate y-axis label.
     """
     if x_col not in plot_df.columns:  # Assumes the x_col is the index if the column doesn't exist.
         plot_df[x_col] = plot_df.index
@@ -199,11 +198,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
     Plots a basic layered histogram which allows for hue, whose order can be defined as well.
     If x_col is not a column in the df, it will be assumed that hue_col names all the columns which are supposed to be
     plotted.
-    :param stat: count: show the number of observations in each bin
-        frequency: show the number of observations divided by the bin width
-        probability or proportion: normalize such that bar heights sum to 1
-        percent: normalize such that bar heights sum to 100
-        density: normalize such that the total area of the histogram equals 1
+    :param stat: count: show the number of observations in each bin. frequency: show the number of observations divided by the bin width. probability or proportion: normalize such that bar heights sum to 1. percent: normalize such that bar heights sum to 100. density: normalize such that the total area of the histogram equals 1
     :param element: {“bars”, “step”, “poly”}.
     :param multiple: {“layer”, “dodge”, “stack”, “fill”}
     :param discrete: If True, each data point gets their own bar with binwidth=1 and bin_num is ignored.
@@ -594,12 +589,13 @@ def upset_plotter(inter_sets, max_groups=None, sort_by='cardinality', y_label='I
                   intersection_plot_elements=None, font_enhancer=0, element_size=None, formats=['pdf']):
     """
     Based on a dictionary with sets as values creates the intersection and an upsetplot.
-    :param max_groups: defines the maximum number of intersections plotted, sorted descending by size
-    :param sort_categories_by: cardinality, degree or input.
-    :param font_enhancer: what to add onto the default sizes, does not affect the title.
-    notes for that hideous API:
-    :param intersection_plot_elements: height
-    :param element_size: ~overall size and margins
+    
+    Args:
+        max_groups: defines the maximum number of intersections plotted, sorted descending by size
+        sort_categories_by: cardinality, degree or input.
+        font_enhancer: what to add onto the default sizes, does not affect the title.
+        intersection_plot_elements: height
+        element_size: ~overall size and margins
     """
     # totals_plot_elements: ~size of the horizontal bars for total size
     if sort_categories_by == 'input':  # Reverse the order, to have it from top to bottom.
