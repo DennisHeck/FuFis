@@ -21,8 +21,10 @@ import scipy.stats
 import ColoursAndShapes
 
 def test1(fu):
-    """Basic SCHABRACKENTAPIR
-    :param fu: IT NEEDS STRIPES"""
+    """
+    Basic SCHABRACKENTAPIR
+    :param fu: IT NEEDS STRIPES
+    """
     print(fu)
     return
 
@@ -197,17 +199,18 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
                ylabel=None, element='step', alpha=0.3, kde=False, legend_out=False, legend_title=True, fill=True,
                edgecolour=None, multiple='layer', shrink=1, hlines=[], vlines=[], discrete=False, grid=True,
                linewidth=None, formats=['pdf']):
-    """Plots a basic layered histogram which allows for hue, whose order can be defined as well.
+    """
+    Plots a basic layered histogram which allows for hue, whose order can be defined as well.
     If x_col is not a column in the df, it will be assumed that hue_col names all the columns which are supposed to be
     plotted.
-    @param stat:
+    :param stat:
         count: show the number of observations in each bin
         frequency: show the number of observations divided by the bin width
         probability or proportion: normalize such that bar heights sum to 1
         percent: normalize such that bar heights sum to 100
         density: normalize such that the total area of the histogram equals 1
-    @param element: {“bars”, “step”, “poly”}.
-    @param multiple: {“layer”, “dodge”, “stack”, “fill”}
+    :param element: {“bars”, “step”, “poly”}.
+    :param multiple: {“layer”, “dodge”, “stack”, “fill”}
     @param discrete: If True, each data point gets their own bar with binwidth=1 and bin_num is ignored.
     """
 
