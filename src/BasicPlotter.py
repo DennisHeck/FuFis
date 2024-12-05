@@ -12,7 +12,7 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import to_hex, LinearSegmentedColormap
 from itertools import chain
 import upsetplot
-import venn
+# import venn
 from collections import Counter
 from pandas.api.types import is_string_dtype
 from matplotlib.lines import Line2D
@@ -22,7 +22,7 @@ import seaborn as sns
 import scipy.stats
 
 def test1(fu):
-    """SCHABRACKENTAPIR
+    """Basic SCHABRACKENTAPIR
     :param fu: IT NEEDS STRIPES"""
     print(fu)
     return
@@ -584,21 +584,21 @@ def venn_from_list(plot_list, label_list, plot_path, blob_colours=ColoursAndShap
     plt.close('All')
 
 
-def py_venn(plot_list, label_list, plot_path, title='', formats=['pdf']):
-    """Based on a list of iterables creates the intersections and fancy plots with a Python venn script
-    https://github.com/tctianchi/pyvenn."""
-    labels = venn.get_labels(plot_list, fill=['number'])
-    if len(plot_list) == 4:
-        f, ax = venn.venn4(labels, names=label_list, figsize=(5, 5), fontsize=14)
-    elif len(plot_list) == 5:
-        f, ax = venn.venn5(labels, names=label_list, figsize=(5, 5), fontsize=14)
-    elif len(plot_list) == 6:
-        f, ax = venn.venn6(labels, names=label_list, figsize=(5, 5), fontsize=14)
-    plt.title(title, size=16)
-    if type(formats) != list:
-        formats = list(formats)
-    for form in formats:
-        plt.savefig((plot_path + title + '_Venn.'+form).replace(' ', ''), bbox_inches='tight', format=form)
+# def py_venn(plot_list, label_list, plot_path, title='', formats=['pdf']):
+#     """Based on a list of iterables creates the intersections and fancy plots with a Python venn script
+#     https://github.com/tctianchi/pyvenn."""
+#     labels = venn.get_labels(plot_list, fill=['number'])
+#     if len(plot_list) == 4:
+#         f, ax = venn.venn4(labels, names=label_list, figsize=(5, 5), fontsize=14)
+#     elif len(plot_list) == 5:
+#         f, ax = venn.venn5(labels, names=label_list, figsize=(5, 5), fontsize=14)
+#     elif len(plot_list) == 6:
+#         f, ax = venn.venn6(labels, names=label_list, figsize=(5, 5), fontsize=14)
+#     plt.title(title, size=16)
+#     if type(formats) != list:
+#         formats = list(formats)
+#     for form in formats:
+#         plt.savefig((plot_path + title + '_Venn.'+form).replace(' ', ''), bbox_inches='tight', format=form)
 
 
 def upset_plotter(inter_sets, max_groups=None, sort_by='cardinality', y_label='Intersection', title_tag='',
