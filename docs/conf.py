@@ -45,8 +45,10 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon']
 
-autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'numpy', 'math', 'matplotlib_venn', 'itertools',
-                        'upsetplot', 'collections', 'adjustText', 'seaborn', 'scipy']
+autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'matplotlib.patches', 'numpy', 'matplotlib.ticker',
+                        'matplotlib.colors', 'matplotlib.lines', 'matplotlib.patches', 'math', 'matplotlib_venn',
+                        'itertools', 'upsetplot', 'collections',
+                        'adjustText', 'seaborn', 'scipy.stats', 'ColoursAndShapes', 'pandas.api.types']
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
