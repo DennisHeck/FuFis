@@ -44,7 +44,7 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.intersphinx',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
-    'sphinx_exec_code',
+    'sphinx-exec-code',
     ]
 
 autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
