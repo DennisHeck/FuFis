@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.abspath('../src/'))
 from pathlib import Path
 sys.path.insert(0, str(Path('..', 'src').resolve()))
 import sphinx_rtd_theme
+import sphinx_exec_code
 
 # -- General configuration ------------------------------------------------
 
@@ -44,7 +45,7 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.intersphinx',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
-    'sphinx.exec.code',
+    'sphinx_exec_code',
     ]
 
 autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
