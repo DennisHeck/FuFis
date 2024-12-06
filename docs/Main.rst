@@ -3,19 +3,29 @@ Test
 ============
 
 
-.. autofunction:: TEST.test1
 
-below test.test1
-
-.. autofunction:: BasicPlotter.test1
+.. autofunction:: BasicPlotter.basic_hist
 
 
-Below Basicplotter.test1
+Below Basicplotter.basichist
+
+.. code-block:: python
+
+   import pandas as pd
+   testcode
+
+.. code-block:: python
+
+    *BasicPlotter.basic_bars*
 
 
-.. automodule:: BasicPlotter
-   :members:
-   :undoc-members:
-   :show-inheritance:
+%.. automodule:: BasicPlotter
+5   :members:
+%   :undoc-members:
+%  :show-inheritance:
+
+
+.. image:: gallery/species_flipper_length_mm_Bars.pdf
+  :alt: basic_bars
 
 Lowest

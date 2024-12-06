@@ -42,20 +42,22 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
     f, ax = plt.subplots(figsize=(x_size, y_size))
     ax.set_axisbelow(True)
     ax.grid(True, axis='y', color='#f2f2f2', linewidth=1, which='major')
-    sns.barplot(data=plot_df, x=x_col, y=y_col, order=x_order, hue=hue_col, hue_order=hue_order, ax=ax, alpha=1, edgecolor='k',
-                linewidth=1, color='#2d63ad', palette='tab10' if hue_col and not palette else palette)
+    sns.barplot(data=plot_df, x=x_col, y=y_col, order=x_order, hue=hue_col, hue_order=hue_order, ax=ax, alpha=1,
+                errorbar=None, edgecolor='k', linewidth=1, color='#2d63ad',
+                palette='tab10' if hue_col and not palette else palette)
     if ylim:
         ax.set_ylim(ylim)
     ax.tick_params(axis='both', labelsize=font_s)
-    ax.set_ylabel(y_col, fontsize=font_s+2)
+    ax.set_ylabel(y_col if not y_label else y_label, fontsize=font_s+2)
     ax.set_xlabel(x_col, fontsize=font_s+2)
     if rotation:
         ax.tick_params(axis='x', rotation=rotation)
-    if legend_out:
-        ax.legend(prop={'size': 14, 'weight': 'bold'}, loc='upper right',
-                  bbox_to_anchor=(2 if type(legend_out) == bool else legend_out, 1))
-    else:
-        ax.legend(prop={'size': 14, 'weight': 'bold'})
+    if hue_col:
+        if legend_out:
+            ax.legend(prop={'size': 14, 'weight': 'bold'}, loc='upper right',
+                      bbox_to_anchor=(2 if type(legend_out) == bool else legend_out, 1))
+        else:
+            ax.legend(prop={'size': 14, 'weight': 'bold'})
     if not legend and ax.get_legend():
         ax.get_legend().remove()
     plt.title(title, fontsize=font_s+4, fontweight='bold')
@@ -205,7 +207,9 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
     plotted.
 
     Args:
-        stat: count: show the number of observations in each bin. frequency: show the number of observations divided by the bin width. probability or proportion: normalize such that bar heights sum to 1. percent: normalize such that bar heights sum to 100. density: normalize such that the total area of the histogram equals 1
+        stat: count: show the number of observations in each bin. frequency: show the number of observations divided
+            by the bin width. probability or proportion: normalize such that bar heights sum to 1. percent: normalize
+            such that bar heights sum to 100. density: normalize such that the total area of the histogram equals 1.
         element: {“bars”, “step”, “poly”}.
         multiple: {“layer”, “dodge”, “stack”, “fill”}
         discrete: If True, each data point gets their own bar with binwidth=1 and bin_num is ignored.
@@ -421,7 +425,8 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
 
     Args:
         line_plot: 2D list of dots which will be connected to a lineplot.
-        label_dots: A pair of columns [do_label, label_col] with boolean do_label telling which entries should get a text label within the plot, and label_col giving the string of the label.
+        label_dots: A pair of columns [do_label, label_col] with boolean do_label telling which entries should get a
+            text label within the plot, and label_col giving the string of the label.
     """
     main_list = plot_df[[x for x in score_cols+[colour_col, marker_col] if x is not None]].values.tolist()
     main_idx = {x: i for i, x in enumerate([y for y in score_cols+[colour_col, marker_col] if y is not None])}
@@ -550,10 +555,10 @@ def venn_from_list(plot_list, label_list, plot_path, blob_colours=ColoursAndShap
                    scaled=True, linestyle='', number_size=11, xsize=5, ysize=5, formats=['pdf']):
     """
     Based on a list with the size of the sets and the respective labels, plot a non-scaled / scaled Venn diagram
-     for up to three sets. If sets are given, the intersection will be done automatically.
-     Choose non-scaled if the difference is too high.
-     two sets: [a-b, b-a, a∩b]
-     three sets: [a-b-c, b-a-c, a∩b-c, c-a-b, a∩c-b, b∩c-a, a∩b∩c]
+    for up to three sets. If sets are given, the intersection will be done automatically.
+    Choose non-scaled if the difference is too high.
+    two sets: [a-b, b-a, a∩b]
+    three sets: [a-b-c, b-a-c, a∩b-c, c-a-b, a∩c-b, b∩c-a, a∩b∩c]
      """
     if len(plot_list) > 3:
         print("ERROR, only making Venns for three or two sets")
@@ -676,7 +681,7 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
         title: Optional title to add.
         dot_size: Size of the dots of the scatterplots.
         top_labels: How many dots will be labelled, sorted by abs(x_col), if mark_groups is given will take
-                top_labels from each of them, if not once from all.
+            top_labels from each of them, if not once from all.
         label_col: In which columns the text for the labels are found.
         label_s: Size of the label text.
         vlines: Positions of vertical lines to add.
