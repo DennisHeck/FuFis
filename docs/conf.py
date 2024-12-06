@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# STARE documentation build configuration file, created by
+# FuFi documentation build configuration file, created by
 # sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its
@@ -43,7 +43,9 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.intersphinx',
     'sphinx.ext.githubpages',
-    'sphinx.ext.napoleon']
+    'sphinx.ext.napoleon',
+    'sphinx_exec_code',
+    ]
 
 autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
                         'Patch', 'matplotlib_venn', 'matplotlib.ticker', 'matplotlib.colors',

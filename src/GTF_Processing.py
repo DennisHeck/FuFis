@@ -20,8 +20,6 @@ def bed_to_feature_dict(bedobj):
     """
     Takes a bedtools object and returns a dictionary with the fourth column as key and the bedtools fields as value.
     Multiple occurrences of the identifier are appended.
-    @param bedobj:
-    @return:
     """
     feature_dict = {}
     for entry in bedobj:
@@ -39,14 +37,17 @@ def gene_window_bed(gtf_file, extend=200, gene_set=set(), tss_type='5', dict_onl
     Alternatively gives a dictionary with the TSS.
     The BedTools intervals will be 0-based, the TSS in the dictionary still 1-based like in the gtf-file.
     Care: removes the .-suffixes from all gene IDs.
-    @param gtf_file: gtf-file in GENCODE's format, either .gz or .gtf
-    @param extend: number of base pairs to extend the TSS in each direction
-    @param gene_set: Limits the output to the given gene set, leave empty to get all.
-    @param tss_type: "5" to get only the 5' TSS or "all" to get all unique TSS of all transcripts in the gtf-file
-    @param dict_only: Returns a dictionary instead of a BedTool's object.
-    @param merge: If True, merges all intersecting promoter of the same gene into one row in the BedTool's object.
-    @param open_regions: Optional bed file or BedTools' object, only overlapping parts of promoters will be kept for the
-                         BedTool's object.
+
+    Args:
+        gtf_file: gtf-file in GENCODE's format, can be gzipped.
+        extend: number of base pairs to extend the TSS in each direction
+        gene_set: Set of Ensembl IDs or gene names or mix of both to limit the output to. If empty, return for all
+            genes in the annotation.
+        tss_type: "5" to get only the 5' TSS or "all" to get all unique TSS of all transcripts in the gtf-file
+        dict_only: Returns a dictionary instead of a BedTool's object.
+        merge: If True, merges all intersecting promoter of the same gene into one row in the BedTool's object.
+        open_regions: Optional bed file or BedTools' object, only overlapping parts of promoters will be kept for the
+            BedTool's object.
     """
     if tss_type == '5':
         identifier = 'gene'
@@ -113,8 +114,13 @@ def gene_window_bed(gtf_file, extend=200, gene_set=set(), tss_type='5', dict_onl
 def gene_body_bed(gtf_file, gene_set=set(), dict_only=False):
     """
     From a gtf-file fetches the gene bodies, meaning start-end for the entries labelled as 'gene'.
-    @param dict_only: Returns a dict {Ensembl ID: [chr, start, end, Ensembl ID, '.', strand]
-    @return: If dict_only false return a BedTool's object.
+
+    Args:
+        gtf_file: gtf-file in GENCODE's format, can be gzipped.
+        gene_set: Set of Ensembl IDs or gene names or mix of both to limit the output to. If empty, return for all
+            genes in the annotation.
+        dict_only: Returns a dict {Ensembl ID: [chr, start, end, Ensembl ID, '.', strand]. Else, returns a bedtool-
+            object with the coordinates per gene.
     """
     if gene_set:
         gene_set = set([g.split('.')[0] for g in gene_set])
@@ -145,20 +151,19 @@ def gene_body_bed(gtf_file, gene_set=set(), dict_only=False):
 def gene_feature_bed(gtf_file, feature, gene_set=set(), dict_only=False, merge=True, length_only=False,
                      keep_strand=False):
     """
-    On gene-level fetch a specific feature of a gene, e.g. all exons, matching the 3rd column in the gtf=file.
-    @param feature: one of gtf's annotated regions:
-    'CDS',
-    'Selenocysteine',
-    'UTR',
-    'exon',
-    'gene',
-    'start_codon',
-    'stop_codon',
-    'transcript'
-    @param merge: Merge the features per gene.
-    @param dict_only: Return a dict instead.
-    @param length_only: Return a dict with {gene: feature_len}, only makes sense with merge=True.
-    @return: BedTool's object.
+    On gene-level fetch a specific feature of a gene, e.g. all exons, matching the 3rd column in the gtf-file.
+
+    Args:
+        gtf_file: gtf-file in GENCODE's format, can be gzipped.
+        feature: one of gtf's annotated regions: 'CDS', 'Selenocysteine', 'UTR', 'exon', 'gene', 'start_codon',
+            'stop_codon', 'transcript'.
+        gene_set: Set of Ensembl IDs or gene names or mix of both to limit the output to. If empty, return for all
+            genes in the annotation.
+        merge: Merge the features per gene.
+        dict_only: Return a dict instead.
+        length_only: Return a dict with {gene: feature_len}, only makes sense with merge=True.
+        keep_strand: Whether the strand should be kept as information. CARE: merging and keep_strand together is not
+            properly tested.
     """
     if not merge and length_only:
         print("WARNING: Getting length without merging")
@@ -209,9 +214,13 @@ def gene_feature_bed(gtf_file, feature, gene_set=set(), dict_only=False, merge=T
 def gene_introns(gtf_file, gene_set=set(), dict_only=False, length_only=False):
     """
     Gets the introns of annotated genes in a gtf-file, by taking the gene bodies and subtracting exons and UTRs.
-    @param dict_only: Return a dict instead.
-    @param length_only: Return a dict with {gene: feature_len}, only makes sense with merge=True.
-    @return: BedTool's object.
+
+    Args:
+        gtf_file: gtf-file in GENCODE's format, can be gzipped.
+        gene_set: Set of Ensembl IDs or gene names or mix of both to limit the output to. If empty, return for all
+            genes in the annotation.
+        dict_only: Return a dict instead.
+        length_only: Return a dict with {gene: feature_len}, only makes sense with merge=True.
     """
     gene_bodies = gene_body_bed(gtf_file=gtf_file, gene_set=gene_set, dict_only=False)
     exons = gene_feature_bed(gtf_file=gtf_file, feature='exon', gene_set=gene_set, merge=True)

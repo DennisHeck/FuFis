@@ -19,10 +19,6 @@ Below Basicplotter.basichist
     *BasicPlotter.basic_bars*
 
 
-%.. automodule:: BasicPlotter
-5   :members:
-%   :undoc-members:
-%  :show-inheritance:
 
 
 .. image:: gallery/species_flipper_length_mm_Bars.png

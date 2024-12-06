@@ -6,5 +6,5 @@ Schabrackentapir
       :maxdepth: 2
    
    Main.rst
-   Main_replaced.rst
+   GTF_Processing_formatted.rst
 
