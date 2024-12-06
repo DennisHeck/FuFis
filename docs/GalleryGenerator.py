@@ -34,6 +34,7 @@ gene_list = ['ENSG00000160294', 'ENSG00000279493', 'ENSG00000279720']
 promoter_regions = GTF_Processing.gene_window_bed(gtf_file=annotation, extend=200, gene_set=gene_list, tss_type='5')
 print(promoter_regions)
 # ---
+open("docs/gallery/src.GTF_Processing.txt", 'w').write(str(promoter_regions))
 
 
 
