@@ -28,7 +28,7 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
 
     Args:
         y_col: Can be list, then the df will be transformed long format and var_name set to hue_col.
-        Use y_label to have an appropriate y-axis label.
+        y_label: to have an appropriate y-axis label.
     """
     if x_col not in plot_df.columns:  # Assumes the x_col is the index if the column doesn't exist.
         plot_df[x_col] = plot_df.index
@@ -264,7 +264,9 @@ def basic_2Dhist(plot_df, columns, hue_col=None, hue_order=None, bin_num=200, ti
                  diagonal=False, grid=True, font_s=14, formats=['pdf']):
     """
     Plots a basic 2D histogram as heatmap which allows for hue, whose order can be defined as well.
-    :param columns: List with 2 entries representing the columns from plot_df for the x- and y-axis.
+
+    Args:
+        columns: List with 2 entries representing the columns from plot_df for the x- and y-axis.
     """
     if len(columns) != 2:
         print("ERROR: the 2Dhist can only work with 2 columns")
@@ -419,8 +421,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
 
     Args:
         line_plot: 2D list of dots which will be connected to a lineplot.
-        label_dots: A pair of columns [do_label, label_col] with boolean do_label telling which entries should get
-                    a text label within the plot, and label_col giving the string of the label.
+        label_dots: A pair of columns [do_label, label_col] with boolean do_label telling which entries should get a text label within the plot, and label_col giving the string of the label.
     """
     main_list = plot_df[[x for x in score_cols+[colour_col, marker_col] if x is not None]].values.tolist()
     main_idx = {x: i for i, x in enumerate([y for y in score_cols+[colour_col, marker_col] if y is not None])}
@@ -669,13 +670,13 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
         mark_groups: Optional dictionary with {k: list/set} of identifiers that will be coloured differently.
         mark_indexcol: Optional column holding the index where to look for the identifiers from mark_groups.
         mark_colours: Optional dict with the colours assigned to the mark_groups, has to have the same keys as
-                mark_groups. An existing colour palette will be used if not given.
+            mark_groups. An existing colour palette will be used if not given.
         mark_labels: Optional legend labels for the mark_groups, leave empty to skip the legend.
         output_path: Path to store the pdf.
         title: Optional title to add.
         dot_size: Size of the dots of the scatterplots.
         top_labels: How many dots will be labelled, sorted by abs(x_col), if mark_groups is given will take
-    top_labels from each of them, if not once from all.
+                top_labels from each of them, if not once from all.
         label_col: In which columns the text for the labels are found.
         label_s: Size of the label text.
         vlines: Positions of vertical lines to add.
