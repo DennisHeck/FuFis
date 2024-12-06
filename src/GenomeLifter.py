@@ -3,7 +3,7 @@ import os
 import gzip
 import numpy as np
 import subprocess
-import TSS_Fetcher
+import GTF_Processing
 import Various
 
 

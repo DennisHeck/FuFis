@@ -4,7 +4,7 @@ from collections import Counter
 import subprocess
 import os
 import argparse
-import TSS_Fetcher
+import GTF_Processing
 
 """For each gene call TFBS in a promoter window at the 5'TSS with Fimo. Then convert Fimo's output into a matrix
 of genes x TFs with the counted binding sites."""

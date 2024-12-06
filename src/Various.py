@@ -17,7 +17,7 @@ import os
 import fnmatch
 import re
 from itertools import chain
-import TSS_Fetcher
+import GTF_Processing
 
 
 def df_column_binner(df, col, num_bins, string_precision=0, lower_bound=None, upper_bound=None, tag='', numerate=True):

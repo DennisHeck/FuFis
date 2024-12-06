@@ -1,9 +1,5 @@
 from pybedtools import BedTool
-import fnmatch
 import numpy as np
-import re
-import os
-import TSS_Fetcher
 import Various
 
 """Collections of functions for integrating different data on top of gABC interaction files."""
