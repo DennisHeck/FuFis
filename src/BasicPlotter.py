@@ -25,7 +25,10 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
                formats=['pdf']):
     """
     Plots a basic barplot, allows to select hue levels.
-    :param y_col: Can be list, then the df will be transformed long format and var_name set to hue_col. Use y_label to have an appropriate y-axis label.
+
+    Args:
+        y_col: Can be list, then the df will be transformed long format and var_name set to hue_col.
+        Use y_label to have an appropriate y-axis label.
     """
     if x_col not in plot_df.columns:  # Assumes the x_col is the index if the column doesn't exist.
         plot_df[x_col] = plot_df.index
@@ -113,8 +116,10 @@ def stacked_bars(plot_df, x_col, y_cols, y_label='', title=None, output_path='',
                  legend_out=False, width=0.8, vertical=False, hatches=None, font_s=14, formats=['pdf']):
     """
     Plots a stacked barplot, with a stack for each y_col.
-    :param fraction: If True take all values as fraction of the row sum.
-    :param hatches: If given assumes the colour list is meant for the x-axis.
+
+    Args:
+        fraction: If True take all values as fraction of the row sum.
+        hatches: If given assumes the colour list is meant for the x-axis.
     """
     plot_df = copy.deepcopy(plot_df)
     if vertical:  # To start the index at the top.
@@ -198,10 +203,12 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
     Plots a basic layered histogram which allows for hue, whose order can be defined as well.
     If x_col is not a column in the df, it will be assumed that hue_col names all the columns which are supposed to be
     plotted.
-    :param stat: count: show the number of observations in each bin. frequency: show the number of observations divided by the bin width. probability or proportion: normalize such that bar heights sum to 1. percent: normalize such that bar heights sum to 100. density: normalize such that the total area of the histogram equals 1
-    :param element: {“bars”, “step”, “poly”}.
-    :param multiple: {“layer”, “dodge”, “stack”, “fill”}
-    :param discrete: If True, each data point gets their own bar with binwidth=1 and bin_num is ignored.
+
+    Args:
+        stat: count: show the number of observations in each bin. frequency: show the number of observations divided by the bin width. probability or proportion: normalize such that bar heights sum to 1. percent: normalize such that bar heights sum to 100. density: normalize such that the total area of the histogram equals 1
+        element: {“bars”, “step”, “poly”}.
+        multiple: {“layer”, “dodge”, “stack”, “fill”}
+        discrete: If True, each data point gets their own bar with binwidth=1 and bin_num is ignored.
     """
 
     if x_col not in plot_df.columns:  # Reformat so that seaborn can interpret x_col as hue.
@@ -303,7 +310,9 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
     """
     Plots a basic violin plot which allows for hue, whose order can be defined as well.
     Use y_col=None and x_col=None for seaborn to interpret the columns as separate plots on the x-asis.
-    :param boxplot_meanonly: Remove all lines from the boxplot and show just the mean as horizontal line.
+
+    Args:
+        boxplot_meanonly: Remove all lines from the boxplot and show just the mean as horizontal line.
     """
     if palette and 'glasbey' in palette:
         palette = ColoursAndShapes.glasbey_palettes[palette]
@@ -407,9 +416,11 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
     Compares two scores. For each entry in plot_df plot one dot with [x,y] based on score_col and
     allows to colour all dots based on colour_col, and if marker_col is selected assigns each class a different
     marker.
-    line_plot: 2D list of dots which will be connected to a lineplot.
-    :param: label_dots: A pair of columns [do_label, label_col] with boolean do_label telling which entries should get
-    a text label within the plot, and label_col giving the string of the label.
+
+    Args:
+        line_plot: 2D list of dots which will be connected to a lineplot.
+        label_dots: A pair of columns [do_label, label_col] with boolean do_label telling which entries should get
+                    a text label within the plot, and label_col giving the string of the label.
     """
     main_list = plot_df[[x for x in score_cols+[colour_col, marker_col] if x is not None]].values.tolist()
     main_idx = {x: i for i, x in enumerate([y for y in score_cols+[colour_col, marker_col] if y is not None])}
@@ -589,7 +600,7 @@ def upset_plotter(inter_sets, max_groups=None, sort_by='cardinality', y_label='I
                   intersection_plot_elements=None, font_enhancer=0, element_size=None, formats=['pdf']):
     """
     Based on a dictionary with sets as values creates the intersection and an upsetplot.
-    
+
     Args:
         max_groups: defines the maximum number of intersections plotted, sorted descending by size
         sort_categories_by: cardinality, degree or input.
@@ -650,24 +661,26 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
                  label_s=12, vlines=[], hlines=[], base_colour='black', log_y=True, formats=['pdf']):
     """
     Volcanoplot of x_col versus -log10(y_col). Usual application results from a differential expression analysis.
-    :param plot_df: pandas DataFrame from which all entries will be plotted.
-    :param x_col: Column that will be used for the x-axis.
-    :param y_col: Column used for the y-axis that will be -log10-transformed.
-    :param mark_groups: Optional dictionary with {k: list/set} of identifiers that will be coloured differently.
-    :param mark_indexcol: Optional column holding the index where to look for the identifiers from mark_groups.
-    :param mark_colours: Optional dict with the colours assigned to the mark_groups, has to have the same keys as
-    mark_groups. An existing colour palette will be used if not given.
-    :param mark_labels: Optional legend labels for the mark_groups, leave empty to skip the legend.
-    :param output_path: Path to store the pdf.
-    :param title: Optional title to add.
-    :param dot_size: Size of the dots of the scatterplots.
-    :param top_labels: How many dots will be labelled, sorted by abs(x_col), if mark_groups is given will take
+
+    Args:
+        plot_df: pandas DataFrame from which all entries will be plotted.
+        x_col: Column that will be used for the x-axis.
+        y_col: Column used for the y-axis that will be -log10-transformed.
+        mark_groups: Optional dictionary with {k: list/set} of identifiers that will be coloured differently.
+        mark_indexcol: Optional column holding the index where to look for the identifiers from mark_groups.
+        mark_colours: Optional dict with the colours assigned to the mark_groups, has to have the same keys as
+                mark_groups. An existing colour palette will be used if not given.
+        mark_labels: Optional legend labels for the mark_groups, leave empty to skip the legend.
+        output_path: Path to store the pdf.
+        title: Optional title to add.
+        dot_size: Size of the dots of the scatterplots.
+        top_labels: How many dots will be labelled, sorted by abs(x_col), if mark_groups is given will take
     top_labels from each of them, if not once from all.
-    :param label_col: In which columns the text for the labels are found.
-    :param label_s: Size of the label text.
-    :param vlines: Positions of vertical lines to add.
-    :param hlines: Positions of horizontal lines to add.
-    :param base_colour: Colour for the dots that are not additionally marked.
+        label_col: In which columns the text for the labels are found.
+        label_s: Size of the label text.
+        vlines: Positions of vertical lines to add.
+        hlines: Positions of horizontal lines to add.
+        base_colour: Colour for the dots that are not additionally marked.
     """
     if mark_groups and not mark_colours:
         mark_colours = {k: ColoursAndShapes.tol_vibrant[i] for i, k in enumerate(mark_groups.keys())}
@@ -722,11 +735,12 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
 def fisher_test_table(fisher_table, fisher_rows, fisher_cols, title='', output_path='', xsize=6, ysize=4,
                       formats=['pdf']):
     """
-    :param fisher_table: Nested list, usually [[Target GroupA, NonTarget GroupA], [Target GroupB, NonTarget GroupB]].
-    :param fisher_rows: Names for the rows of the table, for the example [Group A, GroupB]
-    :param fisher_cols: Names for the columns of the table, for the example [Target, NonTarget]
-    :param title: Title for the table, followed by a newline and the p-value and oddsratio.
-    :param output_path: Output path, the fisher_rows and cols will be added.
+    Args:
+        fisher_table: Nested list, usually [[Target GroupA, NonTarget GroupA], [Target GroupB, NonTarget GroupB]].
+        fisher_rows: Names for the rows of the table, for the example [Group A, GroupB]
+        fisher_cols: Names for the columns of the table, for the example [Target, NonTarget]
+        title: Title for the table, followed by a newline and the p-value and oddsratio.
+        output_path: Output path, the fisher_rows and cols will be added.
     """
 
     fish_stat, pval = scipy.stats.fisher_exact(fisher_table)
