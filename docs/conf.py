@@ -43,7 +43,7 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.intersphinx',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
-    'myst-parser',
+    'sphinx_exec_code',
     ]
 
 basicplotter_mocks = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',

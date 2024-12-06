@@ -7,8 +7,9 @@ GTF processing
 
     *GTF_Processing.gene_window_bed*
 
-.. include:: gallery/src.GTF_Processing.txt
-   :literal:
+.. exec_code::
+
+   print('Easy!')
 
 .. automodule:: GTF_Processing
    :members:
