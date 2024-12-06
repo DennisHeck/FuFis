@@ -13,6 +13,7 @@ GTF processing
     
 
 .. include:: gallery/src.GTF_Processing.txt
+    :literal:
 
 .. automodule:: GTF_Processing
    :members:
