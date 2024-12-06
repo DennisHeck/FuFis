@@ -25,7 +25,7 @@ Below Basicplotter.basichist
 %  :show-inheritance:
 
 
-.. image:: gallery/species_flipper_length_mm_Bars.pdf
+.. image:: gallery/species_flipper_length_mm_Bars.png
   :alt: basic_bars
 
 Lowest

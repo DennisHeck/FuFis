@@ -10,7 +10,7 @@ gallery_code = {x.split('\n')[0]: '\n'.join(x.split('\n')[1:]).split('# ---')[0]
 
 rst_text = open(rst_file).read()
 for gall in gallery_code:
-    rst_text = rst_text.replace('*'+gall+'*', gallery_code[gall])
+    rst_text = rst_text.replace('*'+gall+'*', gallery_code[gall].replace('\n', '\n\t'))  # To indent the code block.
 
 open(rst_file.replace('.rst', '_replaced.rst'), 'w').write(rst_text)
 
