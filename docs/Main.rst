@@ -19,8 +19,6 @@ Below Basicplotter.basichist
     *BasicPlotter.basic_bars*
 
 
-
-
 .. image:: gallery/species_flipper_length_mm_Bars.png
   :alt: basic_bars
 

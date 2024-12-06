@@ -46,12 +46,15 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.napoleon',
     ]
 
-autodoc_mock_imports = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
+basicplotter_mocks = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
                         'Patch', 'matplotlib_venn', 'matplotlib.ticker', 'matplotlib.colors',
                         'itertools', 'chain', 'upsetplot', 'collections', 'Counter',
                         'pandas.api.types', 'is_string_dtype', 'matplotlib.lines', 'Line2D', 'mpatches', 'adjustText',
                         'adjust_text', 'seaborn', 'scipy.stats', 'scipy', 'ColoursAndShapes', 'to_hex']
 
+gtf_processing_mocks = ['pybedtools', 'BedTool', 'gzip', 'itertools', 'chain']
+
+autodoc_mock_imports = list(set(basicplotter_mocks + gtf_processing_mocks))
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
