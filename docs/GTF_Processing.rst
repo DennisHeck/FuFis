@@ -7,7 +7,7 @@ GTF processing
 
     *GTF_Processing.gene_window_bed*
 
-.. include:: <docs/gallery/src.GTF_Processing.txt>
+.. include:: gallery/src.GTF_Processing.txt
    :literal:
 
 .. automodule:: GTF_Processing
