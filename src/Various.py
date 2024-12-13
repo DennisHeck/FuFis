@@ -97,85 +97,6 @@ def get_distance_to_one(start, end, other):
     return distance
 
 
-def match_genenames(gene_symbols, gtf_file, species='human', scopes="symbol, alias, uniprot", fields="ensembl, symbol"):
-    """
-    Takes a list of gene names to look for their matching Ensembl ID first in a gtf-file. Missing names will be
-    queried via the API of https://mygene.info/. Only hits with a valid Ensembl ID will be returned. If multiple hits
-    are found, the first one is used. Name mapping is fun.
-    :param gene_symbols: List of gene names/symbols.
-    :param: gtf_file: Gene annotation in gtf-style, can be gzipped.
-    :param species: Give the name of the species, see below for the available ones.
-    :param scopes: Where mygene.info will search for the gene symbols.
-    :param fields: To which fields the output will be limited to.
-    :return: mapped_names: Dict of {gene name: Ensembl ID} of the mappable names.
-    :return: no_hits: Names which were not mappable via gtf-file nor mygene.info.
-    """
-    available_species = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish', 'thale-cress', 'frog' and 'pig']
-    if species not in available_species:
-        print("ERROR: species not available with name for mygene.info", species)
-        print("Available are", available_species)
-        return
-
-    if gtf_file.endswith('.gz'):
-        opener = gzip.open(gtf_file, 'rt')
-    else:
-        opener = open(gtf_file)
-    name_id_map = {}
-    for line in opener:
-        if not line.startswith("#") and line.split('\t')[2] == 'gene':
-            name_id_map[line.split('\t')[8].split('gene_name "')[-1].split('";')[0].lower()] = \
-                line.split('\t')[8].split('gene_id "')[-1].split('";')[0].split('.')[0]
-
-    gtf_missed = []
-    mapped_names = {}
-    for name in gene_symbols:
-        if name.lower() in name_id_map:
-            mapped_names[name] = name_id_map[name.lower()]
-        else:
-            gtf_missed.append(name)
-
-    # Use the API from mygene for those we can't find in the gtf-file.
-    if len(gtf_missed) > 0:
-        print("Querying mygene for names", len(gtf_missed))
-        query_data = {'species': species,
-                      'scopes': scopes,
-                      'fields': fields,
-                      'ensemblonly': 'true'}
-        query_n = len(gtf_missed)
-        query_time = time.time()
-        if query_n <= 1000:
-            query_data['q'] = ' '.join(gtf_missed)
-            res = requests.post('https://mygene.info/v3/query', query_data)
-            res_json = res.json()
-        else:
-            # If the query is too long, we will need to break it up into chunks of 1000 query genes (MyGene.info cap)
-            if query_n % 1000 == 0:
-                chunks = query_n / 1000
-            else:
-                chunks = (query_n / 1000) + 1
-            query_chunks = []
-            for i in range(math.ceil(chunks)):
-                start_i, end_i = i*1000, (i+1)*1000
-                query_chunks.append(' '.join(gtf_missed[start_i:end_i]))
-            res_json = []
-            for chunk in query_chunks:
-                query_data['q'] = chunk
-                res = requests.post('https://mygene.info/v3/query', query_data)
-                res_json = res_json+list(res.json())
-        print('Batch query complete:', round(time.time()-query_time, 2), 'seconds')
-
-        for entry in res_json[:len(gtf_missed)]:  # There can be appended entries that are just plain strings.
-            if 'ensembl' in entry:
-                if type(entry['ensembl']) == list:
-                    mapped_names[entry['query']] = entry['ensembl'][0]['gene']  # Only keep the first hit.
-                else:
-                    mapped_names[entry['query']] = entry['ensembl']['gene']
-
-    total_missed = [g for g in gene_symbols if g not in mapped_names]
-    print("Non-matchable names", len(total_missed))
-    return mapped_names, total_missed
-
-
 def meme_id_map(meme_file, gtf_file, species):
     """Takes a meme-file and returns the list of TF gene ids belonging to that TF. Note that it assumes a certain
     syntax for the different motif versions. Species is required for looking up names missing in the
@@ -356,44 +277,6 @@ def concat_df_dict(df_dict, new_col):
             joint_df = pd.concat([joint_df, df_vals], axis=0, ignore_index=True)
     joint_df = joint_df[[new_col] + list(joint_df.columns[:-1])]
     return joint_df
-
-
-def gene_biotypes(gtf_file, gene_set=set()):
-    """
-    Gives a dict of Ensembl IDs with their biotype {g: {gtf: as noted in the gtf, general: manually summarized}.
-    Removes Ensembl ID version suffixes.
-    """
-
-    def biotyper(biotype):
-        """Translates the specific gtf biotypes into more general ones."""
-        if 'pseudogene' in biotype:
-            return 'pseudogene'
-        elif 'RNA' in biotype or biotype == 'ribozyme':
-            return "non-coding RNA"
-        elif 'TR_' in biotype:
-            return 'protein-coding'  #"TcR gene"  # T-cell receptor gene
-        elif 'IG_' in biotype:
-            return 'protein-coding'  #'Ig gene'  # Immunoglobulin variable chain gene
-        elif biotype == 'protein_coding':
-            return 'protein-coding'
-        else:
-            return biotype
-
-    if gtf_file.endswith('.gz'):
-        gtf_opener = gzip.open(gtf_file, 'rt')
-    else:
-        gtf_opener = open(gtf_file)
-    biotype_dict = {}
-    with gtf_opener as gtf_in:
-        for entry in gtf_in:
-            if not entry.startswith('#') and entry.split('\t')[2] == 'gene':
-                ensembl_id = entry.split('\t')[8].split('gene_id "')[-1].split('"; ')[0].split('.')[0]
-                gene_name = entry[8].split('gene_name "')[-1].split('"; ')[0].split('.')[0]
-                if not gene_set or ensembl_id in gene_set or gene_name in gene_set:
-                    gtf_type = entry.split('\t')[8].split('gene_type "')[-1].split('"; ')[0]
-                    biotype_dict[ensembl_id] = {'gtf': gtf_type,
-                                                'general': biotyper(gtf_type)}
-    return biotype_dict
 
 
 def split_row_till_col(row_string, till_col, sep='\t'):

@@ -1,0 +1,1 @@
+{'ENSG00000279493': {'ensembl': 'ENSG00000279493', 'symbol': 'CH507-9B2.2'}, 'ENSG00000279720': {'ensembl': 'ENSG00000279720', 'symbol': 'SOWAHCP2'}, 'ENSG00000160294': {'ensembl': 'ENSG00000160294', 'symbol': 'MCM3AP'}}

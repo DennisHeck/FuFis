@@ -1,0 +1,29 @@
+  source      native                                      name   p_value  \
+0  GO:MF  GO:0030169  low-density lipoprotein particle binding  0.004557   
+1  GO:BP  GO:0001568                  blood vessel development  0.005963   
+2  GO:BP  GO:0001944                   vasculature development  0.007327   
+
+   significant                                        description  term_size  \
+0         True  "Binding to a low-density lipoprotein particle...         16   
+1         True  "The process whose specific outcome is the pro...        721   
+2         True  "The process whose specific outcome is the pro...        752   
+
+   query_size  intersection_size  effective_domain_size  precision    recall  \
+0          10                  2                  20212   0.200000  0.125000   
+1           9                  5                  21031   0.555556  0.006935   
+2           9                  5                  21031   0.555556  0.006649   
+
+     query                   parents  \
+0  query_1              [GO:0071813]   
+1  query_1  [GO:0001944, GO:0048856]   
+2  query_1  [GO:0048731, GO:0072359]   
+
+                                       intersections  \
+0                 [ENSG00000140945, ENSG00000169174]   
+1  [ENSG00000140945, ENSG00000122691, ENSG0000016...   
+2  [ENSG00000140945, ENSG00000122691, ENSG0000016...   
+
+                                           evidences  Gene fraction  
+0                                [[IDA], [ISS, IEA]]            0.2  
+1  [[IDA, IBA], [NAS], [IDA, ISS, IEA], [TAS, IEA...            0.5  
+2  [[IDA, IBA], [NAS], [IDA, ISS, IEA], [TAS, IEA...            0.5  

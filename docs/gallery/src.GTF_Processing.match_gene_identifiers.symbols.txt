@@ -1,0 +1,1 @@
+{'AXL': {'ensembl': 'ENSG00000167601', 'entrezgene': '558'}, 'MYO10': {'ensembl': 'ENSG00000145555', 'entrezgene': '4651'}, 'ATP5SL': {'ensembl': 'ENSG00000105341', 'entrezgene': '55101'}}

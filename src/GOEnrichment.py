@@ -5,18 +5,34 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
-def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', font_s=16, organism='hsapiens', numerate=False,
-                  background=None, godf_only=False, cmap='plasma', fig_width=None, fig_height=None, legend_out=None,
-                  wanted_sources=['GO:MF', 'GO:BP', 'KEGG', 'REAC', 'HP', 'WP'], keywords={}, rotation=45,
-                  custom_dfs=None):
-    """Requires a dictionary with sets of genes. Will run GO enrichment for each of the sets. There will be written
-    one plot for each GO source.
-    @param max_terms: Allow a maximum of max_terms per dict key. Use 'all' to get all.
-    @param go_genes: {class: [class genes] for class in classes}
-    @param background: Same as go_genes but holding the set of background genes for each entry in go_genes.
-    @param custom_dfs: {gene set: {go_source: DF}}; In case an external df was used or a g:Profiler was customized,
-    to just use the plotting part. Must have the same format as the g:Profiler DFs.
-    @param out_tag: Will be appended by GO source + .pdf"""
+def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism='hsapiens', background=None,
+                  numerate=False, godf_only=False, wanted_sources=['GO:MF', 'GO:BP', 'KEGG', 'REAC', 'HP', 'WP'],
+                  keywords={}, cmap='plasma', fig_width=None, fig_height=None, legend_out=None, rotation=45, font_s=16,
+                  custom_dfs=None, formats=['pdf']):
+    """Requires a dictionary with sets of genes. Will run GO enrichment for each of the sets. One plot will be written
+    for each GO source. For only one gene set uses the x-axis for indicating the FDR, multiple sets will be
+    separated on the x-axis and the FDR value shown as colour. Note, root terms of the databases are manually
+    filtered out (e.g., HP root), but some might be missed. Uses the Python package of g:Profiler:
+     https://biit.cs.ut.ee/gprofiler/gost.
+
+    Args:
+        go_genes: {class: [class genes] for class in classes}, or as sets. Safest identifiers are Ensembl IDs.
+        max_terms: Allow a maximum of max_terms per dict key. Use 'all' to get all.
+        organism: 'hsapiens' for human, 'mmusculus' for mouse. Check the g:Profiler page for all options.
+        background: Same as go_genes but holding the set of background genes for each entry in go_genes. The keys of
+            the two dictionaries will be matched. Leave empty to not use any background.
+        numerate: Show the size of the gene sets in parentheses on the x-axis.
+        godf_only: Skip the plotting step and only return the df.
+        wanted_sources: Which databases to plot.
+        keywords: A dictionary of {source: list of keywords}, e.g. {GO:BP: ['vascular', 'angio']}, to limit the
+            plot to terms containing any of the listed strings. Capitalization doesn't matter, string comparison is done
+            on the lowered strings.
+        custom_dfs: Very specific use case. {gene set: {go_source: DF}}; In case an external df was used or
+            a g:Profiler was customized, to just use the plotting part. Must have the same format as the g:Profiler DFs.
+
+    Returns:
+        - Returns a dict of {key df} with a df for each gene set as provided by the gprofiler package, which includes which genes matched to which terms.
+    """
     keywords = {k: [t.lower() for t in vals] for k, vals in keywords.items()}  # We compare lower strings.
     cmap = cm.get_cmap(cmap)
     norm = plt.Normalize(0, 0.05)
@@ -151,9 +167,11 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', font_s=16
                 leg = plt.legend([h3], [str(round(max(size_col), 4))], loc="upper right", markerscale=1, scatterpoints=1,
                            fontsize=font_s - 6, title="Gene fraction", bbox_to_anchor=(legend_out if legend_out else x_offset+0.5, 1))
             leg.get_title().set_fontsize(11)
-
-            f.savefig((out_tag + "_" + source + "_max"+str(max_terms)+".pdf").replace(' ', ''),
-                      bbox_inches='tight')
+            if type(formats) != list:
+                formats = [formats]
+            for form in formats:
+                f.savefig((out_tag + "_" + source + "_max"+str(max_terms)+"."+form).replace(' ', '').replace(':', ''),
+                          bbox_inches='tight', format=form)
             plt.close()
 
         else:

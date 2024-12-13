@@ -1,0 +1,11 @@
+                   Gene name  #TSS  #Transcripts  Gene length  Exons length  \
+Ensembl ID                                                                    
+ENSG00000160294       MCM3AP    10            10        51164          9542   
+ENSG00000279493  CH507-9B2.2     1             1         5346           509   
+ENSG00000279720     SOWAHCP2     1             1          500           500   
+
+                          Biotype gtf Biotype general  Gene density  
+Ensembl ID                                                           
+ENSG00000160294        protein_coding  protein-coding             0  
+ENSG00000279493        protein_coding  protein-coding             0  
+ENSG00000279720  processed_pseudogene      pseudogene             0  

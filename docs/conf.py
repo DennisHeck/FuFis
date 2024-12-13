@@ -23,6 +23,7 @@ sys.path.insert(0, os.path.abspath('../'))
 sys.path.insert(0, os.path.abspath('../src/'))
 
 import sphinx_rtd_theme
+import docs.DocGenerator
 
 # -- General configuration ------------------------------------------------
 
@@ -48,13 +49,15 @@ extensions = ['sphinx.ext.todo',
 
 basicplotter_mocks = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
                         'Patch', 'matplotlib_venn', 'matplotlib.ticker', 'matplotlib.colors',
-                        'itertools', 'chain', 'upsetplot', 'collections', 'Counter',
+                        'itertools', 'chain', 'upsetplot', 'collections', 'Counter', 'requests', 'time',
                         'pandas.api.types', 'is_string_dtype', 'matplotlib.lines', 'Line2D', 'mpatches', 'adjustText',
                         'adjust_text', 'seaborn', 'scipy.stats', 'scipy', 'ColoursAndShapes', 'to_hex']
 
-gtf_processing_mocks = ['pybedtools', 'BedTool', 'gzip', 'itertools', 'chain']
+gtf_processing_mocks = ['pybedtools', 'BedTool', 'gzip', 'itertools', 'chain', 'collections', 'Counter', 'pandas']
 
-autodoc_mock_imports = list(set(basicplotter_mocks + gtf_processing_mocks))
+goenrichment_mocks = ['gprofiler', 'GProfiler', 'matplotlib', 'cm', 'matplotlib.lines', 'Line2D', "pyplot", 'plt', 'numpy']
+
+autodoc_mock_imports = list(set(basicplotter_mocks + gtf_processing_mocks + goenrichment_mocks))
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),

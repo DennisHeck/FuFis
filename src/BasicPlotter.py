@@ -62,7 +62,7 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
         ax.get_legend().remove()
     plt.title(title, fontsize=font_s+4, fontweight='bold')
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig((output_path + '_'.join([str(x_col), str(y_col)]) + '_Bars.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
@@ -106,7 +106,7 @@ def jitter_bars(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=None,
         plt.xticks(rotation=rotation, ha='center')
     plt.title(title, fontsize=22, fontweight='bold', y=1.01)
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig((output_path + str(x_col) + '_' + str(y_col) + '_' + str(hue_col) + '_JitterBars.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
@@ -189,7 +189,7 @@ def stacked_bars(plot_df, x_col, y_cols, y_label='', title=None, output_path='',
         ax.tick_params(axis='x', rotation=rotation)
     plt.title(title, fontsize=font_s+4, fontweight='bold')
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig((output_path + '_'.join([str(x_col), str(y_label)]) + '_'+"Frac"*fraction+'StackedBars.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
@@ -256,7 +256,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
         plt.axvline(pos, color="#a7a8a7", linestyle="--")
     plt.title(title, fontsize=font_s+4, fontweight='bold')
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig((output_path + str(x_col) + '_' + str(hue_col) + '_Hist.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
@@ -301,7 +301,7 @@ def basic_2Dhist(plot_df, columns, hue_col=None, hue_order=None, bin_num=200, ti
         ax.axline((0, 0), slope=-1 if diagonal == -1 else 1, linestyle='dotted', color='grey')
     plt.title(title, fontsize=18, fontweight='bold')
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig((output_path + columns[0] + "_" + columns[1] + '_' + str(hue_col) + '_2DHist.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
@@ -372,7 +372,7 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
         ax.get_legend().remove()
     plt.title(title, fontsize=22, fontweight='bold', y=1.02)
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig((output_path + str(x_col) + '_' + str(y_col) + '_' + str(hue_col) + '_Violin.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
@@ -407,7 +407,7 @@ def basic_pie(plot_df, title='', palette=None, numerate=True, legend_perc=True, 
               bbox_to_anchor=(1, 0, 0.5, 1))
     ax.set_title(title + ('\n#' + str(plot_df.sum().values[0])) * numerate, fontsize=14, y=1)
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig(output_path + str(plot_df.columns[0]).replace(' ', '_') + "_PieChart."+form, bbox_inches='tight',
                   format=form)
@@ -541,7 +541,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         plt.title('spear_r='+str(round(spear_r, 3)), fontsize=font_s+4)
 
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig((output_path + str(score_cols[0])+'Vs'+str(score_cols[1])+'_'+str(colour_col)+'_marker'+str(marker_col)+'.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
@@ -595,7 +595,7 @@ def venn_from_list(plot_list, label_list, plot_path, blob_colours=ColoursAndShap
             text.set_fontsize(number_size)
     plt.title(title, size=16, y=1.15)
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         plt.savefig((plot_path + title + '_Venn.'+form).replace(' ', ''), bbox_inches='tight', format=form)
     plt.close('All')
@@ -656,7 +656,7 @@ def upset_plotter(inter_sets, max_groups=None, sort_by='cardinality', y_label='I
     ax.set_ylabel(y_label)
     ax.set_title("UpSet " + title_tag + '\n#' + str(len(intersection)), fontsize=16, fontweight='bold', y=1.05)
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         plt.savefig((plot_path + '_UpSet.'+form).replace(' ', ''), bbox_inches='tight', format=form)
     plt.close()
@@ -732,7 +732,7 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
             plt.legend(fontsize=14)
     plt.title(title, fontsize=18, fontweight='bold', y=1.05)
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig((output_path + "Volcano_" + str(x_col) + '_minuslog10' + str(y_col) + '.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
@@ -764,7 +764,7 @@ def fisher_test_table(fisher_table, fisher_rows, fisher_cols, title='', output_p
     plt.title(title + '\nFisher p-value: ' + str(round(pval, 5)) + '\nlog2(oddsratio): ' + str(round(fish_stat, 5)),
               fontsize=16)
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         f.savefig(output_path+('FisherTable_'+'_'.join(fisher_rows+fisher_cols)).replace(' ', '')+'.'+form,
                   bbox_inches='tight', format=form)
