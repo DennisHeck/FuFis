@@ -3,6 +3,8 @@
 ##contact: gencode-help@ebi.ac.uk
 ##format: gtf
 ##date: 2021-03-12
+chr21	HAVANA	gene	500	2000	.	+	.	gene_id "ENSG0000MOCK1"; gene_type "protein_coding"; gene_name "CH507-9B2.2"; level 2; havana_gene "OTTHUMG00000189354.1";
+chr21	HAVANA	gene	1000	2000	.	+	.	gene_id "ENSG0000MOCK2"; gene_type "protein_coding"; gene_name "CH507-9B2.2"; level 2; havana_gene "OTTHUMG00000189354.1";
 chr21	HAVANA	gene	5011799	5017145	.	+	.	gene_id "ENSG00000279493.1"; gene_type "protein_coding"; gene_name "CH507-9B2.2"; level 2; havana_gene "OTTHUMG00000189354.1";
 chr21	HAVANA	gene	5022493	5040666	.	+	.	gene_id "ENSG00000277117.5"; gene_type "protein_coding"; gene_name "CH507-9B2.1"; level 2; havana_gene "OTTHUMG00000189355.2";
 chr21	HAVANA	gene	5073458	5087867	.	+	.	gene_id "ENSG00000279687.1"; gene_type "lncRNA"; gene_name "CH507-9B2.8"; level 2; havana_gene "OTTHUMG00000189356.1";

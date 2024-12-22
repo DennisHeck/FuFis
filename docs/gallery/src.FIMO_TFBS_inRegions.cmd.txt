@@ -1,0 +1,1 @@
+python3 src/FIMO_TFBS_inRegions.py --bed_file ExampleData/chr21_MockPeaks.bed --PWMs ExampleData/Jaspar_Hocomoco_Kellis_human_meme.txt --fasta ExampleData/chr21_MiniMock.fa --fimo_src fimo --out_dir docs/gallery/FIMO_inRegions --write_sequence False

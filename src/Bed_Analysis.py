@@ -133,7 +133,7 @@ def gene_location_bpwise(bed_dict, gtf_file, plot_path, tss_type='5', external_b
     return regions_locs, total_locs
 
 
-def inter_heatmap(bed_dict, region_label, plot_path, annot_nums=True, x_size=16, y_size=10, annot_s=15, col_beds=None,
+def intersection_heatmap(bed_dict, region_label, plot_path, annot_nums=True, x_size=16, y_size=10, annot_s=15, col_beds=None,
                   row_beds=None, inter_thresh=1e-9, cmap='plasma', num_cmap='Blues', pickle_path='', tmp_dir='',
                   wspace=0.1, hspace=0.1, width_ratios=[0.01, 0.05, 0.96], height_ratios=[0.05, 0.97], font_s=16,
                   formats=['pdf']):
@@ -156,7 +156,8 @@ def inter_heatmap(bed_dict, region_label, plot_path, annot_nums=True, x_size=16,
         num_cmap: Colourmap for the total number of regions.
         pickle_path: Path where a pickle object will be stored. If it already exists will be loaded instead to
             skip the intersection steps. If not given will store it in plot_path.
-        tmp_dir: Optional path for temporary files created by pybedtools.
+        tmp_dir: Optional path for temporary files created by pybedtools. CARE: If your outer function already uses
+            the same tmp_dir for pybedtools, the objects in there will be deleted.
         wspace: Vertical whitespace between plot elements.
         hspace: Horizontal whitespace between plot elements.
         width_ratios: Control the width ratios of the sub-parts of the plot, meaning the colourbar for the total
@@ -199,8 +200,7 @@ def inter_heatmap(bed_dict, region_label, plot_path, annot_nums=True, x_size=16,
                 bed1 = pybedtools.BedTool('\n'.join(['\t'.join(x.fields[:3]).replace('chr', '') for x in bed_formatted[pair[0]]]), from_string=True)
                 bed2 = pybedtools.BedTool('\n'.join(['\t'.join(x.fields[:3]).replace('chr', '') for x in bed_formatted[pair[1]]]), from_string=True)
                 shared = len(bed1.intersect(bed2, u=True, f=inter_thresh))
-                if tmp_dir:
-                    pybedtools.helpers.cleanup(verbose=False, remove_all=False)
+
             bed_shared_frac[row_beds.index(pair[0])][col_beds.index(pair[1])] = 0 if not len(bed_formatted[pair[0]]) else shared / len(bed_formatted[pair[0]])
             bed_shared_abs[row_beds.index(pair[0])][col_beds.index(pair[1])] = str(shared)
         intersection_storage['bed_shared_frac'] = bed_shared_frac
@@ -208,6 +208,8 @@ def inter_heatmap(bed_dict, region_label, plot_path, annot_nums=True, x_size=16,
         intersection_storage['row_beds'] = row_beds  # To guarantee the same order from the object.
         intersection_storage['col_beds'] = col_beds
         pickle.dump(intersection_storage, open(pickle_path, 'wb'))
+        if tmp_dir:
+            pybedtools.helpers.cleanup(verbose=False, remove_all=False)
     else:
         print("Loading existing pickle file")
         intersection_storage = pickle.load(open(pickle_path, 'rb'))
@@ -232,7 +234,7 @@ def inter_heatmap(bed_dict, region_label, plot_path, annot_nums=True, x_size=16,
     # Get the boundaries jointly for the row_ and col_counts.
     count_min = min([intersection_storage['bed_colcounts'].min().min(), intersection_storage['bed_rowcounts'].min().min()])
     count_max = max([intersection_storage['bed_colcounts'].max().max(), intersection_storage['bed_rowcounts'].max().max()])
-    rowcount_heat = sns.heatmap(intersection_storage['bed_rowcounts'], cmap=num_cmap, ax=axes[1][1], xticklabels=False, rasterized=True,
+    rowcount_heat = sns.heatmap(intersection_storage['bed_rowcounts'], cmap=num_cmap, ax=axes[1][1], xticklabels=False, rasterized=False,
                                 yticklabels=False, cbar=False, fmt='', annot=intersection_storage['bed_rowcounts'], annot_kws={'size': font_s-2},
                                 square=False, vmin=count_min, vmax=count_max)
     cobar = f.colorbar(axes[1][1].get_children()[0], cax=axes[1][0], orientation="vertical",
@@ -243,7 +245,7 @@ def inter_heatmap(bed_dict, region_label, plot_path, annot_nums=True, x_size=16,
     cobar.ax.yaxis.set_ticks_position('left')
     cobar.ax.ticklabel_format(style='plain')
     if row_beds != col_beds:
-        colcount_heat = sns.heatmap(intersection_storage['bed_colcounts'], cmap=num_cmap, ax=axes[0][2], xticklabels=False, rasterized=True,
+        colcount_heat = sns.heatmap(intersection_storage['bed_colcounts'], cmap=num_cmap, ax=axes[0][2], xticklabels=False, rasterized=False,
                                     yticklabels=False, cbar=True, fmt='', annot=intersection_storage['bed_colcounts'], annot_kws={'size': font_s-2},
                                     square=False, cbar_kws={'label': "", 'pad': 0.01, 'shrink': 0})
         colcount_heat.collections[0].colorbar.ax.remove()  # Only needed it to align to the intersection heatmap.

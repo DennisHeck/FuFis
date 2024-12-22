@@ -3,45 +3,72 @@ import os
 import gzip
 import numpy as np
 import subprocess
-import GTF_Processing
+from pybedtools import BedTool
 import Various
 
 
-def genome_lifter(region_list, input_version, output_version):
+def genome_lifter(regions, input_version, output_version, same_chr=True, size_change=2):
     """
-    @param region_list: Takes a list of regions with [chr, start, end, ...] and returns a list of all successful hits,
-    based on the converter object given. Only keeps regions if they are mapped to the same chromosome.
-    Additional columns are kept. The chr can be w/ or w/o the 'chr' prefix, the original chr will be retained.
-    @param input_version: Genome version of the entries in region_list.
-    @param output_version: Genome version region_list should be lifted to.
-    e.g. from hg19 to hg38 input_version=hg19, output_version=hg38
+    Takes a list of regions and returns a list of all successful lifted regions,
+    based on the converter object given. Strand is not considered. The chr can be w/ or w/o the 'chr' prefix,
+    the original chr will be retained.
+
+    Args:
+        regions: Either the path to a bed-file (without header or with the first line starting with #), a BedTool's
+            objects or a list of regions with [chr, start, end, ...]. Any additional columns are kept.
+        input_version: Genome version of the entries in region_list. E.g., "hg19".
+        output_version: Genome version region_list should be lifted to. E.g., "hg38".
+        same_chr: Boolean if regions should only be lifted if they remain on the same chromosome. Yes, lifting may
+            change the chromosome.
+        size_change: Multiplier by how much the original region size is allowed to change. E.g., 2 means that a 100 bp
+            region is allowed to be 200 bp after lifting, the region will be skipped otherwise.
+
+    Returns:
+        tuple:
+            - **lifted_regions**: List of regions lifted to output_version.
+            - **unliftable**: List of regions that could not be lifted with their coordinates still in the input genome version.
     """
+
+    if type(regions) != list:
+        region_list = [x.fields for x in BedTool(regions)]
+    else:
+        region_list = regions
 
     converter = get_lifter(input_version, output_version)
     lifted_regions = []
+    unliftable = []
     for region in region_list:
         chro, start, end = region[:3]
         chro = str(chro)
         if '_' in chro:  # For those fun scaffold like chrUn_KI270467v1.
+            unliftable += region
             continue
         try:
             new_start = converter[chro][int(float(start))]
             new_end = converter[chro][int(float(end))]
         except KeyError:  # In cases where we got the weird scaffolds.
+            unliftable += region
             continue
         # The conversion failed if one position is not liftable and when the strands differ. We add as condition
         # that the lifted region does not exceed a size of twice the original region, and that it's on the same chr.
-        if len(new_start) > 0 and len(new_end) > 0 and new_start[0][2] == new_end[0][2] and abs(
-                new_end[0][1] - new_start[0][1]) <= 2 * (int(float(end)) - int(float(start))) \
-                and chro.replace('chr', '') == new_start[0][0].replace('chr', '') \
-                and chro.replace('chr', '') == new_end[0][0].replace('chr', ''):
+        if not (len(new_start) > 0 and len(new_end) > 0 and new_start[0][2] == new_end[0][2]):
+            unliftable += region
+            continue
+        if same_chr:
+            if not (chro.replace('chr', '') == new_start[0][0].replace('chr', '')
+                    and chro.replace('chr', '') == new_end[0][0].replace('chr', '')):
+                unliftable += region
+                continue
+        if abs(new_end[0][1] - new_start[0][1]) <= (size_change * (int(float(end)) - int(float(start)))):
             if new_end[0][1] > new_start[0][1]:  # The conversion sometimes maps to the minus strand, mixing locs.
                 lifted_regions.append([chro, str(new_start[0][1]), str(new_end[0][1])] + region[3:])
             else:
                 # On the minus strand we have to +1 and reverse start and end to match the UCSC lift.
                 lifted_regions.append([chro, str(new_end[0][1] + 1), str(new_start[0][1] + 1)] + region[3:])
+        else:
+            unliftable += region
 
-    return lifted_regions
+    return lifted_regions, unliftable
 
 
 def abc_lifter(abc_folder, lift_folder, input_version, output_version, output_gtf, tss_mode="5"):

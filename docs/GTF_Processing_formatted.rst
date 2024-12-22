@@ -38,6 +38,45 @@ To run the example code for this module, we will always start with this block of
 .. include:: gallery/src.GTF_Processing.gene_feature_table.txt
     :literal:
 
+.. autofunction:: GTF_Processing.match_gene_identifiers
+
+.. code-block:: python
+
+    # The best task of all, map different identifiers. Let's start with Ensembl IDs to gene symbols, which can often
+    # be successfully done by a gtf-file alone.
+    gene_ids = ['ENSG00000160294', 'ENSG00000279493', 'ENSG00000279720']
+    mapped_ids, missed_ids = GTF_Processing.match_gene_identifiers(gene_ids, gtf_file=annotation, species='human',
+                                                                   fields="symbol")
+    print(mapped_ids)
+    
+
+.. include:: gallery/src.GTF_Processing.match_gene_identifiers.ensembl.txt
+    :literal:
+
+.. code-block:: python
+
+    # Next we start from symbols, which is more prone to failing. We can also query for the Entrez ID.
+    gene_symbols = ['AXL', 'MYO10', 'ATP5SL']
+    mapped_symbols, missed_symbols = GTF_Processing.match_gene_identifiers(gene_symbols, gtf_file=annotation, species='human',
+                                                                           fields="ensembl,entrezgene")
+    print(mapped_symbols)
+    
+
+.. include:: gallery/src.GTF_Processing.match_gene_identifiers.symbols.txt
+    :literal:
+
+.. code-block:: python
+
+    # If we want to lookup Entrez IDs, we have to add entrezgene to the scope in which mygene looks.
+    gene_entrez = [4651, 558]
+    mapped_entrez, missed_entrez = GTF_Processing.match_gene_identifiers(gene_entrez, gtf_file=annotation, species='human',
+                                                                         scopes='symbol,entrezgene', fields="ensembl")
+    print(mapped_entrez)
+    
+
+.. include:: gallery/src.GTF_Processing.match_gene_identifiers.entrez.txt
+    :literal:
+
 
 .. autofunction:: GTF_Processing.gene_body_bed
 
@@ -79,44 +118,7 @@ To run the example code for this module, we will always start with this block of
     :literal:
 
 
-.. autofunction:: GTF_Processing.match_gene_identifiers
 
-.. code-block:: python
-
-    # The best task of all, map different identifiers. Let's start with Ensembl IDs to gene symbols, which can often
-    # be successfully done by a gtf-file alone.
-    gene_ids = ['ENSG00000160294', 'ENSG00000279493', 'ENSG00000279720']
-    mapped_ids, missed_ids = GTF_Processing.match_gene_identifiers(gene_ids, gtf_file=annotation, species='human',
-                                                                   fields="symbol")
-    print(mapped_ids)
-    
-
-.. include:: gallery/src.GTF_Processing.match_gene_identifiers.ensembl.txt
-    :literal:
-
-.. code-block:: python
-
-    # Next we start from symbols, which is more prone to failing. We can also query for the Entrez ID.
-    gene_symbols = ['AXL', 'MYO10', 'ATP5SL']
-    mapped_symbols, missed_symbols = GTF_Processing.match_gene_identifiers(gene_symbols, gtf_file=annotation, species='human',
-                                                                           fields="ensembl,entrezgene")
-    print(mapped_symbols)
-    
-
-.. include:: gallery/src.GTF_Processing.match_gene_identifiers.symbols.txt
-    :literal:
-
-.. code-block:: python
-
-    # If we want to lookup Entrez IDs, we have to add entrezgene to the scope in which mygene looks.
-    gene_entrez = [4651, 558]
-    mapped_entrez, missed_entrez = GTF_Processing.match_gene_identifiers(gene_entrez, gtf_file=annotation, species='human',
-                                                                         scopes='symbol,entrezgene', fields="ensembl")
-    print(mapped_entrez)
-    
-
-.. include:: gallery/src.GTF_Processing.match_gene_identifiers.entrez.txt
-    :literal:
 
 
 .. autofunction:: GTF_Processing.gene_biotypes

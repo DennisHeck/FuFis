@@ -11,7 +11,7 @@ import pandas as pd
 def bed_to_length_dict(bedobj):
     """
     Takes a bedtools object with an identifier (Ensembl ID) in the fourth column, and sums the length of all
-    regions of that gene.
+    regions of that gene. Used by other functions.
     """
     length_dict = {}
     for entry in bedobj:
@@ -39,7 +39,7 @@ def gene_window_bed(gtf_file, extend=200, gene_set=set(), tss_type='5', dict_onl
     """
     Based on a gtf file fetches all or the most 5' TSS for all genes, and returns a BedTool object with windows
     around the TSS, expanding by 'extend' in each direction, resulting in a total window size of 2*'extend'+1.
-    Alternatively gives a dictionary with the TSS.
+    Alternatively gives a dictionary with the TSS, also containing the number of transcripts, gene name and strand.
     The BedTools intervals will be 0-based, the TSS in the dictionary still 1-based like in the gtf-file.
     Care: removes the .-suffixes from all gene IDs.
 
@@ -50,7 +50,7 @@ def gene_window_bed(gtf_file, extend=200, gene_set=set(), tss_type='5', dict_onl
             genes in the annotation.
         tss_type: "5" to get only the 5' TSS or "all" to get all unique TSS of all transcripts in the gtf-file
         dict_only: Returns a dictionary instead of a BedTool's object.
-        merge: If True, merges all intersecting promoter of the same gene into one row in the BedTool's object.
+        merge: If True, merges all overlapping promoters of the same gene into one row in the BedTool's object.
         open_regions: Optional bed file or BedTools' object, only overlapping parts of promoters will be kept for the
             BedTool's object.
     """
@@ -109,7 +109,9 @@ def gene_window_bed(gtf_file, extend=200, gene_set=set(), tss_type='5', dict_onl
                                               in open(open_regions).readlines() if not x.startswith('#')]), from_string=True)
         promoter_bed = promoter_bed.intersect(open_regions)
 
-    if merge:  # Flip the chr and geneID column to merge promoter of the same gene, and afterwards flip again.
+    if merge:  # Flip the chr and Ensembl ID column to merge promoter of the same gene, and afterwards flip again.
+        # Due to using the Ensembl ID as the first coordinate we don't need to consider the strand for merging (relying
+        # on the annotations putting a gene only on one strand exclusively).
         promoter_bed = BedTool('\n'.join(['\t'.join([x.fields[3], x.fields[1], x.fields[2], x.fields[0], x.fields[4], x.fields[5]]) for x in promoter_bed]), from_string=True).sort().merge(c=[4, 5, 6], o='distinct')
         promoter_bed = BedTool('\n'.join(['\t'.join([x.fields[3], x.fields[1], x.fields[2], x.fields[0], x.fields[4], x.fields[5]]) for x in promoter_bed]), from_string=True)
 
@@ -167,8 +169,7 @@ def gene_feature_bed(gtf_file, feature, gene_set=set(), dict_only=False, merge=T
         merge: Merge the features per gene.
         dict_only: Return a dict instead.
         length_only: Return a dict with {gene: feature_len}, only makes sense with merge=True.
-        keep_strand: Whether the strand should be kept as information. CARE: merging and keep_strand together is not
-            properly tested.
+        keep_strand: Whether the strand should be kept as information.
     """
     if not merge and length_only:
         print("WARNING: Getting length without merging")
@@ -198,7 +199,8 @@ def gene_feature_bed(gtf_file, feature, gene_set=set(), dict_only=False, merge=T
 
     feature_bed = BedTool('\n'.join(['\t'.join(x) for x in hits]), from_string=True)
 
-    if merge:  # Flip the chr and geneID column to merge features of the same gene, and afterwards flip again.
+    if merge:  # Flip the chr and Ensembl ID column to merge features of the same gene, and afterwards flip again.
+        # We can ignore the strand for merging when using the Ensembl ID as first coordinate.
         if keep_strand:
             feature_bed = BedTool('\n'.join(['\t'.join([x.fields[3], x.fields[1], x.fields[2], x.fields[0], x.fields[4], x.fields[5]]) for x in feature_bed]), from_string=True).sort().merge(c=4, o='distinct')
             feature_bed = BedTool('\n'.join(['\t'.join([x.fields[3], x.fields[1], x.fields[2], x.fields[0], x.fields[4], x.fields[5]]) for x in feature_bed]), from_string=True)
@@ -295,7 +297,7 @@ def gene_biotypes(gtf_file, gene_set=set()):
 def match_gene_identifiers(gene_identifiers, gtf_file='', species='human', scopes="symbol,alias,uniprot",
                            fields="ensembl,symbol", ensemblonly=False, return_full=False):
     """
-    Takes a list of gene identifiers to map to a different type of identifie or multiple identifiers. For Ensembl IDs
+    Takes a list of gene identifiers to map to a different type of identifier or multiple identifiers. For Ensembl IDs
     and symbols first check in a gtf-file, all not found there are queried via the API of https://mygene.info/
     (how to cite: https://mygene.info/citation/). See the documentation of mygene for further specifications
     of the options: https://docs.mygene.info/en/latest/doc/query_service.html. Note, there might be cases where
@@ -316,7 +318,7 @@ def match_gene_identifiers(gene_identifiers, gtf_file='', species='human', scope
     Returns:
         tuple:
             - **mapped_identifiers**: Dict of {identifier: {field: field ID for each field}} of the mappable identifiers.
-            -**no_hits**: Identifiers which were not mappable via gtf-file nor mygene.info.
+            - **no_hits**: Identifiers which were not mappable via gtf-file nor mygene.info.
     """
     gene_identifiers = [str(x) for x in gene_identifiers]  # In case IDs are given as IDs.
     available_species = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish', 'thale-cress', 'frog' and 'pig']

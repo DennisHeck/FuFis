@@ -1,0 +1,4 @@
+               FOXH1  REST  PLAG1
+region                           
+ENSG0000MOCK1      1     1      0
+ENSG0000MOCK2      0     0      1

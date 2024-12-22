@@ -30,6 +30,29 @@ To run the example code for this module, we will always start with this block of
 .. include:: gallery/src.GTF_Processing.gene_feature_table.txt
     :literal:
 
+.. autofunction:: GTF_Processing.match_gene_identifiers
+
+.. code-block:: python
+
+    *GTF_Processing.match_gene_identifiers.ensembl*
+
+.. include:: gallery/src.GTF_Processing.match_gene_identifiers.ensembl.txt
+    :literal:
+
+.. code-block:: python
+
+    *GTF_Processing.match_gene_identifiers.symbols*
+
+.. include:: gallery/src.GTF_Processing.match_gene_identifiers.symbols.txt
+    :literal:
+
+.. code-block:: python
+
+    *GTF_Processing.match_gene_identifiers.entrez*
+
+.. include:: gallery/src.GTF_Processing.match_gene_identifiers.entrez.txt
+    :literal:
+
 
 .. autofunction:: GTF_Processing.gene_body_bed
 
@@ -61,28 +84,7 @@ To run the example code for this module, we will always start with this block of
     :literal:
 
 
-.. autofunction:: GTF_Processing.match_gene_identifiers
 
-.. code-block:: python
-
-    *GTF_Processing.match_gene_identifiers.ensembl*
-
-.. include:: gallery/src.GTF_Processing.match_gene_identifiers.ensembl.txt
-    :literal:
-
-.. code-block:: python
-
-    *GTF_Processing.match_gene_identifiers.symbols*
-
-.. include:: gallery/src.GTF_Processing.match_gene_identifiers.symbols.txt
-    :literal:
-
-.. code-block:: python
-
-    *GTF_Processing.match_gene_identifiers.entrez*
-
-.. include:: gallery/src.GTF_Processing.match_gene_identifiers.entrez.txt
-    :literal:
 
 
 .. autofunction:: GTF_Processing.gene_biotypes

@@ -40,20 +40,23 @@ To run the example code for this module, we will always start with this block of
    :width: 45%
 
 
-.. autofunction:: Bed_Analysis.inter_heatmap
+.. autofunction:: Bed_Analysis.intersection_heatmap
+
+.. image:: gallery/IGV_MultiBed.png
+   :width: 90%
 
 .. code-block:: python
 
-    # For the example, let's create three BedTool object. The first one with three large regions, the second repeating
-    # two of those regions, and the last having multiple small regions inside one of those.
+    # For the example, let's create three BedTool object that match the image above. The first one with three large regions,
+    # the second repeating two of those regions, and the last having multiple small regions inside one of those.
     large_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000', 'chr1\t4000\t5000']), from_string=True)
     subset_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000']), from_string=True)
-    small_regions = BedTool('\n'.join(['chr1\t1\t10', 'chr1\t11\t20', 'chr1\t21\t30']), from_string=True)
-    multi_bed_dict = {'Large peaks': large_regions,
-                      'Subset peaks': subset_regions,
-                      'Small peaks': small_regions}
-    Bed_Analysis.inter_heatmap(multi_bed_dict, region_label='peaks', plot_path=out_dir, annot_nums=True,  x_size=10, y_size=7,
-                               wspace=1, hspace=0.6, width_ratios=[0.05, 0.05, 0.96], height_ratios=[0.05, 0.97], formats=['png'])
+    small_regions = BedTool('\n'.join(['chr1\t100\t300', 'chr1\t400\t600', 'chr1\t700\t900']), from_string=True)
+    multi_bed_dict = {'Large regions': large_regions,
+                      'Subset regions': subset_regions,
+                      'Small regions': small_regions}
+    Bed_Analysis.intersection_heatmap(multi_bed_dict, region_label='peaks', plot_path=out_dir, annot_nums=True,  x_size=10, y_size=7,
+                               wspace=1.3, hspace=0.7, width_ratios=[0.05, 0.05, 0.96], height_ratios=[0.05, 0.97], formats=['png'])
     
 
 .. image:: gallery/_MultiIntersectHeat.png
@@ -70,11 +73,11 @@ To run the example code for this module, we will always start with this block of
     # peaks overlaps with both the large regions and the small regions, and one only with the large regions.
     large_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000', 'chr1\t4000\t5000']), from_string=True)
     subset_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000']), from_string=True)
-    small_regions = BedTool('\n'.join(['chr1\t1\t10', 'chr1\t11\t20', 'chr1\t21\t30']), from_string=True)
-    multi_bed_dict = {'Large peaks': large_regions,
-                      'Subset peaks': subset_regions,
-                      'Small peaks': small_regions}
-    Bed_Analysis.upset_to_reference(bed_files=multi_bed_dict, ref_tag='Subset peaks', y_label='Intersecting regions',
+    small_regions = BedTool('\n'.join(['chr1\t100\t300', 'chr1\t400\t600', 'chr1\t700\t900']), from_string=True)
+    multi_bed_dict = {'Large regions': large_regions,
+                      'Subset regions': subset_regions,
+                      'Small regions': small_regions}
+    Bed_Analysis.upset_to_reference(bed_files=multi_bed_dict, ref_tag='Subset regions', y_label='Intersecting regions',
                                     plot_path=out_dir, formats=['png'])
     
 

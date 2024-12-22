@@ -26,11 +26,14 @@ To run the example code for this module, we will always start with this block of
    :width: 45%
 
 
-.. autofunction:: Bed_Analysis.inter_heatmap
+.. autofunction:: Bed_Analysis.intersection_heatmap
+
+.. image:: gallery/IGV_MultiBed.png
+   :width: 90%
 
 .. code-block:: python
 
-    *Bed_Analysis.inter_heatmap*
+    *Bed_Analysis.intersection_heatmap*
 
 .. image:: gallery/_MultiIntersectHeat.png
    :width: 90%

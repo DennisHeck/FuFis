@@ -5,28 +5,6 @@ pd.options.display.max_rows = None
 """Gather the code that creates plots and output to be shown in the documentation. The code blocks also serve
 as template for the code in the documentation itself. This is why the imports are above the clode blocks directly."""
 
-# Block that has to be executed for all.
-import src.BasicPlotter as BasicPlotter
-import pandas as pd
-import seaborn as sns
-out_dir = 'docs/gallery/'
-penguin_df = sns.load_dataset('penguins')
-
-# Barplot with one bar per group.
-# ***BasicPlotter.basic_bars
-avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
-BasicPlotter.basic_bars(penguin_df, x_col='species', y_col='flipper_length_mm', formats=['png'],
-                        x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Group of pinguins on land is called a waddle',
-                        output_path=out_dir, y_label='Flipper length [mm]', rotation=None, palette='glasbey_cool')
-# ---
-
-# ***BasicPlotter.basic_bars2
-avg_bill_length = pd.DataFrame(penguin_df.groupby('species')['bill_length_mm'].mean())
-BasicPlotter.basic_bars(avg_bill_length, x_col='species', y_col='bill_length_mm',
-                        x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Group of pinguins on land is called a waddle',
-                        output_path=out_dir, y_label='Bill length [mm]', rotation=None, palette='glasbey_cool')
-# ---
-
 # _________________________________________________________________________________________________________
 # GTF_Processing
 # _________________________________________________________________________________________________________
@@ -153,17 +131,17 @@ region_locs, total_locs = Bed_Analysis.gene_location_bpwise(bed_dict=bed_dict, g
                                                             plot_path=out_dir+"InclExternal", tss_type='5', palette='glasbey_cool', formats=['png'])
 # ---
 
-# ***Bed_Analysis.inter_heatmap
-# For the example, let's create three BedTool object. The first one with three large regions, the second repeating
-# two of those regions, and the last having multiple small regions inside one of those.
+# ***Bed_Analysis.intersection_heatmap
+# For the example, let's create three BedTool object that match the image above. The first one with three large regions,
+# the second repeating two of those regions, and the last having multiple small regions inside one of those.
 large_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000', 'chr1\t4000\t5000']), from_string=True)
 subset_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000']), from_string=True)
-small_regions = BedTool('\n'.join(['chr1\t1\t10', 'chr1\t11\t20', 'chr1\t21\t30']), from_string=True)
-multi_bed_dict = {'Large peaks': large_regions,
-                  'Subset peaks': subset_regions,
-                  'Small peaks': small_regions}
-Bed_Analysis.inter_heatmap(multi_bed_dict, region_label='peaks', plot_path=out_dir, annot_nums=True,  x_size=10, y_size=7,
-                           wspace=1, hspace=0.6, width_ratios=[0.05, 0.05, 0.96], height_ratios=[0.05, 0.97], formats=['png'])
+small_regions = BedTool('\n'.join(['chr1\t100\t300', 'chr1\t400\t600', 'chr1\t700\t900']), from_string=True)
+multi_bed_dict = {'Large regions': large_regions,
+                  'Subset regions': subset_regions,
+                  'Small regions': small_regions}
+Bed_Analysis.intersection_heatmap(multi_bed_dict, region_label='peaks', plot_path=out_dir, annot_nums=True,  x_size=10, y_size=7,
+                           wspace=1.3, hspace=0.7, width_ratios=[0.05, 0.05, 0.96], height_ratios=[0.05, 0.97], formats=['png'])
 # ---
 
 # ***Bed_Analysis.upset_to_reference
@@ -173,11 +151,11 @@ Bed_Analysis.inter_heatmap(multi_bed_dict, region_label='peaks', plot_path=out_d
 # peaks overlaps with both the large regions and the small regions, and one only with the large regions.
 large_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000', 'chr1\t4000\t5000']), from_string=True)
 subset_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000']), from_string=True)
-small_regions = BedTool('\n'.join(['chr1\t1\t10', 'chr1\t11\t20', 'chr1\t21\t30']), from_string=True)
-multi_bed_dict = {'Large peaks': large_regions,
-                  'Subset peaks': subset_regions,
-                  'Small peaks': small_regions}
-Bed_Analysis.upset_to_reference(bed_files=multi_bed_dict, ref_tag='Subset peaks', y_label='Intersecting regions',
+small_regions = BedTool('\n'.join(['chr1\t100\t300', 'chr1\t400\t600', 'chr1\t700\t900']), from_string=True)
+multi_bed_dict = {'Large regions': large_regions,
+                  'Subset regions': subset_regions,
+                  'Small regions': small_regions}
+Bed_Analysis.upset_to_reference(bed_files=multi_bed_dict, ref_tag='Subset regions', y_label='Intersecting regions',
                                 plot_path=out_dir, formats=['png'])
 # ---
 
@@ -217,9 +195,128 @@ go_dict = GOEnrichment.go_enrichment(gene_sets, title_tag='CAD gene sets', keywo
 # ---
 
 
+# _________________________________________________________________________________________________________
+# GenomeLifter
+# _________________________________________________________________________________________________________
+# ***GenomeLifter.genome_lifter
+import src.GenomeLifter as GenomeLifter
+from pybedtools import BedTool
+
+# Lift an example list of hg38 regions to hg19.
+hg38_bed_file = "ExampleData/H3K27acPeaks_chr21.narrowPeak"
+hg38_regions = BedTool(hg38_bed_file)
+print('hg38 coordinates:')
+print(''.join([str(x) for x in hg38_regions[:3]]))
+hg19_regions, unliftable = GenomeLifter.genome_lifter(hg38_regions, input_version='hg38', output_version='hg19')
+print('hg19 coordinates:')  # Note the output is now a list.
+print(hg19_regions[:3])
+# ---
+open("docs/gallery/src.GenomeLifter.genome_lifter_hg38.txt", 'w').write('hg38 coordinates:\n'+''.join([str(x) for x in hg38_regions[:3]]))
+open("docs/gallery/src.GenomeLifter.genome_lifter_hg19.txt", 'w').write('hg19 coordinates:\n'+str(hg19_regions[:3]))
 
 
+# _________________________________________________________________________________________________________
+# FIMO TFBS
+# _________________________________________________________________________________________________________
+# ***FIMO_TFBS_inRegions.cmd
+import subprocess
+import pandas as pd
+
+# We use subprocess here to run the bash command for easier documentation. It's also possible to run it directly
+# in the terminal.
+bed_file = 'ExampleData/chr21_MockPeaks.bed'
+PWMs = 'ExampleData/Jaspar_Hocomoco_Kellis_human_meme.txt'
+fasta = 'ExampleData/chr21_MiniMock.fa'  # For the example it's a random sequence from chr21.
+fimo_src = "fimo"  # If it's on the PATH, otherwise full path to the executable.
+out_dir = 'docs/gallery/FIMO_inRegions'
+
+fimo_cmd = 'python3 src/FIMO_TFBS_inRegions.py --bed_file {} --PWMs {} --fasta {} --fimo_src {} --out_dir {} --write_sequence False'.format(bed_file, PWMs, fasta, fimo_src, out_dir)
+print(fimo_cmd)
+subprocess.call(fimo_cmd, shell=True)
+# ---
+open("docs/gallery/src.FIMO_TFBS_inRegions.cmd.txt", 'w').write(fimo_cmd)
+
+# ***FIMO_TFBS_inRegions.matrix
+# The output matrix will be stored in the following path.
+fimo_matrix_file = 'docs/gallery/FIMO_inRegions/Out_Fimo_TFBSMatrix.txt.gz'
+fimo_matrix = pd.read_table(fimo_matrix_file, sep='\t', header=0, index_col=0)
+# With the tiny example most TF have no binding site, so let's pick a few that have some.
+print(fimo_matrix[['FOXH1', 'STAT1', 'STAT3']])
+# ---
+open("docs/gallery/src.FIMO_TFBS_inRegions.matrix.txt", 'w').write(str(fimo_matrix[['FOXH1', 'STAT1', 'STAT3']]))
+
+# ***FIMO_TFBS_inPromoter
+import subprocess
+import pandas as pd
+
+# The run is similar to the previous, but we use a gtf-file instead of a bed-file.
+gtf_file = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'  # With tow mock genes covered by the mock fasta.
+PWMs = 'ExampleData/Jaspar_Hocomoco_Kellis_human_meme.txt'
+fasta = 'ExampleData/chr21_MiniMock.fa'  # For the example it's a random sequence from chr21.
+fimo_src = "fimo"  # If it's on the PATH, otherwise full path to the executable.
+out_dir = 'docs/gallery/FIMO_inPromoter'
+
+fimo_cmd = 'python3 src/FIMO_TFBS_inPromoter.py --gtf {} --PWMs {} --fasta {} --fimo_src {} --out_dir {} --write_sequence False'.format(gtf_file, PWMs, fasta, fimo_src, out_dir)
+subprocess.call(fimo_cmd, shell=True)
+
+fimo_matrix_file = 'docs/gallery/FIMO_inPromoter/Out_Fimo_TFBSMatrix.txt.gz'
+fimo_matrix = pd.read_table(fimo_matrix_file, sep='\t', header=0, index_col=0)
+# With the tiny example most TF have no binding site, so let's pick a few that have some.
+print(fimo_matrix[['FOXH1', 'REST', 'PLAG1']])
+# ---
+open("docs/gallery/src.FIMO_TFBS_inPromoter.txt", 'w').write(str(fimo_matrix[['FOXH1', 'REST', 'PLAG1']]))
 
 
+# _________________________________________________________________________________________________________
+# Bigwig_Counter
+# _________________________________________________________________________________________________________
+# ***Bigwig_Counter
+import src.BigWig_Counter as BigWig_Counter
+# Take a mini bed-file and get the signal from two chr21 bigwig files.
+bed_file = "ExampleData/H3K27acPeaks_chr21.narrowPeak"
+bigwigs = ['ExampleData/IHECRE00000013_chr21.bigwig', 'ExampleData/IHECRE00000017_chr21.bigwig']
+bed_counts, errors = BigWig_Counter.bigwig_counts(bed_file, bigwigs, n_cores=1)
+print(bed_counts.head())
+# ---
+open("docs/gallery/src.BigWig_Counter.txt", 'w').write(str(bed_counts.head()))
 
+
+# _________________________________________________________________________________________________________
+# BasicPlotter
+# _________________________________________________________________________________________________________
+# ***BasicPlotter.base_code
+# Block that has to be executed for all.
+import src.BasicPlotter as BasicPlotter
+import pandas as pd
+import seaborn as sns
+out_dir = 'docs/gallery/'
+penguin_df = sns.load_dataset('penguins')   # Example data from seaborn.
+# ---
+
+# ***BasicPlotter.cumulative_plot
+# This is most instructive with diverging data e.g. logFC from RNA-seq. We use the RNA data from a study on the histone
+# mark H379me2 (10.1038/s41467-022-35070-2) and a formatted file from their supplements.
+rna_file = 'ExampleData/41467_2022_35070_MOESM4_ESM_E16Sub.txt'
+rna_table = pd.read_table(rna_file, sep='\t', header=0)
+# Add a column that groups genes into rough bins of how much of the gene body is covered.
+rna_table['binned H3K79me2 GB Coverage'] = pd.cut(rna_table['H3K79me2 GB Coverage'], bins=2).astype('string')
+BasicPlotter.cumulative_plot(rna_table, x_col='logFC', hue_col='binned H3K79me2 GB Coverage', palette='glasbey_cool', xlimit=[-1.5, 2],
+                             add_all=True, output_path=out_dir, numerate=True, title=None, vertical_line=0, table_width=0.4, table_x_pos=1.2, formats=['png'])
+# ---
+
+
+# Barplot with one bar per group.
+# ***BasicPlotter.basic_bars
+avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
+BasicPlotter.basic_bars(penguin_df, x_col='species', y_col='flipper_length_mm', formats=['png'],
+                        x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Group of pinguins on land is called a waddle',
+                        output_path=out_dir, y_label='Flipper length [mm]', rotation=None, palette='glasbey_cool')
+# ---
+
+# ***BasicPlotter.basic_bars2
+avg_bill_length = pd.DataFrame(penguin_df.groupby('species')['bill_length_mm'].mean())
+BasicPlotter.basic_bars(avg_bill_length, x_col='species', y_col='bill_length_mm',
+                        x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Group of pinguins on land is called a waddle',
+                        output_path=out_dir, y_label='Bill length [mm]', rotation=None, palette='glasbey_cool')
+# ---
 

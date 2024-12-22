@@ -1,6 +1,7 @@
 from pybedtools import BedTool
 import numpy as np
 import Various
+import GTF_Processing
 
 """Collections of functions for integrating different data on top of gABC interaction files."""
 
@@ -60,7 +61,7 @@ def peaks_peaks_overlap(peak_file, other_peak_file):
 def peaks_promoter_overlap(peak_file, gtf_file, tss_type='all', gene_set=()):
     """Based on a bed-file path or BedTools object returns a dictionary with
        {chr\tstart\tend: {genes whose promoter overlap}} and one with {gene: {peaks}}."""
-    promoter_bed = TSS_Fetcher.gene_window_bed(gtf_file=gtf_file, extend=200, tss_type=tss_type, merge=True,
+    promoter_bed = GTF_Processing.gene_window_bed(gtf_file=gtf_file, extend=200, tss_type=tss_type, merge=True,
                                                gene_set=gene_set)
     gene_dict = {x.fields[3]: set() for x in promoter_bed}
     if type(peak_file) == str:
@@ -79,7 +80,7 @@ def promoter_fetch_col(pattern, gtf_file, tss_type='all', gene_set=(), fetch_col
     """Based on a bed-file path or BedTools object returns a dictionary with
        {g: average value of fetch_col of intersecting regions.}.
        Uses peaks_fetch_col but maps the regions back to the genes and takes care of multiple promoters."""
-    promoter_bed = TSS_Fetcher.gene_window_bed(gtf_file=gtf_file, extend=200, tss_type=tss_type, merge=True,
+    promoter_bed = GTF_Processing.gene_window_bed(gtf_file=gtf_file, extend=200, tss_type=tss_type, merge=True,
                                                gene_set=gene_set)
     prom_gene_map = {'\t'.join(x.fields[:3]): x.fields[3] for x in promoter_bed}
     fill_dict, fill_cols = peaks_fetch_col(promoter_bed, pattern, same_peaks=False, fetch_col=fetch_col)
@@ -95,7 +96,7 @@ def promoter_fetch_col(pattern, gtf_file, tss_type='all', gene_set=(), fetch_col
 def peaks_genebody_overlap(peak_file, gtf_file, gene_set=()):
     """Based on a bed-file path or BedTools object returns a dictionary with
        {gene: fraction of gene body overlapping with peak_file}."""
-    genebody_bed = TSS_Fetcher.gene_body_bed(gtf_file=gtf_file, gene_set=gene_set)
+    genebody_bed = GTF_Processing.gene_body_bed(gtf_file=gtf_file, gene_set=gene_set)
     genebody_overlap = {x.fields[3]: 0 for x in genebody_bed}
     genebody_lengths = {x.fields[3]: x.length for x in genebody_bed}
     genebody_inter = genebody_bed.intersect(BedTool(peak_file).sort().merge(), wo=True)

@@ -114,7 +114,7 @@ def meme_id_map(meme_file, gtf_file, species):
     tf_ids = {t: [] for t in tfs}
     misses = []
     all_tf_names = list(chain(*[[x.split('(')[0].lower() for x in tf.split('::')] for tf in tfs]))
-    mapped_names, missed_names = match_genenames(all_tf_names, gtf_file, species=species)
+    mapped_names, missed_names = GTF_Processing.match_gene_identifiers(all_tf_names, gtf_file, species=species)
     for tf in tfs:
         sub_tfs = [x.split('(')[0].lower() for x in tf.split('::')]
         for sub in sub_tfs:

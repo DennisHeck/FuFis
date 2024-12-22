@@ -6,6 +6,10 @@ Schabrackentapir
       :maxdepth: 2
    
    Main.rst
-   GTF_Processing_formatted.rst
    Bed_Analysis_formatted.rst
+   GTF_Processing_formatted.rst
+   GenomeLifter_formatted.rst
    GOEnrichment_formatted.rst
+   FIMO_TFBS_formatted.rst
+   BigWig_Counter_formatted.rst
+   BasicPlotter_formatted.rst

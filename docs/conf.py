@@ -24,6 +24,8 @@ sys.path.insert(0, os.path.abspath('../src/'))
 
 import sphinx_rtd_theme
 import docs.DocGenerator
+# import cli
+
 
 # -- General configuration ------------------------------------------------
 
@@ -45,6 +47,7 @@ extensions = ['sphinx.ext.todo',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'myst_parser',
+    'sphinxarg.ext'
     ]
 
 basicplotter_mocks = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
@@ -57,7 +60,15 @@ gtf_processing_mocks = ['pybedtools', 'BedTool', 'gzip', 'itertools', 'chain', '
 
 goenrichment_mocks = ['gprofiler', 'GProfiler', 'matplotlib', 'cm', 'matplotlib.lines', 'Line2D', "pyplot", 'plt', 'numpy']
 
-autodoc_mock_imports = list(set(basicplotter_mocks + gtf_processing_mocks + goenrichment_mocks))
+genomelifter_mocks = ['liftover', 'get_lifter', 'os', 'gzip', 'numpy', 'subprocess', 'pybedtools', 'Various']
+
+fimo_tfbs_inregions_mocks = ['gzip', 'pybedtools', 'collections', 'subprocess', 'os']
+
+bigwig_counter_mocks = ['pyBigWig', 'timeit', 'multiprocess', 'pandas']
+
+
+autodoc_mock_imports = list(set(basicplotter_mocks + gtf_processing_mocks + goenrichment_mocks + genomelifter_mocks +
+                                fimo_tfbs_inregions_mocks + bigwig_counter_mocks))
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
