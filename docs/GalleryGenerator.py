@@ -144,6 +144,26 @@ Bed_Analysis.intersection_heatmap(multi_bed_dict, region_label='peaks', plot_pat
                            wspace=1.3, hspace=0.7, width_ratios=[0.05, 0.05, 0.96], height_ratios=[0.05, 0.97], formats=['png'])
 # ---
 
+# ***Bed_Analysis.intersection_heatmap_fisher
+# Now we repeat the analysis above, but instead of just doing the pairwise-intersection, we make use of the fisher mode
+# of the function. For that, we need data with more entries (limited to chr1 though). We use the scATAC-seq data from Hocker 2021 (10.1126/sciadv.abf1444)
+# which was aggregated on cell type-level. They defined a union set of ATAC peaks and calculated the RPKM per cell type cluster.
+# For four cell types (vCM: ventricular cardiomyocytes, MAC: macrophages, LC: lymphocytes) we subset this union to those peaks with RPKM ≥ 2 in
+# the respective cell type. These peaks we then intersect with GWAS SNPs from the GWAS catalog for the traits heart rate
+# (EFO_0004326) and immune system disease (EFO_0000540). Since we need a group for comparison for the Fisher's exact test,
+# we take all chr1 ATAC peaks as background (the function will remove the foreground peaks from the background).
+fisher_bed_dict = {"vCM": 'ExampleData/MultiBedFisher/Hocker2021_ATAC_vCM_chr1.bed',
+                   "MAC": 'ExampleData/MultiBedFisher/Hocker2021_ATAC_MAC_chr1.bed',
+                   "LC": 'ExampleData/MultiBedFisher/Hocker2021_ATAC_LC_chr1.bed',
+                   'GWAS\nHeartRate': 'ExampleData/MultiBedFisher/GWAS_EFO_0004326_heart-rate.txt',
+                   'GWAS\nHeartDisease': 'ExampleData/MultiBedFisher/GWAS_EFO_0003777_heart-disease.txt'}
+fisher_background = {c: 'ExampleData/MultiBedFisher/Hocker2021_ATAC_Union_chr1.bed' for c in ['vCM', 'MAC', 'LC']}
+Bed_Analysis.intersection_heatmap(fisher_bed_dict, region_label='peaks', fisher=True, fisher_background=fisher_background,
+                                  row_beds=['vCM', 'MAC', 'LC'], col_beds=['GWAS\nHeartRate', 'GWAS\nHeartDisease'],
+                                  plot_path=out_dir+"HockerATAC", annot_nums=True,  x_size=10, y_size=8, n_cores=2,
+                                  wspace=0.4, hspace=0.9, width_ratios=[0.05, 0.2, 0.96], height_ratios=[0.08, 0.97], formats=['png'])
+# ---
+
 # ***Bed_Analysis.upset_to_reference
 # Similar to the asymmetric above, this UpSet plot is meant for checking the overlap of bed-files with different sizes.
 # However, this one shows the overlap only with respect to one selected bed-file. Let's use the same example bed objects
@@ -158,6 +178,62 @@ multi_bed_dict = {'Large regions': large_regions,
 Bed_Analysis.upset_to_reference(bed_files=multi_bed_dict, ref_tag='Subset regions', y_label='Intersecting regions',
                                 plot_path=out_dir, formats=['png'])
 # ---
+
+# ***Bed_Analysis.peaks_peaks_overlap
+# Let's get a mapping of two small example sets of regions where all regions from the second set are located in
+# one region of the first set.
+large_regions = BedTool('\n'.join(['chr1\t1\t1000', 'chr1\t2000\t3000', 'chr1\t4000\t5000']), from_string=True)
+small_regions = BedTool('\n'.join(['chr1\t100\t300', 'chr1\t400\t600', 'chr1\t700\t900']), from_string=True)
+peak_peak_map = Bed_Analysis.peaks_peaks_overlap(peak_file=large_regions, other_peak_file=small_regions)
+print(peak_peak_map)
+# ---
+open("docs/gallery/src.Bed_Analysis.peaks_peaks_overlap.txt", 'w').write(str(peak_peak_map))
+
+
+# ***Bed_Analysis.peaks_promoter_overlap
+# Now instead of intersecting multiple bed-files we get the intersection with promoter regions of genes (±200bp around the TSS).
+example_bed_file = "ExampleData/H3K27acPeaks_chr21.narrowPeak"
+annotation = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'
+peak_promoter_map, promoter_peak_map = Bed_Analysis.peaks_promoter_overlap(peak_file=example_bed_file, gtf_file=annotation, tss_type='5')
+print(list(peak_promoter_map.items())[:2])
+print(list(promoter_peak_map.items())[:2])
+# ---
+open("docs/gallery/src.Bed_Analysis.peaks_promoter_overlap.txt", 'w').write(str(list(peak_promoter_map.items())[:2]) + '\n' + str(list(promoter_peak_map.items())[:2]))
+
+# ***Bed_Analysis.peaks_fetch_col1
+# Let's assume we have a set of ATAC peaks and found differential ATAC peaks for different conditions.
+base_peaks_file = 'ExampleData/BaseATAC_peaks.txt'
+# We have a directory with two bed files with a header from which we want to get the average log2FC value in all the
+# base peaks they overlap.
+diff_atac_pattern = 'ExampleData/DiffATAC/DiffATAC_*.txt'
+# ---
+# ***Bed_Analysis.peaks_fetch_col2
+base_peaks_log2fc, matched_ids = Bed_Analysis.peaks_fetch_col(base_regions=base_peaks_file, pattern=diff_atac_pattern, same_peaks=False, fetch_col='log2FC')
+print(base_peaks_log2fc)
+# ---
+open("docs/gallery/src.Bed_Analysis.peaks_fetch_col.txt", 'w').write(str(base_peaks_log2fc))
+
+# ***Bed_Analysis.promoter_fetch_col
+# This one is very similar to the previous, but starts from genes to get their promoter regions to then get the
+# values from other bed files in those promoters.
+diff_atac_pattern = 'ExampleData/DiffATAC/DiffATAC_*.txt'
+annotation = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'
+promoter_log2FC, matched_ids = Bed_Analysis.promoter_fetch_col(pattern=diff_atac_pattern, gtf_file=annotation, tss_type='5',
+                                                               gene_set={'ENSG0000MOCK1', 'ENSG0000MOCK2'}, fetch_col='log2FC')
+print(promoter_log2FC)
+# ---
+open("docs/gallery/src.Bed_Analysis.promoter_fetch_col.txt", 'w').write(str(promoter_log2FC))
+
+
+# ***Bed_Analysis.peaks_genebody_overlap
+# Based on an example peak file and gtf-file, we get the fraction of the gene body that is covered by the peaks.
+peak_file = 'ExampleData/H3K27acPeaks_chr21.narrowPeak'
+annotation = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'
+gene_body_fractions = Bed_Analysis.peaks_genebody_overlap(peak_file=peak_file, gtf_file=annotation,
+                                                          gene_set=['ENSG00000275895', 'ENSG00000273840'])
+print(gene_body_fractions)
+# ---
+open("docs/gallery/src.Bed_Analysis.peaks_genebody_overlap.txt", 'w').write(str(gene_body_fractions))
 
 
 # _________________________________________________________________________________________________________
@@ -319,4 +395,16 @@ BasicPlotter.basic_bars(avg_bill_length, x_col='species', y_col='bill_length_mm'
                         x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Group of pinguins on land is called a waddle',
                         output_path=out_dir, y_label='Bill length [mm]', rotation=None, palette='glasbey_cool')
 # ---
+
+
+# _________________________________________________________________________________________________________
+# GOEnrichment
+# _________________________________________________________________________________________________________
+
+# ***Various.fn_patternmatch
+import src.Various as Various
+my_files = Various.fn_patternmatch('ExampleData/BirdCollection/Bird_*.txt')
+print(my_files)
+# ---
+open("docs/gallery/src.Various.fn_patternmatch.txt", 'w').write(str(my_files))
 

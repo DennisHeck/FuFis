@@ -4,20 +4,17 @@ import numpy as np
 import random
 from timeit import default_timer as clock
 import pybedtools
-import requests
 import sys
 from pybedtools import BedTool
 import gzip
 import copy
-import time
 import scipy.stats
 import statsmodels.stats.multitest
-import math
 import os
 import fnmatch
 import re
 from itertools import chain
-import GTF_Processing
+import src.GTF_Processing as GTF_Processing
 
 
 def df_column_binner(df, col, num_bins, string_precision=0, lower_bound=None, upper_bound=None, tag='', numerate=True):
@@ -97,69 +94,6 @@ def get_distance_to_one(start, end, other):
     return distance
 
 
-def meme_id_map(meme_file, gtf_file, species):
-    """Takes a meme-file and returns the list of TF gene ids belonging to that TF. Note that it assumes a certain
-    syntax for the different motif versions. Species is required for looking up names missing in the
-    gtf file with the MyGene.info API.
-    @param species: usually 'mouse' or 'human'
-    """
-    if gtf_file.endswith('.gz'):
-        file_lines = gzip.open(gtf_file, 'rt').readlines()
-    else:
-        file_lines = open(gtf_file).readlines()
-    name_id_map = {x.split('\t')[8].split('gene_name "')[-1].split('";')[0].lower():
-                   x.split('\t')[8].split('gene_id "')[-1].split('";')[0].split('.')[0]
-                   for x in file_lines if not x.startswith("#") and x.split('\t')[2] == 'gene'}
-    tfs = [x.split('\n\n')[0].split(' ')[0] for x in open(meme_file).read().split('MOTIF ')[1:]]
-    tf_ids = {t: [] for t in tfs}
-    misses = []
-    all_tf_names = list(chain(*[[x.split('(')[0].lower() for x in tf.split('::')] for tf in tfs]))
-    mapped_names, missed_names = GTF_Processing.match_gene_identifiers(all_tf_names, gtf_file, species=species)
-    for tf in tfs:
-        sub_tfs = [x.split('(')[0].lower() for x in tf.split('::')]
-        for sub in sub_tfs:
-            if sub not in name_id_map:
-                if sub in mapped_names:
-                    tf_ids[tf].append(mapped_names[sub])
-                else:
-                    misses.append(tf)
-                    print(sub, 'name not found in annotation nor MyGene.info')
-                    if tf in tf_ids:  # Might have been already deleted as part of an earlier dimer.
-                        del tf_ids[tf]
-            else:
-                try:
-                    tf_ids[tf].append(name_id_map[sub])
-                except KeyError:
-                    pass  # Means that one of the sub-TFS was missing and the key deleted.
-
-    return tf_ids, misses
-
-
-def subset_meme(meme_file, motif_names, out_file, include_dimers=True, exact_match=False):
-    """Takes a meme file and writes a new one containing only the ones present in motif_names.
-    Different motif versions are included.
-    @param include_dimers: Also adds dimers containing one of the motif_names.
-    @param exact_match: If the given list of names is really the original motifs' names and not just TF names."""
-
-    meme = open(meme_file).read()
-    header_block = meme.split("\nMOTIF")[0]
-    tf_blocks = meme.split('MOTIF ')[1:]
-
-    with open(out_file, 'w') as output:
-        output.write(header_block + '\n')
-        for block in tf_blocks:
-            if not exact_match:
-                this_tf = [x.split(' ')[0].split('(')[0] for x in block.split('\n\n')[0].strip().split('::')]
-            else:
-                this_tf = [block.split('\n\n')[0].strip().split(" ")[0]]
-            if include_dimers:
-                if sum([sub_t in motif_names for sub_t in this_tf]) > 0:  # If any matches.
-                    output.write("MOTIF " + block)
-            else:
-                if sum([sub_t in motif_names for sub_t in this_tf]) == len(this_tf):  # If all match.
-                    output.write("MOTIF " + block)
-
-
 def tpm_norm(count_df, gtf_file):
     """
     Converts a count df into its TPM-normalized version. Genes for which no matching name/id can be found are removed
@@ -212,7 +146,7 @@ def tpm_norm(count_df, gtf_file):
 def open_genes_multibed(bed_dict, annotation):
     """For each of the bed files in bed_dict {tag: bed file} returns the set of genes that intersect with at least
     one of their promoters with a peak."""
-    promoter_bed = TSS_Fetcher.gene_window_bed(annotation, extend=200, tss_type='all')
+    promoter_bed = GTF_Processing.gene_window_bed(annotation, extend=200, tss_type='all')
     open_genes = {}
     for tag, bed in bed_dict.items():
         print(bed)
@@ -225,6 +159,7 @@ def open_genes_multibed(bed_dict, annotation):
 
 def open_genes(activity_file, annotation, first_col, tmp_dir):
     """
+    NOTE: The GTF_Processing.gene_window_bed fulfils this function when not working with an activity column but just a bed file.
     Takes a bed-styled file with the activities of regions across multiple samples/conditions in columns.
     Takes all annotated promoters ±200bp for genes and checks which genes have an intersecting peak that has an
     activity > 0. The activity file requires a header preceded by #.
@@ -233,7 +168,7 @@ def open_genes(activity_file, annotation, first_col, tmp_dir):
     """
     pybedtools.set_tempdir(tmp_dir)
     start_prom = clock()
-    promoter_bed = TSS_Fetcher.gene_window_bed(annotation, extend=200, tss_type='all', open_regions=activity_file)
+    promoter_bed = GTF_Processing.gene_window_bed(annotation, extend=200, tss_type='all', open_regions=activity_file)
     print(clock() - start_prom, "Got promoter bed")
     open_genes = {c: set() for c in open(activity_file).readline().strip().split('\t')[first_col:]}
     # Get the index of the columns in the bed intersection. The promoter columns are the first 4 entries.
@@ -301,10 +236,11 @@ def split_row_till_col(row_string, till_col, sep='\t'):
 
 
 def fn_patternmatch(pattern):
-    """Grabs all files in the file system that match the pattern and returns a dictionary with {file: wildcard}.
-     Only works if the wildcard is in the file name and not in a directory name.
-     E.g. for a directory /Users/Dodo/ that contains chr1.txt and chr2.txt:
-     fn_patternmatch("/Users/Dodo/chr*.txt" = {"/Users/Dodo/chr1.txt": "1", "/Users/Dodo/chr2.txt": "2"}
+    """
+    Grabs all files in the file system that match the pattern and returns a dictionary with {file: wildcard}.
+    Only works if the wildcard is in the file name and not in a directory name.
+    E.g. for a directory BirdCollection/ that contains Bird_Kakapo.txt and Bird_Kea.txt:
+    fn_patternmatch("BirdCollection/*.txt" = {"BirdCollection/Bird_Kakapo.txt": "Kakao", "BirdCollection/Bird_Kea.txt": "Kea"}
      """
     parent_folder = '/'.join(pattern.split('/')[:-1]) + '/'
     children_pattern = pattern.split('/')[-1]
@@ -328,7 +264,7 @@ def random_sampler_percentiled(df, var_col, idx_col, hit_list, iterations=1, per
     @return: Dictionary of {random iteration: set(random identifiers)}.
     """
     random.seed(seed_int)
-    df = copy.deepcopy(df)  # Otherwise we mutate the original df.
+    df = copy.deepcopy(df)  # Otherwise, we mutate the original df.
 
     if 100 % perc_size != 0:
         print("ERROR choose a percentile size that allows even splitting.")

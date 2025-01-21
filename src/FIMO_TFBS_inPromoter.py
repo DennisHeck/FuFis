@@ -2,7 +2,7 @@
 import argparse
 
 """For each gene call TFBS in a promoter window at the 5'TSS with Fimo. Then convert Fimo's output into a matrix
-of genes x TFs with the counted binding sites."""
+of genes x TFs with the counted binding sites. Only genes with at least one binding site are written to output."""
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--gtf", required=True, help='GENCODE gtf-file to take the genes and locations from.')
@@ -20,8 +20,8 @@ parser.add_argument("--write_sequence", default='False', help='If Fimo should wr
 if __name__ == '__main__':
     # This is ugly and a style violation, but otherwise can't convince the Sphinx markdown to document this function.
     from pybedtools import BedTool
-    import src.GTF_Processing as GTF_Processing
-    import src.FIMO_TFBS_Helper as FIMO_TFBS_Helper
+    import GTF_Processing
+    import FIMO_TFBS_Helper
 
     args, seq_out, fimo_out = FIMO_TFBS_Helper.process_args(parser.parse_args())
 

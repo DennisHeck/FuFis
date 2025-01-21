@@ -5,7 +5,6 @@ from matplotlib import cm
 import matplotlib as mpl
 import numpy as np
 import math
-import ColoursAndShapes
 from matplotlib.patches import Patch
 import matplotlib_venn
 from matplotlib.colors import to_hex
@@ -19,6 +18,7 @@ from adjustText import adjust_text
 import seaborn as sns
 import scipy.stats
 import itertools
+import src.ColoursAndShapes as ColoursAndShapes
 
 
 def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None, title=None, output_path='', y_label='',

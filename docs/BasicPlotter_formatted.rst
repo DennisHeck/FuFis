@@ -15,14 +15,14 @@ Collection of plotting functions, some quite general, others rather specific.
     # Add a column that groups genes into rough bins of how much of the gene body is covered.
     rna_table['binned H3K79me2 GB Coverage'] = pd.cut(rna_table['H3K79me2 GB Coverage'], bins=2).astype('string')
     BasicPlotter.cumulative_plot(rna_table, x_col='logFC', hue_col='binned H3K79me2 GB Coverage', palette='glasbey_cool', xlimit=[-1.5, 2],
-                                 add_all=True, output_path=out_dir, numerate=True, title=None, vertical_line=0, table_width=0.3, table_x_pos=1.2, formats=['png'])
+                                 add_all=True, output_path=out_dir, numerate=True, title=None, vertical_line=0, table_width=0.4, table_x_pos=1.2, formats=['png'])
     
 
 From the plot we can see, that the genes with more coverage of their gene body are more often downregulated and that
 they have less strong positive logFC, compared to genes with lower gene body coverage.
 
 .. image:: gallery/logFC_binned_H3K79me2_GB_Coverage.png
-  :alt: H3K79me2_Coverage
+  :width: 90%
 
 
 

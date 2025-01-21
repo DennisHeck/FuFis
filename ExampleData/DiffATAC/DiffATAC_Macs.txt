@@ -1,0 +1,4 @@
+#chr	start	end	log2FC
+chr1	20	50	-2
+chr1	400	500	-4
+chr1	2010	2050	2

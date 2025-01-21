@@ -1,3 +1,4 @@
+import pandas as pd
 from pybedtools import BedTool
 import gzip
 from itertools import chain
@@ -5,7 +6,6 @@ import requests
 import time
 import math
 from collections import Counter
-import pandas as pd
 
 
 def bed_to_length_dict(bedobj):
@@ -45,14 +45,15 @@ def gene_window_bed(gtf_file, extend=200, gene_set=set(), tss_type='5', dict_onl
 
     Args:
         gtf_file: gtf-file in GENCODE's format, can be gzipped.
-        extend: number of base pairs to extend the TSS in each direction
+        extend: Number of base pairs to extend the TSS in each direction. 200 means a window of size 401.
         gene_set: Set of Ensembl IDs or gene names or mix of both to limit the output to. If empty, return for all
             genes in the annotation.
-        tss_type: "5" to get only the 5' TSS or "all" to get all unique TSS of all transcripts in the gtf-file
+        tss_type: "5" to get only the 5' TSS or "all" to get all unique TSS of all transcripts in the gtf-file.
         dict_only: Returns a dictionary instead of a BedTool's object.
         merge: If True, merges all overlapping promoters of the same gene into one row in the BedTool's object.
         open_regions: Optional bed file or BedTools' object, only overlapping parts of promoters will be kept for the
-            BedTool's object.
+            BedTool's object. Can therefore be used to find genes whose promoter overlap a set of peaks, for example to
+            find genes that are accessible.
     """
     if tss_type == '5':
         identifier = 'gene'
@@ -409,7 +410,7 @@ def gene_feature_table(gtf_file, gene_set=(), extend=500000):
         gtf_file: gtf-file in GENCODE's format, can be gzipped.
         gene_set: Set of Ensembl IDs or gene names or mix of both to limit the output to. If empty, return for all
             genes in the annotation.
-        extend: How much the gene windows should be extended to each side of the TSS to calculate gene density.
+        extend: How much the gene windows should be extended to each side of the TSS to calculate gene density. 1000 means a window of size 2001.
 
     Returns:
         pandas DataFrame:

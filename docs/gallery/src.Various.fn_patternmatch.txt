@@ -1,0 +1,1 @@
+{'ExampleData/BirdCollection/Bird_Kea.txt': 'Kea', 'ExampleData/BirdCollection/Bird_Kakapo.txt': 'Kakapo'}

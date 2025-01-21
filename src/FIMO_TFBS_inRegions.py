@@ -1,7 +1,8 @@
 import argparse
 
 """Takes a bed file with regions and runs Fimo on them. Afterwards converts Fimo's output into a matrix of regions x TFs
- with the counted binding sites. Overlapping TFBS of the same TF on the same strand are merged and counted as 1. 
+ with the counted binding sites. Only regions with at least one binding site are written to output. 
+ Overlapping TFBS of the same TF on the same strand are merged and counted as 1. 
  Includes the steps of writing the sequence of the regions, forcing the regions to be within the genome boundaries, 
  and adjusting the TF motif meme-file so that the base content of the bed-regions is used as background frequencies."""
 
@@ -18,7 +19,7 @@ parser.add_argument("--write_sequence", default='False', help='If Fimo should wr
 if __name__ == '__main__':
     # This is ugly and a style violation, but otherwise can't convince the Sphinx markdown to document this function.
     from pybedtools import BedTool
-    import src.FIMO_TFBS_Helper as FIMO_TFBS_Helper
+    import FIMO_TFBS_Helper
 
     args, seq_out, fimo_out = FIMO_TFBS_Helper.process_args(parser.parse_args())
 

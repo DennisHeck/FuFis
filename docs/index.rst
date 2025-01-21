@@ -4,7 +4,7 @@ Schabrackentapir
 
 .. toctree::
       :maxdepth: 2
-   
+
    Main.rst
    Bed_Analysis_formatted.rst
    GTF_Processing_formatted.rst
@@ -13,3 +13,4 @@ Schabrackentapir
    FIMO_TFBS_formatted.rst
    BigWig_Counter_formatted.rst
    BasicPlotter_formatted.rst
+   Various_formatted.rst

@@ -21,11 +21,10 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
 sys.path.insert(0, os.path.abspath('../src/'))
+sys.path.insert(0, os.path.abspath('../ExampleData/'))
 
 import sphinx_rtd_theme
 import docs.DocGenerator
-# import cli
-
 
 # -- General configuration ------------------------------------------------
 
@@ -50,25 +49,20 @@ extensions = ['sphinx.ext.todo',
     'sphinxarg.ext'
     ]
 
-basicplotter_mocks = ['copy', 'pandas', 'matplotlib', 'pyplot', 'cm', 'mpl', 'numpy', 'math', 'matplotlib.patches',
-                        'Patch', 'matplotlib_venn', 'matplotlib.ticker', 'matplotlib.colors',
-                        'itertools', 'chain', 'upsetplot', 'collections', 'Counter', 'requests', 'time',
-                        'pandas.api.types', 'is_string_dtype', 'matplotlib.lines', 'Line2D', 'mpatches', 'adjustText',
-                        'adjust_text', 'seaborn', 'scipy.stats', 'scipy', 'ColoursAndShapes', 'to_hex']
+# Get the mock imports automatically, but only from scripts we have rst files for. Too many mocks or specific mocks
+# might crash it again, it's a bit janky.
+mock_imports = set()
+script_dir = '../src/'
+existing_rst_tags = [x.split('.')[0] for x in os.listdir() if x.endswith('.rst')]
+print(existing_rst_tags)
+for script in [script_dir+x for x in os.listdir(script_dir) if x.endswith('.py') and x.split('.py')[0] in existing_rst_tags]:
+    import_lines = [x for x in open(script).read().split('\n\n')[0].split('\n') if x.startswith('import') or x.startswith('from')]
+    mock_imports |= set([x.split(' ')[1].split('.')[0] for x in import_lines])
 
-gtf_processing_mocks = ['pybedtools', 'BedTool', 'gzip', 'itertools', 'chain', 'collections', 'Counter', 'pandas']
-
-goenrichment_mocks = ['gprofiler', 'GProfiler', 'matplotlib', 'cm', 'matplotlib.lines', 'Line2D', "pyplot", 'plt', 'numpy']
-
-genomelifter_mocks = ['liftover', 'get_lifter', 'os', 'gzip', 'numpy', 'subprocess', 'pybedtools', 'Various']
-
-fimo_tfbs_inregions_mocks = ['gzip', 'pybedtools', 'collections', 'subprocess', 'os']
-
-bigwig_counter_mocks = ['pyBigWig', 'timeit', 'multiprocess', 'pandas']
-
-
-autodoc_mock_imports = list(set(basicplotter_mocks + gtf_processing_mocks + goenrichment_mocks + genomelifter_mocks +
-                                fimo_tfbs_inregions_mocks + bigwig_counter_mocks))
+# mock_imports = mock_imports - {"*"}  # Not sure where this is coming from.
+mock_imports = mock_imports - set(existing_rst_tags)  # There appears to be an issue if a function itself is mocked.
+print(mock_imports)
+autodoc_mock_imports = list(mock_imports)
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
@@ -126,7 +120,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-#html_theme = 'alabaster'
+# html_theme = 'furo'
 html_theme = "sphinx_rtd_theme"
 
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]

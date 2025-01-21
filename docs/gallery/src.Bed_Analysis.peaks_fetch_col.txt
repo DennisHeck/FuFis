@@ -1,0 +1,1 @@
+{'chr1\t1\t1000': {'Macs': -3.0, 'TCells': nan}, 'chr1\t2000\t3000': {'Macs': 2.0, 'TCells': nan}, 'chr1\t4000\t5000': {'Macs': nan, 'TCells': 3.0}}

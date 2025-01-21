@@ -10,6 +10,8 @@ The preprocessing includes
   - adjusting the TF motif meme-file so that the base content of the bed-regions is used as background frequencies.
 
 In the output matrix, overlapping TFBS of the same TF on the same strand are merged and counted as 1.
+Take care with palindromic motifs, they are still counted on both strands.Only the regions with at least
+one binding site are written into the matrix.
 The first script starts with a bed-file, the second with a set of genes to get the TFBS in their promoter regions.
 Both are called via the command line.
 If the genome sequence file doesn't have an index, `samtools <https://www.htslib.org/>`_ has to be installed and on the
