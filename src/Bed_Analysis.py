@@ -84,7 +84,8 @@ def gene_location_bpwise(bed_dict, gtf_file, plot_path, tss_type='5', external_b
     regions_locs = {}
     total_locs = {}
     for tag, this_bed in bed_dict.items():
-        if len(this_bed) == 0:
+        print(tag)
+        if len(BedTool(this_bed)) == 0:
             print("Empty bed", tag)
             continue
         # Merge the bedfile to have unique bp, but keep track of what got merged and assemble it back later.
