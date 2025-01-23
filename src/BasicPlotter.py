@@ -87,7 +87,7 @@ def jitter_bars(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=None,
     bars = sns.barplot(data=plot_df, x=x_col, y='mean x', hue=hue_col, hue_order=hue_order, ax=ax, alpha=1, edgecolor='k',
                 linewidth=1, color='#2d63ad', palette='tab10' if hue_col and not palette else palette, order=x_order)
     sns.stripplot(data=plot_df, x=x_col, y=y_col, jitter=True, ax=ax, hue=hue_col, order=x_order,
-                  palette=jitter_colour, dodge=True)
+                  color=jitter_colour, dodge=True)
     ax.tick_params(axis='both', labelsize=font_s+4)
     ax.set_ylabel(y_col, fontsize=font_s+8)
     ax.set_xlabel(x_col, fontsize=font_s+8)

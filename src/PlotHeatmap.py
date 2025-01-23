@@ -9,7 +9,7 @@ from pybedtools import BedTool
 
 
 def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, mode, perGroup=True, title='',
-                scaled_size=1000, start_label='TSS', end_label='TES', referencePoint='center', vmin='auto', vmax='auto', matrix_min=None,
+                scaled_size=1000, start_label='TSS', end_label='TES', referencePoint='center', vmin='auto', vmax='auto',
                 upstream=200, downstream=200, n_cores=1, cmap='plasma', legend_loc='best', show='plot, heatmap and colorbar'):
     """
     @param beds_to_plot: Either a BedTool object or the path to a bed-file. Note that if strand is a relevant
@@ -30,7 +30,6 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
     'TSS' for region start, 'TES' for region end or 'center'.
     @param vmin: Minimum value for the heatmap. The curves are unaffected by this.
     @param vmax: Maximum value for the heatmap.
-    @param matrix_min: CURRENTLY NOT WORKING. Values below this value are set to this value in the matrix file, so that it's reflected in the curves.
     @param upstream: How far to extend the regions upstream in 'reference' mode.
     @param downstream: How far to extend the regions downstream in 'reference' mode.
     @param n_core: Number of cores to compute the matrix that's then used for plotting.
@@ -88,7 +87,7 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
         matrix_cmd = "computeMatrix scale-regions -S "+' '.join(bigwigs)+" -R "+ ' '.join(["'"+b+"'" for b in bed_paths])+\
                         " -R " + ' '.join(["'"+b+"'" for b in bed_paths])+\
                         " --regionBodyLength "+str(scaled_size)+" --outFileName "+matrix_out+\
-                        " --startLabel "+start_label+" --endLabel "+end_label+" --binSize 10 -p " + str(n_cores)
+                        " --startLabel '"+start_label+"' --endLabel '"+end_label+"' --binSize 10 -p " + str(n_cores)
     elif mode == 'reference':
         matrix_cmd = "computeMatrix reference-point -S "+' '.join(bigwigs)+" -R "+ ' '.join(["'"+b+"'" for b in bed_paths])+\
                         ' --referencePoint ' + referencePoint + " --upstream "+str(upstream) +\
@@ -97,23 +96,23 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
     print(matrix_cmd)
     subprocess.call(matrix_cmd, shell=True)
 
-    if matrix_min is not None:  # NOTE Currently not working, no idea why, the matrix is not accepted afterwards.
-        # Open the matrix file and set all values <forced_min to forced_min.
-        header_row = gzip.open(matrix_out, 'rt').readline()
-        matrix_df = pd.read_table(matrix_out, sep='\t', header=None, skiprows=1)
-        val_cols = matrix_df.iloc[:, 6:]  # Bit too many lines here, but pandas was refusing to do it in one.
-        val_cols[val_cols < matrix_min] = matrix_min
-        minned_matrix = pd.concat([matrix_df.iloc[:, :6], val_cols], axis=1)
-        print(matrix_df.shape, matrix_df.shape)
-        open(matrix_out.replace('.gz', ''), 'w').write(header_row)
-        matrix_df.to_csv(matrix_out.replace('.gz', ''), sep='\t', header=False, index=False, mode='a')
-        subprocess.call('gzip -f '+ matrix_out.replace('.gz', ''), shell=True)
+    # if matrix_min is not None:  # NOTE Currently not working, no idea why, the matrix is not accepted afterwards.
+    #     # Open the matrix file and set all values <forced_min to forced_min.
+    #     header_row = gzip.open(matrix_out, 'rt').readline()
+    #     matrix_df = pd.read_table(matrix_out, sep='\t', header=None, skiprows=1)
+    #     val_cols = matrix_df.iloc[:, 6:]  # Bit too many lines here, but pandas was refusing to do it in one.
+    #     val_cols[val_cols < matrix_min] = matrix_min
+    #     minned_matrix = pd.concat([matrix_df.iloc[:, :6], val_cols], axis=1)
+    #     print(matrix_df.shape, matrix_df.shape)
+    #     open(matrix_out.replace('.gz', ''), 'w').write(header_row)
+    #     matrix_df.to_csv(matrix_out.replace('.gz', ''), sep='\t', header=False, index=False, mode='a')
+    #     subprocess.call('gzip -f '+ matrix_out.replace('.gz', ''), shell=True)
 
 
     # Call the plotting function.
     print('Plotting heatmap')
     heatmap_cmd = "plotHeatmap -m " + matrix_out + ' --perGroup'*perGroup + (" --plotTitle '" + title+"'")*bool(title) +\
-                    ' --startLabel ' + start_label + ' --endLabel ' + end_label + ' --colorMap ' + cmap + " --zMin "+str(vmin)+" --zMax "+str(vmax)+\
+                    " --startLabel " + "'" + start_label + "'" + " --endLabel " + "'" + end_label + "'" + " --colorMap " + cmap + " --zMin "+str(vmin)+" --zMax "+str(vmax)+\
                     " --yAxisLabel 'coverage'" + " --regionsLabel "+ ' '.join(["'"+b+"'" for b in filtered_labels])+\
                     ' --samplesLabel '+' '.join(bw_labels)+' --outFileName ' + matrix_out.replace('.gz', '_Heatmap.pdf')+ \
                     " --legendLocation " + legend_loc.lower() + " --whatToShow "+"'"+show+"'"
