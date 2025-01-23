@@ -9,7 +9,7 @@ A script for running GO term enrichment and producing plots from it.
 
 .. code-block:: python
 
-    import src.GOEnrichment as GOEnrichment
+    import GOEnrichment
     out_dir = 'docs/gallery/'  # Replace with wherever you want to store it.
     # We're using a handful of genes from studies finding genes related to Coronary Artery Disease (CAD).
     # 10.1161/CIRCRESAHA.117.312086 and 10.1038/s41586-024-07022-x

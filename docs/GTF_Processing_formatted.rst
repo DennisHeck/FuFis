@@ -9,7 +9,7 @@ To run the example code for this module, we will always start with this block of
 
 .. code-block:: python
 
-    import src.GTF_Processing as GTF_Processing
+    import GTF_Processing
     annotation = 'ExampleData/gencode.v38.annotation_Mini.gtf'
     gene_list = ['ENSG00000160294', 'ENSG00000279493', 'ENSG00000279720']
     
