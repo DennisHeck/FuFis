@@ -1,4 +1,3 @@
-
 import argparse
 
 """For each gene call TFBS in a promoter window at the 5'TSS with Fimo. Then convert Fimo's output into a matrix

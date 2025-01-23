@@ -18,7 +18,7 @@ from adjustText import adjust_text
 import seaborn as sns
 import scipy.stats
 import itertools
-import src.ColoursAndShapes as ColoursAndShapes
+import ColoursAndShapes
 
 
 def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None, title=None, output_path='', y_label='',
@@ -438,7 +438,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
             colour_order = marker_order
 
     if colour_col:
-        if is_string_dtype(plot_df[colour_col]):
+        if is_string_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool:
             if not palette:
                 if len(set(plot_df[colour_col])) > len(ColoursAndShapes.tol_vibrant):
                     palette = ColoursAndShapes.glasbey_palettes['glasbey']
@@ -463,7 +463,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         """Takes the entry that is supposed to be plotted, and checks whether we have categorical colours, or numerical
         ones."""
         if colour_col:
-            if is_string_dtype(plot_df[colour_col]):
+            if is_string_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool:
                 return colour_dict[entry[main_idx[colour_col]]]
             else:
                 if pd.isna(entry[2]):
@@ -493,7 +493,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
                         marker=marker_dict[marker_group], alpha=alpha)
         legend_list = [Line2D([0], [0], marker=marker_dict[mark], color='black' if not marker_col == colour_col else colour_dict[mark], linestyle='None') for mark in marker_dict]
         source_legend = plt.legend(legend_list, list(marker_dict.keys()), markerscale=1.49,
-                                   scatterpoints=1, fontsize=font_s-4, title=marker_col,
+                                   scatterpoints=1, fontsize=font_s-4, title=marker_col, loc='best',
                                    bbox_to_anchor=None if len(legend_list) < 7 else (1.04, 1))
         source_legend.get_title().set_fontsize(11)
         plt.gca().add_artist(source_legend)
@@ -501,10 +501,10 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         plt.scatter(x=[x[0] for x in main_list], y=[x[1] for x in main_list], c=[give_colour(x) for x in main_list],
                     s=msize, edgecolors=None, linewidth=0, zorder=12, alpha=alpha)
 
-    if colour_col and is_string_dtype(plot_df[colour_col]) and colour_col != marker_col:
+    if colour_col and (is_string_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool) and colour_col != marker_col:
         legend_list = [mpatches.Patch([0], [0], color=colour_dict[col], linestyle='None') for col in colour_dict]
         colour_legend = plt.legend(legend_list, list(colour_dict.keys()), markerscale=1,
-                                   scatterpoints=1, fontsize=font_s-4, title=colour_col,
+                                   scatterpoints=1, fontsize=font_s-4, title=colour_col, loc='best',
                                    bbox_to_anchor=None if len(legend_list) < 7 else (1.04, 1))
         colour_legend.get_title().set_fontsize(font_s-3)
         plt.gca().add_artist(colour_legend)
@@ -514,7 +514,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         to_label_df = plot_df[plot_df[label_dots[0]]]
         for i, entry in to_label_df.iterrows():
             texts.append(plt.text(x=entry[score_cols[0]], y=entry[score_cols[1]], s=entry[label_dots[1]],
-                                  fontsize=font_s-4, color=colour_dict[entry[colour_col]], zorder=42))
+                                  fontsize=font_s-2, color=give_colour([None, None, entry[colour_col]]), zorder=42))
         if adjust_labels:
             adjust_text(texts, arrowprops=dict(arrowstyle="-", color='black', lw=0.5))
     ax.set_xlabel(score_cols[0], fontsize=font_s)
@@ -530,10 +530,10 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         plt.axhline(pos, color="#a7a8a7", linestyle="--")
     for pos in vlines:
         plt.axvline(pos, color="#a7a8a7", linestyle="--")
-    if colour_col and not is_string_dtype(plot_df[colour_col]):
+    if colour_col and not is_string_dtype(plot_df[colour_col]) and plot_df[colour_col].dtype != bool:
         cax = plt.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, shrink=0.8 if not marker_col else 0.6)
         cax.set_label(colour_col, size=font_s)
-    if line_plot:
+    if line_plot is not False and line_plot is not None:
         plt.plot([x[0] for x in line_plot], [y[1] for y in line_plot], linestyle='-', color='grey', zorder=12)
     if title:
         plt.suptitle(title, fontsize=font_s+6, fontweight='bold', y=1.01)
@@ -550,6 +550,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
 
     if add_spear:
         return spear_r
+
 
 
 def venn_from_list(plot_list, label_list, plot_path, blob_colours=ColoursAndShapes.tol_highcontrast, title='',

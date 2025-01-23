@@ -11,9 +11,9 @@ from multiprocessing import Pool
 import seaborn as sns
 import pandas as pd
 import gzip
-import src.GTF_Processing as GTF_Processing
-import src.BasicPlotter as BasicPlotter
-import src.Various as Various
+import GTF_Processing
+import BasicPlotter
+import Various
 
 """Collection of functions related to analysis of bed-files, their location or intersection with other files."""
 

@@ -1,5 +1,5 @@
 from itertools import chain
-import src.GTF_Processing as GTF_Processing
+import GTF_Processing
 
 """Collection of functions related to formatting or subsetting TF motif files in meme-format."""
 

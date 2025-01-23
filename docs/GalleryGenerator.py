@@ -10,7 +10,7 @@ as template for the code in the documentation itself. This is why the imports ar
 # _________________________________________________________________________________________________________
 
 # ***GTF_Processing.base_code
-import src.GTF_Processing as GTF_Processing
+import GTF_Processing
 annotation = 'ExampleData/gencode.v38.annotation_Mini.gtf'
 gene_list = ['ENSG00000160294', 'ENSG00000279493', 'ENSG00000279720']
 # ---
@@ -112,7 +112,7 @@ open("docs/gallery/src.GTF_Processing.gene_feature_table.txt", 'w').write(str(fe
 # Bed_Analysis
 # _________________________________________________________________________________________________________
 # ***Bed_Analysis.base_code
-import src.Bed_Analysis as Bed_Analysis
+import Bed_Analysis
 from pybedtools import BedTool
 out_dir = 'docs/gallery/'  # Replace with wherever you want to store it.
 # ---
@@ -240,7 +240,7 @@ open("docs/gallery/src.Bed_Analysis.peaks_genebody_overlap.txt", 'w').write(str(
 # GOEnrichment
 # _________________________________________________________________________________________________________
 # ***GOEnrichment.go_enrichment1
-import src.GOEnrichment as GOEnrichment
+import GOEnrichment
 out_dir = 'docs/gallery/'  # Replace with wherever you want to store it.
 # We're using a handful of genes from studies finding genes related to Coronary Artery Disease (CAD).
 # 10.1161/CIRCRESAHA.117.312086 and 10.1038/s41586-024-07022-x
@@ -275,7 +275,7 @@ go_dict = GOEnrichment.go_enrichment(gene_sets, title_tag='CAD gene sets', keywo
 # GenomeLifter
 # _________________________________________________________________________________________________________
 # ***GenomeLifter.genome_lifter
-import src.GenomeLifter as GenomeLifter
+import GenomeLifter
 from pybedtools import BedTool
 
 # Lift an example list of hg38 regions to hg19.
@@ -347,7 +347,7 @@ open("docs/gallery/src.FIMO_TFBS_inPromoter.txt", 'w').write(str(fimo_matrix[['F
 # Bigwig_Counter
 # _________________________________________________________________________________________________________
 # ***Bigwig_Counter
-import src.BigWig_Counter as BigWig_Counter
+import BigWig_Counter
 # Take a mini bed-file and get the signal from two chr21 bigwig files.
 bed_file = "ExampleData/H3K27acPeaks_chr21.narrowPeak"
 bigwigs = ['ExampleData/IHECRE00000013_chr21.bigwig', 'ExampleData/IHECRE00000017_chr21.bigwig']
@@ -362,7 +362,7 @@ open("docs/gallery/src.BigWig_Counter.txt", 'w').write(str(bed_counts.head()))
 # _________________________________________________________________________________________________________
 # ***BasicPlotter.base_code
 # Block that has to be executed for all.
-import src.BasicPlotter as BasicPlotter
+import BasicPlotter
 import pandas as pd
 import seaborn as sns
 out_dir = 'docs/gallery/'
@@ -398,11 +398,10 @@ BasicPlotter.basic_bars(avg_bill_length, x_col='species', y_col='bill_length_mm'
 
 
 # _________________________________________________________________________________________________________
-# GOEnrichment
+# Various
 # _________________________________________________________________________________________________________
-
 # ***Various.fn_patternmatch
-import src.Various as Various
+import Various
 my_files = Various.fn_patternmatch('ExampleData/BirdCollection/Bird_*.txt')
 print(my_files)
 # ---
