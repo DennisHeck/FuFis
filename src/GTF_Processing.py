@@ -322,7 +322,7 @@ def match_gene_identifiers(gene_identifiers, gtf_file='', species='human', scope
             - **no_hits**: Identifiers which were not mappable via gtf-file nor mygene.info.
     """
     gene_identifiers = [str(x) for x in gene_identifiers]  # In case IDs are given as IDs.
-    available_species = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish', 'thale-cress', 'frog' and 'pig']
+    available_species = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish', 'thale-cress', 'frog', 'pig']
     if species not in available_species:
         print("ERROR: species not available with name for mygene.info", species)
         print("Available are", available_species)
