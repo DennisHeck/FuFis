@@ -4,6 +4,7 @@ import gzip
 import pandas as pd
 from timeit import default_timer as clock
 from multiprocessing import Pool
+import Various
 
 
 def score_summer(args):
