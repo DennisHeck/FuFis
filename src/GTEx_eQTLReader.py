@@ -1,7 +1,7 @@
 import gzip
 import pybedtools
 from timeit import default_timer as clock
-import TSS_Fetcher
+import GTF_Processing
 
 
 """Functions to read-in the GTEx files. Is fixed for the specific GTEx paths."""
