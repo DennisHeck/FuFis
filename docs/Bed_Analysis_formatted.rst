@@ -9,7 +9,7 @@ To run the example code for this module, we will always start with this block of
 
 .. code-block:: python
 
-    import src.Bed_Analysis as Bed_Analysis
+    import Bed_Analysis
     from pybedtools import BedTool
     out_dir = 'docs/gallery/'  # Replace with wherever you want to store it.
     

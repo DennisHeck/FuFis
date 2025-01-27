@@ -11,7 +11,7 @@ A collection of functions that don't really fit with anything else.
 
 .. code-block:: python
 
-    import src.Various as Various
+    import Various
     my_files = Various.fn_patternmatch('ExampleData/BirdCollection/Bird_*.txt')
     print(my_files)
     

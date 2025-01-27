@@ -8,7 +8,7 @@ A handy function to lift genomic coordinates between genome versions.
 
 .. code-block:: python
 
-    import src.GenomeLifter as GenomeLifter
+    import GenomeLifter
     from pybedtools import BedTool
     
     # Lift an example list of hg38 regions to hg19.
