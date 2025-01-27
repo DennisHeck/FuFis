@@ -21,7 +21,7 @@ def get_eqtls(gtex_folder, gtex_tissues, hg38_annotation, max_distance=None):
             - **eqtl_beds**: Dict of {tissues: {eqtl_type: bed object}} with the bed-object being all eQTL-gene pairs in format EnsemblID|POS-1|POS
     """
     start = clock()
-    hg38_tss = TSS_Fetcher.gene_window_bed(hg38_annotation, tss_type='5', dict_only=True)
+    hg38_tss = GTF_Processing.gene_window_bed(hg38_annotation, tss_type='5', dict_only=True)
     eqtl_types = {'CAVIAR': gtex_folder+"/GTEx_v8_finemapping_CAVIAR/CAVIAR_Results_v8_GTEx_LD_HighConfidentVariants.gz",
                   'CaVEMaN': gtex_folder+"/GTEx_v8_finemapping_CaVEMaN/GTEx_v8_finemapping_CaVEMaN.txt.gz",
                   'DAP-G': gtex_folder+"/GTEx_v8_finemapping_DAPG/GTEx_v8_finemapping_DAPG.CS95.txt.gz"}
