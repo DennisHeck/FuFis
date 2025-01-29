@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from multiprocessing import Pool
 import GenomeLifter
-import TSS_Fetcher
+import GTF_Processing
 
 
 """
@@ -33,8 +33,8 @@ def gtf_information():
         if not entry.startswith('#') and entry.split('\t')[2] == 'gene':
             gene_name_map[entry.split('\t')[8].split('gene_name "')[-1].split('"; ')[0]] = entry.split('\t')[8].split('gene_id "')[-1].split('"; ')[0].split('.')[0]
 
-    hg19_tss_dict = TSS_Fetcher.gene_window_bed(gtf_file=hg19_annotation, extend=1, tss_type='5', dict_only=True)
-    hg38_tss_dict = TSS_Fetcher.gene_window_bed(gtf_file=hg38_annotation, extend=1, tss_type='5', dict_only=True)
+    hg19_tss_dict = GTF_Processing.gene_window_bed(gtf_file=hg19_annotation, extend=1, tss_type='5', dict_only=True)
+    hg38_tss_dict = GTF_Processing.gene_window_bed(gtf_file=hg38_annotation, extend=1, tss_type='5', dict_only=True)
     return gene_name_map, hg19_tss_dict, hg38_tss_dict
 
 

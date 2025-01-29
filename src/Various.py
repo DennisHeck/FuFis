@@ -289,16 +289,16 @@ def random_sampler_percentiled(df, var_col, idx_col, hit_list, iterations=1, per
     return random_sets
 
 
-def gene_cre_overlap_fisher(interaction_df, overlap_col):
+def gene_cre_overlap_fisher(interaction_df, overlap_col, peak_id_col='peak_id'):
     """CARE: the input df is quite specific.
-    Takes a pandas df of interactions (gene in Ensembl ID and a peak identifier in peak_id) and tests for each gene
+    Takes a pandas df of interactions (gene in Ensembl ID and a peak identifier in peak_id_col) and tests for each gene
     in the Df if its CREs more often have a hit in overlap_col (e.g. ChIP-seq peak overlap) than compared to the whole
     set of CREs that form interactions."""
     inter_genes = set(interaction_df['Ensembl ID'])
-    inter_cres = len(set(interaction_df['peak_id']))
+    inter_cres = len(set(interaction_df[peak_id_col]))
     gene_num_cres = Counter(interaction_df['Ensembl ID'])
     hits_only = interaction_df[interaction_df[overlap_col] > 0]
-    cres_w_hits = len(set(hits_only['peak_id']))
+    cres_w_hits = len(set(hits_only[peak_id_col]))
     gene_cre_hits = Counter(hits_only['Ensembl ID'])
     gene_pvals = []
     for gene in inter_genes:
