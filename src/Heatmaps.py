@@ -91,7 +91,7 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
     if title:
         plt.title(title, size=18, fontweight='bold')
     plt.subplots_adjust(wspace=0.4 if not wspace else wspace)
-    plt.savefig(plot_out + "_MultiColHeatmap.pdf", bbox_inches='tight')
+    plt.savefig((plot_out + "_MultiColHeatmap.pdf").replace(' ', '_'), bbox_inches='tight')
     plt.close()
 
 

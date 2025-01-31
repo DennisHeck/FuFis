@@ -562,6 +562,8 @@ def venn_from_list(plot_list, label_list, plot_path, blob_colours=ColoursAndShap
     two sets: [a-b, b-a, a∩b]
     three sets: [a-b-c, b-a-c, a∩b-c, c-a-b, a∩c-b, b∩c-a, a∩b∩c]
      """
+    if 'glasbey' in blob_colours:
+        blob_colours = ColoursAndShapes.glasbey_palettes[blob_colours][:len(plot_list)]
     if len(plot_list) > 3:
         print("ERROR, only making Venns for three or two sets")
         return
