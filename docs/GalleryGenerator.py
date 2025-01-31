@@ -433,14 +433,14 @@ open("docs/gallery/src.UniProtAPI.uniprot_domains.txt", 'w').write(str(protein_d
 # _________________________________________________________________________________________________________
 # CoveragePlots
 # _________________________________________________________________________________________________________
-# NOTE: Run in a separate conda environment
+# NOTE: Make sure deeptools is on path
 # ***CoveragePlots.plotheatmap
 from pybedtools import BedTool
 import CoveragePlots
 out_dir = 'docs/gallery/'
 # Let's plot the signal of two bigwig files in a small set of peaks and compare that to the signal in their shuffled locations.
 peaks = BedTool("ExampleData/H3K27acPeaks_chr21.narrowPeak")
-shuffled_peaks = peaks.shuffle(genome='hg38', seed=12)
+shuffled_peaks = peaks.shuffle(genome='hg38', chrom=True, seed=12)
 bigwigs = ['ExampleData/IHECRE00000013_chr21.bigwig', 'ExampleData/IHECRE00000017_chr21.bigwig']
 CoveragePlots.plotHeatmap(beds_to_plot=[peaks, shuffled_peaks], bed_labels=['Original', 'Shuffled'], bigwigs=bigwigs, bw_labels=['Sample1', 'Sample2'],
                           out_dir=out_dir, out_tag='ExampleCoveragePlot', mode='scale', perGroup=True, title='',
