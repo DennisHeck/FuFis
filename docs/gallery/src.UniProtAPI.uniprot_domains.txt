@@ -1,0 +1,3 @@
+{'KDM6A': {'JmjC'}, 'DNMT3A': {'ADD', 'PWWP', 'SAM-dependent MTase C5-type'}, 'STAT2': {'SH2'}}
+
+{'KDM6A': {'Interaction with SUPT6H', 'Disordered'}, 'DNMT3A': {'Interaction with the PRC2/EED-EZH2 complex', 'Interaction with DNMT1 and DNMT3B', 'Disordered'}, 'STAT2': {'Interaction with SFTSV virus NSs', 'Interaction with heartland virus NSs', 'Mediates interaction with USP18'}}

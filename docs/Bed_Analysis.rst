@@ -121,4 +121,11 @@ DiffATAC/DiffATAC_TCells.txt
 .. include:: gallery/src.Bed_Analysis.peaks_genebody_overlap.txt
     :literal:
 
+.. autofunction:: Bed_Analysis.possible_interactions
 
+.. code-block:: python
+
+    *Bed_Analysis.possible_interactions*
+
+.. include:: gallery/src.Bed_Analysis.possible_interactions.txt
+    :literal:

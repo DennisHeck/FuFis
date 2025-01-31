@@ -1,4 +1,4 @@
-Schabrackentapir
+FuFis (Frequently used Functions)
 ===========================================================================
 
 
@@ -13,4 +13,5 @@ Schabrackentapir
    FIMO_TFBS_formatted.rst
    BigWig_Counter_formatted.rst
    BasicPlotter_formatted.rst
+   UniProt_API_formatted.rst
    Various_formatted.rst

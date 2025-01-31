@@ -11,6 +11,10 @@ installed (conda but fast), just replace the 'conda' in the commands with 'mamba
 git clone https://github.com/DennisHeck/FuFis.git
 conda env create -f requirements.txt
 
+Disclaimers:
+ - No warranties. There are no tests to guarantee the correctness of functions. Be sceptical.
+ - Double-check whether the packages and APIs of the functions originate from work that needs to be cited. Usually, this is mentioned in the docstring, but this is not kept up-to-date and does not claim to be complete.
+
 If you also have functions which could be useful to others, it would be great if you open a pull request to add
 it to the collection! If you submit anything, please:
  - Provide code how to run it.
@@ -20,9 +24,6 @@ it to the collection! If you submit anything, please:
 
 If you want to make the maintainers' lives even easier, follow the guide on how to document code for this repository. TODO
 
-Disclaimers:
- - No warranties. There are no tests to guaranty the correctness of functions. Be sceptical.
- - Double-check whether the packages and APIs of the functions originate from work that needs to be cited. Usually, this is mentioned in the docstring, but this is not kept up-to-date and does not claim to be complete.
 
 ***************************
 Frequently used Flags

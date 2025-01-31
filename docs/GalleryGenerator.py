@@ -235,6 +235,15 @@ print(gene_body_fractions)
 # ---
 open("docs/gallery/src.Bed_Analysis.peaks_genebody_overlap.txt", 'w').write(str(gene_body_fractions))
 
+# ***Bed_Analysis.possible_interactions
+# For a small example, get all possible region-gene combinations within 500 base pairs.
+peak_file = 'ExampleData/H3K27acPeaks_chr21.narrowPeak'
+annotation = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'
+all_interactions = Bed_Analysis.possible_interactions(peak_file=peak_file, gtf_file=annotation, extend=500, tss_type='5')
+print(list(all_interactions)[:3])
+# ---
+open("docs/gallery/src.Bed_Analysis.possible_interactions.txt", 'w').write(str(list(all_interactions)[:3]))
+
 
 # _________________________________________________________________________________________________________
 # GOEnrichment
@@ -406,4 +415,36 @@ my_files = Various.fn_patternmatch('ExampleData/BirdCollection/Bird_*.txt')
 print(my_files)
 # ---
 open("docs/gallery/src.Various.fn_patternmatch.txt", 'w').write(str(my_files))
+
+
+# _________________________________________________________________________________________________________
+# UniProtAPI
+# _________________________________________________________________________________________________________
+# ***UniProt_API.uniprot_domains
+import UniProt_API
+# Look up the annotated domains and regions of three examples.
+protein_domains, protein_regions, missed_proteins, failed_requests = UniProt_API.uniprot_domains(protein_names=['KDM6A', 'DNMT3A', 'STAT2'], species='human', n_cores=1)
+print(protein_domains)
+print(protein_regions)
+# ---
+open("docs/gallery/src.UniProtAPI.uniprot_domains.txt", 'w').write(str(protein_domains) + '\n\n' + str(protein_regions))
+
+
+# _________________________________________________________________________________________________________
+# CoveragePlots
+# _________________________________________________________________________________________________________
+# NOTE: Run in a separate conda environment
+# ***CoveragePlots.plotheatmap
+from pybedtools import BedTool
+import CoveragePlots
+out_dir = 'docs/gallery/'
+# Let's plot the signal of two bigwig files in a small set of peaks and compare that to the signal in their shuffled locations.
+peaks = BedTool("ExampleData/H3K27acPeaks_chr21.narrowPeak")
+shuffled_peaks = peaks.shuffle(genome='hg38', seed=12)
+bigwigs = ['ExampleData/IHECRE00000013_chr21.bigwig', 'ExampleData/IHECRE00000017_chr21.bigwig']
+CoveragePlots.plotHeatmap(beds_to_plot=[peaks, shuffled_peaks], bed_labels=['Original', 'Shuffled'], bigwigs=bigwigs, bw_labels=['Sample1', 'Sample2'],
+                          out_dir=out_dir, out_tag='ExampleCoveragePlot', mode='scale', perGroup=True, title='',
+                          scaled_size=500, start_label='Peak start', end_label='Peak end')
+# ---
+
 

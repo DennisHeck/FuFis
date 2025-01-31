@@ -199,4 +199,16 @@ DiffATAC/DiffATAC_TCells.txt
 .. include:: gallery/src.Bed_Analysis.peaks_genebody_overlap.txt
     :literal:
 
+.. autofunction:: Bed_Analysis.possible_interactions
 
+.. code-block:: python
+
+    # For a small example, get all possible region-gene combinations within 500 base pairs.
+    peak_file = 'ExampleData/H3K27acPeaks_chr21.narrowPeak'
+    annotation = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'
+    all_interactions = Bed_Analysis.possible_interactions(peak_file=peak_file, gtf_file=annotation, extend=500, tss_type='5')
+    print(list(all_interactions)[:3])
+    
+
+.. include:: gallery/src.Bed_Analysis.possible_interactions.txt
+    :literal:

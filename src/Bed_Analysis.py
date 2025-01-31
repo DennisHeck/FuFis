@@ -550,13 +550,13 @@ def peaks_genebody_overlap(peak_file, gtf_file, gene_set=()):
     return gene_dict
 
 
-def possible_interactions(cres, gtf_file, extend=2500000, gene_set=set(), tss_type='all'):
+def possible_interactions(peak_file, gtf_file, extend=2500000, gene_set=set(), tss_type='all'):
     """
     Take a bed-file or BedTools object along with a gtf-file annotation to find all possible interactions, meaning
     all pairs of CRE-gene that are within the extend limit.
 
     Args:
-        cres: Path to a bed-file or a BedTools object.
+        peak_file: Path to a bed-file or a BedTools object.
         gtf_file: gtf-file in GENCODE's format, can be gzipped.
         extend: Number of base pairs to extend the TSS in each direction. 200 means a window of size 401.
         gene_set: Set of Ensembl IDs or gene names or mix of both to limit the output to. If empty, return for all
@@ -565,12 +565,12 @@ def possible_interactions(cres, gtf_file, extend=2500000, gene_set=set(), tss_ty
 
     Returns:
         set:
-        All CRE-gene pairs within the defined distance, separated by a hash sign, e.g. chrX-100636854-100637354#ENSG00000000003.
+            - **all_interactions**: All CRE-gene pairs within the defined distance, separated by a hash sign, e.g. chrX-100636854-100637354#ENSG00000000003.
     """
     start_i = clock()
-    cres = BedTool('\n'.join(['chr'+'\t'.join(x.fields[:3]).replace('chr', '') for x in BedTool(cres)]), from_string=True)
+    cres = BedTool('\n'.join(['chr'+'\t'.join(x.fields[:3]).replace('chr', '') for x in BedTool(peak_file)]), from_string=True)
     gene_windows = GTF_Processing.gene_window_bed(gtf_file, extend=extend, gene_set=gene_set,
-                                               tss_type=tss_type, merge=True)
+                                                  tss_type=tss_type, merge=True)
     whole_intersection = gene_windows.intersect(cres, wo=True)
     prom_n_fields = len(gene_windows[0].fields)
     all_interactions = set(['-'.join(x.fields[prom_n_fields:prom_n_fields+3]) + '#' + x.fields[3] for x in whole_intersection])

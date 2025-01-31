@@ -69,16 +69,22 @@ def api_helper(args):
 
 def uniprot_domains(protein_names, species='human', n_cores=1):
     """
-    Uses the UniProt API to look up the annotated domains and regions for a list of protein names/gene names.
+    Uses the UniProt API (https://www.uniprot.org/) to look up the annotated domains and regions for a list of protein names/gene names.
     The domains will only contain the ones from PROSITE, the regions also other annotations. Only entries that are
     reviewed are considered. Also, the proteins must exist like that in UniProt, aliases are not mapped.
     CARE: The UniProt API is unreliable, time-outs, random mal-formatted JSONs, empty results etc.
 
+    Args:
+        protein_names: List of protein names or gene names that should be queried.
+        species: Species. Check their website for available options.
+        n_cores: Cores for parallelization. For large list it can take quite long, it has to be batched to not exceed character limits.
+
     Returns:
-        protein_domains: Dictionary of {protein: set(domains)} with the PROSITE domains. Can be empty.
-        protein_regions: Dictionary of {protein: set(regions)}. Can be empty.
-        missed_proteins: Set of proteins where no matching entry was found in UniProt.
-        failed_requests: Dictionary of {batch number: {Failure information}} in cases the request didn't work or where the JSON from the API was malformatted, not sure why and when this happens.
+        tuple:
+            - **protein_domains**: Dictionary of {protein: set(domains)} with the PROSITE domains. Can be empty.
+            - **protein_regions**: Dictionary of {protein: set(regions)}. Can be empty.
+            - **missed_proteins**: Set of proteins where no matching entry was found in UniProt.
+            - **failed_requests**: Dictionary of {batch number: {Failure information}} in cases the request didn't work or where the JSON from the API was malformatted, not sure why and when this happens.
     """
     start = clock()
     # Prepare the uniprot ID.
