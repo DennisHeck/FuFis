@@ -605,18 +605,24 @@ def venn_from_list(plot_list, label_list, plot_path, blob_colours=ColoursAndShap
     plt.close('All')
 
 
-def upset_plotter(inter_sets, max_groups=None, sort_by='cardinality', y_label='Intersection', title_tag='',
-                  show_percent=False, plot_path='', min_degree=0, sort_categories_by='cardinality',
-                  intersection_plot_elements=None, font_enhancer=0, element_size=None, formats=['pdf']):
+def upset_plotter(inter_sets, y_label='Intersection', max_groups=None, min_degree=0, show_percent=False,
+                  sort_categories_by='cardinality', sort_by='cardinality', intersection_plot_elements=None,
+                  element_size=None, title_tag='', plot_path='', font_s=14, formats=['pdf']):
     """
-    Based on a dictionary with sets as values creates the intersection and an upsetplot.
+    Based on a dictionary with sets as values creates the intersection and an upsetplot. Uses the upsetplot package
+    (https://upsetplot.readthedocs.io/en/stable/#) based on doi.org/10.1109/TVCG.2014.2346248. The size of the resulting
+    plot isn't that easy to control with the flags, the package isn't very user-friendly in that regard.
 
     Args:
-        max_groups: defines the maximum number of intersections plotted, sorted descending by size
-        sort_categories_by: cardinality, degree or input.
-        font_enhancer: what to add onto the default sizes, does not affect the title.
-        intersection_plot_elements: height
-        element_size: ~overall size and margins
+        inter_sets: Dictionary of {key: set}, each key will be plotted as one row.
+        y_label: Label for the y-axis.
+        max_groups: Defines the maximum number of intersections plotted, sorted descending by size.
+        min_degree: Minimum overlap between groups to show.
+        show_percent: Write the percentage of overlap on top of the bars.
+        sort_categories_by: How to sort the rows, 'cardinality', 'degree' or 'input'.
+        sort_by: How to order the columns, meaning the groups of intersections, 'cardinality' or 'degree'.
+        intersection_plot_elements: Roughly the height of the plot.
+        element_size: Roughly the overall size and margins.
     """
     # totals_plot_elements: ~size of the horizontal bars for total size
     if sort_categories_by == 'input':  # Reverse the order, to have it from top to bottom.
@@ -648,12 +654,12 @@ def upset_plotter(inter_sets, max_groups=None, sort_by='cardinality', y_label='I
                                          element_size=len(inter_sets)*1.2+max_string+30 if not element_size else element_size, sort_by=sort_by,
                                          sort_categories_by=sort_categories_by)
 
-    with plt.rc_context({'axes.titlesize': 20,
-                         'axes.labelsize': 14+font_enhancer,
-                         'xtick.labelsize': 11+font_enhancer,  # Ensures enough space between horizontal bars and UpSet.
-                         'ytick.labelsize': 12+font_enhancer,
-                         'font.size': 11+font_enhancer,  # For whatever reason font.size is only for the counts on top of the bars.
-                         'legend.fontsize': 14+font_enhancer}):
+    with plt.rc_context({'axes.titlesize': font_s+6,
+                         'axes.labelsize': 14,
+                         'xtick.labelsize': font_s-3,  # Ensures enough space between horizontal bars and UpSet.
+                         'ytick.labelsize': font_s-2,
+                         'font.size': font_s-3,  # For whatever reason font.size is only for the counts on top of the bars.
+                         'legend.fontsize': font_s}):
         filtered_upset.plot(fig)
 
     ax = plt.gca()
@@ -663,6 +669,79 @@ def upset_plotter(inter_sets, max_groups=None, sort_by='cardinality', y_label='I
         formats = [formats]
     for form in formats:
         plt.savefig((plot_path + '_UpSet.'+form).replace(' ', ''), bbox_inches='tight', format=form)
+    plt.close()
+
+
+def overlap_heatmap(inter_sets, title="", plot_path='', xsize=12, ysize=8, annot=True, mode='Jaccard', annot_type='Jaccard',
+                    font_s=14, matrix_only=False, cmap='mako', formats=['pdf']):
+    """
+    Create heatmap of pairwise overlap of a collection of sets. Either make a symmetric heatmap of the Jaccard index
+    or plot the asymmetric fraction of overlap. Combinations are formed by the keys of the dictionary.
+
+    Args:
+        mode: 'Jaccard' to show the Jaccard index of the intersection, 'Fraction' to show the percentage.
+        annot_type: 'Jaccard' to get the Jaccard index written into the cells, 'Fraction' for the fraction, and 'Absolute' to get the absolute number of shared items.
+        matrix_only: Whether only the matrix should be given without creating a plot, will return two dfs, one with
+            the shared metric and the other the cell labels. If False, only producing the plot without returning matrices.
+    """
+    if mode == 'Jaccard':
+        cbar_label = "Jaccard index"
+    elif mode == 'Fraction':
+        cbar_label = "Fraction shared [ (row & column) / row ]"
+    else:
+        print("ERROR: Invalid mode", mode)
+        return
+    set_tags = list(inter_sets.keys())
+    combos = list(itertools.combinations(set_tags, 2))
+    shared_mat = np.ones([len(inter_sets), len(inter_sets)])
+    annot_mat = np.ones([len(inter_sets), len(inter_sets)])
+
+    for comb in combos:
+        shared = len(inter_sets[comb[0]] & inter_sets[comb[1]])
+        if shared == 0:
+            continue
+        if mode == 'Jaccard':
+            shared_mat[set_tags.index(comb[0])][set_tags.index(comb[1])] = shared / len(inter_sets[comb[0]].union(inter_sets[comb[1]]))
+            shared_mat[set_tags.index(comb[1])][set_tags.index(comb[0])] = shared / len(inter_sets[comb[0]].union(inter_sets[comb[1]]))
+        elif mode == "Fraction":
+            shared_mat[set_tags.index(comb[0])][set_tags.index(comb[1])] = shared / len(inter_sets[comb[0]])
+            shared_mat[set_tags.index(comb[1])][set_tags.index(comb[0])] = shared / len(inter_sets[comb[1]])
+        if annot_type == "Jaccard":
+            annot_mat[set_tags.index(comb[0])][set_tags.index(comb[1])] = shared / len(inter_sets[comb[0]].union(inter_sets[comb[1]]))
+            annot_mat[set_tags.index(comb[1])][set_tags.index(comb[0])] = shared / len(inter_sets[comb[0]].union(inter_sets[comb[1]]))
+        else:
+            annot_mat[set_tags.index(comb[0])][set_tags.index(comb[1])] = len(inter_sets[comb[0]] & inter_sets[comb[1]])
+            annot_mat[set_tags.index(comb[1])][set_tags.index(comb[0])] = len(inter_sets[comb[0]] & inter_sets[comb[1]])
+    if annot_type == 'Jaccard' or annot_type == 'Fraction':
+        annot_mat = annot_mat.round(3)
+    elif annot_type == 'Absolute':
+        for n in range(len(set_tags)):  # Fill the diagonal with the absolute number of items.
+            annot_mat[n][n] = len(inter_sets[set_tags[n]])
+            if len(inter_sets[set_tags[n]]) > 0:
+                shared_mat[n][n] = 1
+        annot_mat = annot_mat.astype(int)
+
+    if matrix_only:
+        shared_df = pd.DataFrame(shared_mat, columns=set_tags, index=set_tags)
+        annot_df = pd.DataFrame(annot_mat, columns=set_tags, index=set_tags)
+        return shared_df, annot_df
+
+    f, ax = plt.subplots(figsize=(xsize, ysize))
+    shared_heat = sns.heatmap(shared_mat, cmap=cmap, ax=ax, square=True, vmin=0, vmax=1, rasterized=True,
+                              yticklabels=set_tags, xticklabels=set_tags, fmt='',
+                              annot=None if not annot else annot_mat,
+                              annot_kws={'size': font_s-2}, cbar_kws={'label': cbar_label, 'pad': 0.01})
+    shared_heat.set_xticklabels(shared_heat.get_xmajorticklabels(), fontsize=font_s-2, rotation=90, fontweight='bold')
+    shared_heat.set_yticklabels(shared_heat.get_ymajorticklabels(), fontsize=font_s-2, rotation=0, fontweight='bold')
+    shared_heat_cbar = shared_heat.collections[0].colorbar
+    shared_heat_cbar.ax.tick_params(labelsize=font_s)
+    shared_heat_cbar.ax.yaxis.label.set_fontsize(font_s)
+    plt.suptitle(title, y=0.93, size=font_s+4, fontweight='bold')
+    plt.subplots_adjust(wspace=0.02)
+    if type(formats) != list:
+        formats = [formats]
+    for form in formats:
+        plt.savefig((plot_path + "_SharedHeatmap."+form).replace(" ", "_"), bbox_inches='tight', format=form)
     plt.close()
 
 

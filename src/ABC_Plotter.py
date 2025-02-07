@@ -3,7 +3,6 @@ import gzip
 import pandas as pd
 import numpy as np
 import Heatmaps
-import Jaccard_Maps
 import BasicPlotter
 
 
@@ -86,5 +85,5 @@ def harry_plotter(abc_folder, tag_order=None, plot_path='', same_enhancer=True, 
         Heatmaps.interaction_intersection_diff_enhancer(abc_folder=abc_folder, tag_order=tag_order,
                                                         plot_path=plot_path, x_size=16, y_size=10, annot_s=15)
     else:
-        Jaccard_Maps.jc_mat(abc_files, plot_path, tag_order)
+        BasicPlotter.overlap_heatmap(abc_files, plot_path, tag_order)
 

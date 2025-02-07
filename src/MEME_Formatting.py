@@ -11,8 +11,8 @@ def meme_monomer_map(meme_file):
     """
     tfs = [x.split('\n\n')[0].split(' ')[0] for x in open(meme_file).read().split('MOTIF ')[1:]]
     tf_monomer_map = {t: [x.split('(')[0] for x in t.split('::')] for t in tfs}
-    all_tf_names = list(set(chain(*tf_monomer_map.values())))
-    return tf_monomer_map, all_tf_names
+    all_monomer_names = list(set(chain(*tf_monomer_map.values())))
+    return tf_monomer_map, all_monomer_names
 
 
 def meme_id_map(meme_file, gtf_file, species='human'):

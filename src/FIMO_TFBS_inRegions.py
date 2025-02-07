@@ -23,9 +23,11 @@ if __name__ == '__main__':
 
     args, seq_out, fimo_out = FIMO_TFBS_Helper.process_args(parser.parse_args())
 
-    # Get regions and run Fimo
+    # Limit the bed file to the coordinates, otherwise there can be weird stuff happening.
+    inter_bed = BedTool('\n'.join(['\t'.join(x.split('\t')[:3]) for x in open(args.bed_file).readlines() if not x.startswith('#')]),
+                        from_string=True)
     # Force the regions to be within the chromosome boundaries.
-    inter_bed = BedTool(args.bed_file).slop(g=args.fasta + '.fai', b=0)
+    inter_bed = inter_bed.slop(g=args.fasta + '.fai', b=0)
     inter_bed = BedTool(''.join([str(x) for x in inter_bed if x.length > 1]), from_string=True)
     if not inter_bed:
         print("No remaining region after capping at locations covered by the fasta file.")

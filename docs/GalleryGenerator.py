@@ -357,7 +357,7 @@ open("docs/gallery/src.FIMO_TFBS_inPromoter.txt", 'w').write(str(fimo_matrix[['F
 # _________________________________________________________________________________________________________
 # ***Bigwig_Counter
 import BigWig_Counter
-# Take a mini bed-file and get the signal from two chr21 bigwig files.
+# Take a mini bed-file and get the signal from two chr21 bigwig files from IHEC (https://ihec-epigenomes.org/epiatlas/data/).
 bed_file = "ExampleData/H3K27acPeaks_chr21.narrowPeak"
 bigwigs = ['ExampleData/IHECRE00000013_chr21.bigwig', 'ExampleData/IHECRE00000017_chr21.bigwig']
 bed_counts, errors = BigWig_Counter.bigwig_counts(bed_file, bigwigs, n_cores=1)
@@ -377,6 +377,33 @@ import seaborn as sns
 out_dir = 'docs/gallery/'
 penguin_df = sns.load_dataset('penguins')   # Example data from seaborn.
 # ---
+# Barplot with one bar per group.
+# ***BasicPlotter.basic_bars
+avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
+BasicPlotter.basic_bars(penguin_df, x_col='species', y_col='flipper_length_mm', formats=['png'],
+                        x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Example bar plot',
+                        output_path=out_dir, y_label='Flipper length [mm]', rotation=None, palette='glasbey_cool')
+# ---
+
+# ***BasicPlotter.overlap_heatmap
+# Plot the overlap of lists of ingredients (incomplete), once with the Jaccard index and once as fraction.
+ingredients = {"Cookies": {'butter', 'sugar', 'flour', 'baking powder', 'chocolate'},
+               'Apple pie': {'butter', 'sugar', 'flour', 'baking powder', 'apples'},
+               'Bread': {'flour', 'yeast', 'oil', 'salt'}}
+for mode in ['Fraction', 'Jaccard']:
+    BasicPlotter.overlap_heatmap(inter_sets=ingredients, title="Ingredients overlap as "+mode, plot_path=out_dir+"Ingredients_"+mode,
+                                 xsize=10, ysize=6, mode=mode, annot_type='Jaccard' if mode == 'Jaccard' else 'Absolute', formats='png')
+# ---
+
+# ***BasicPlotter.upset_plotter
+# Use the same sets from the previous function, but now visualize the overlap with an UpsetPlot.
+ingredients = {"Cookies": {'butter', 'sugar', 'flour', 'baking powder', 'chocolate'},
+               'Apple pie': {'butter', 'sugar', 'flour', 'baking powder', 'apples'},
+               'Bread': {'flour', 'yeast', 'oil', 'salt'}}
+BasicPlotter.upset_plotter(inter_sets=ingredients, sort_categories_by='input', title_tag='Ingredients overlap',
+                           plot_path=out_dir+"Ingredients", intersection_plot_elements=4, formats=['png'])
+# ---
+
 
 # ***BasicPlotter.cumulative_plot
 # This is most instructive with diverging data e.g. logFC from RNA-seq. We use the RNA data from a study on the histone
@@ -388,24 +415,6 @@ rna_table['binned H3K79me2 GB Coverage'] = pd.cut(rna_table['H3K79me2 GB Coverag
 BasicPlotter.cumulative_plot(rna_table, x_col='logFC', hue_col='binned H3K79me2 GB Coverage', palette='glasbey_cool', xlimit=[-1.5, 2],
                              add_all=True, output_path=out_dir, numerate=True, title=None, vertical_line=0, table_width=0.4, table_x_pos=1.2, formats=['png'])
 # ---
-
-
-# Barplot with one bar per group.
-# ***BasicPlotter.basic_bars
-avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
-BasicPlotter.basic_bars(penguin_df, x_col='species', y_col='flipper_length_mm', formats=['png'],
-                        x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Group of pinguins on land is called a waddle',
-                        output_path=out_dir, y_label='Flipper length [mm]', rotation=None, palette='glasbey_cool')
-# ---
-
-# ***BasicPlotter.basic_bars2
-avg_bill_length = pd.DataFrame(penguin_df.groupby('species')['bill_length_mm'].mean())
-BasicPlotter.basic_bars(avg_bill_length, x_col='species', y_col='bill_length_mm',
-                        x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Group of pinguins on land is called a waddle',
-                        output_path=out_dir, y_label='Bill length [mm]', rotation=None, palette='glasbey_cool')
-# ---
-
-
 # _________________________________________________________________________________________________________
 # Various
 # _________________________________________________________________________________________________________
@@ -434,17 +443,31 @@ open("docs/gallery/src.UniProtAPI.uniprot_domains.txt", 'w').write(str(protein_d
 # CoveragePlots
 # _________________________________________________________________________________________________________
 # NOTE: Make sure deeptools is on path
-# ***CoveragePlots.plotheatmap
+# ***CoveragePlots.plotHeatmap
 from pybedtools import BedTool
 import CoveragePlots
 out_dir = 'docs/gallery/'
-# Let's plot the signal of two bigwig files in a small set of peaks and compare that to the signal in their shuffled locations.
+# Let's plot the signal of two bigwig files from IHEC (https://ihec-epigenomes.org/epiatlas/data/) in a small set of peaks and compare that to the signal in their shuffled locations.
 peaks = BedTool("ExampleData/H3K27acPeaks_chr21.narrowPeak")
 shuffled_peaks = peaks.shuffle(genome='hg38', chrom=True, seed=12)
 bigwigs = ['ExampleData/IHECRE00000013_chr21.bigwig', 'ExampleData/IHECRE00000017_chr21.bigwig']
 CoveragePlots.plotHeatmap(beds_to_plot=[peaks, shuffled_peaks], bed_labels=['Original', 'Shuffled'], bigwigs=bigwigs, bw_labels=['Sample1', 'Sample2'],
                           out_dir=out_dir, out_tag='ExampleCoveragePlot', mode='scale', perGroup=True, title='',
                           scaled_size=500, start_label='Peak start', end_label='Peak end')
+# ---
+
+# _________________________________________________________________________________________________________
+# JaccardMaps
+# _________________________________________________________________________________________________________
+# ***JaccardMaps.jc_heatmap
+import BasicPlotter
+out_dir = 'docs/gallery/'
+# Plot the overlap of lists of ingredients (incomplete), once with the Jaccard index and once as fraction.
+ingredients = {"Cookies": {'butter', 'sugar', 'flour', 'baking powder', 'chocolate'},
+               'Apple pie': {'butter', 'sugar', 'flour', 'baking powder', 'apples'},
+               'Bread': {'flour', 'yeast', 'oil', 'salt'}}
+BasicPlotter.overlap_heatmap(inter_sets=ingredients, title="Ingredients overlap", plot_path=out_dir+"Ingredients_JC",
+                             xsize=10, ysize=6, mode='JC', annot_type='JC', annot_size=13)
 # ---
 
 
