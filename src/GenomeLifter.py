@@ -5,6 +5,7 @@ import numpy as np
 import subprocess
 from pybedtools import BedTool
 import Various
+import GTF_Processing
 
 
 def genome_lifter(regions, input_version, output_version, same_chr=True, size_change=2):
@@ -90,7 +91,7 @@ def abc_lifter(abc_folder, lift_folder, input_version, output_version, output_gt
     to_lift = set([x.split('.txt.gz')[0] for x in os.listdir(abc_folder) if not x.startswith('.') and '_ABCpp_scoredInteractions' in x and x.endswith(".txt.gz")]) - already_lifted
 
     # Get the 5' TSS in the output annotation to check how much the distance of interactions changed.
-    output_tss = TSS_Fetcher.gene_window_bed(output_gtf, extend=1, tss_type=tss_mode, dict_only=True)
+    output_tss = GTF_Processing.gene_window_bed(output_gtf, extend=1, tss_type=tss_mode, dict_only=True)
 
     for tag in to_lift:
         abc_file = abc_folder + '/' + tag + '.txt.gz'

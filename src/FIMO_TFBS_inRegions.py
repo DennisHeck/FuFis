@@ -32,7 +32,7 @@ if __name__ == '__main__':
     if not inter_bed:
         print("No remaining region after capping at locations covered by the fasta file.")
         exit()
-    inter_bed.sequence(fi=args.fasta, fo=seq_out, name=True)
+    inter_bed.sequence(fi=args.fasta, fo=seq_out)
     print('sequence fasta stored at', seq_out)
 
     new_meme_file = FIMO_TFBS_Helper.meme_fitbackground(args.PWMs, seq_out, args.out_dir)
