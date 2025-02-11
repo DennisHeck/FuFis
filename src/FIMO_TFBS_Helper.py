@@ -6,6 +6,7 @@ from pybedtools import BedTool
 
 """Helper functions for calling FIMO and processing its output."""
 
+
 def process_args(args):
     if args.write_sequence.lower() == 'true':
         args.write_sequence = True
@@ -30,8 +31,10 @@ def process_args(args):
 
 
 def meme_fitbackground(meme_file, sequence_file, out_dir):
-    """Takes a TF motif file in meme format and a fasta sequence file to create a new meme file where the
-    base content in the header fits to the frequencies in the sequence file."""
+    """
+    Takes a TF motif file in meme format and a fasta sequence file to create a new meme file where the
+    base content in the header fits to the frequencies in the sequence file.
+    """
     base_occs = Counter(
         ''.join([x.strip().lower().replace('n', '') for x in open(sequence_file).readlines() if not x.startswith('>')]))
     cg_content = (base_occs['c'] + base_occs['g']) / sum(base_occs.values()) / 2
@@ -49,7 +52,9 @@ def meme_fitbackground(meme_file, sequence_file, out_dir):
 
 
 def fimo_runner(args, seq_out, fimo_out, new_meme_file):
-    """A wrapper to call FIMO to avoid redundant code for catching specific flags."""
+    """
+    A wrapper to call FIMO to avoid redundant code for catching specific flags.
+    """
     print("Running Fimo")
     write_seq = '' if args.write_sequence else '--skip-matched-sequence'
     # FIMO has its own names when writing the sequence which makes it annoying to handle.
@@ -67,8 +72,10 @@ def fimo_runner(args, seq_out, fimo_out, new_meme_file):
 
 
 def fimo_processor(args, fimo_out):
-    """Takes a FIMO output file and creates a matrix of seq_names to TFBS, while merging all TFBS that are in the
-    same region on the strand and counting them as 1."""
+    """
+    Takes a FIMO output file and creates a matrix of seq_names to TFBS, while merging all TFBS that are in the
+    same region on the strand and counting them as 1.
+    """
     print("Processing Fimo output")
     fimo_fetcher = ''  # Create a bed object to merge hits, with the chromosome as TF#region#strand
     all_regions = set()

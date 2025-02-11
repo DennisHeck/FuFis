@@ -14,5 +14,8 @@ FuFis (Frequently used Functions)
     GenomeLifter_formatted.rst
     GTF_Processing_formatted.rst
     GOEnrichment_formatted.rst
+    MEME_Formatting_formatted.rst
+    Heatmaps_formatted.rst
     UniProt_API_formatted.rst
     Various_formatted.rst
+    DocuDocu.rst

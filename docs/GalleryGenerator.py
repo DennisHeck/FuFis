@@ -376,17 +376,101 @@ import pandas as pd
 import seaborn as sns
 out_dir = 'docs/gallery/'
 penguin_df = sns.load_dataset('penguins')   # Example data from seaborn.
+print(penguin_df.head())
 # ---
+open("docs/gallery/src.BasicPlotter_base_code.txt", 'w').write(str(penguin_df.head()))
+
+
 # Barplot with one bar per group.
 # ***BasicPlotter.basic_bars
+# Make a basic barplot with the average flipper length per species.
 avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
-BasicPlotter.basic_bars(penguin_df, x_col='species', y_col='flipper_length_mm', formats=['png'],
+BasicPlotter.basic_bars(avg_flipper_length, x_col='species', y_col='flipper_length_mm', formats=['png'],
                         x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Example bar plot',
                         output_path=out_dir, y_label='Flipper length [mm]', rotation=None, palette='glasbey_cool')
+
+# Make a second version where we additionally split by sex per species.
+avg_flipper_length_sex = pd.DataFrame(penguin_df.groupby(['species', 'sex'])['flipper_length_mm'].mean()).reset_index()
+BasicPlotter.basic_bars(avg_flipper_length_sex, x_col='species', y_col='flipper_length_mm', formats=['png'],
+                        hue_col='sex', x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Example bar plot with hue',
+                        output_path=out_dir + "SexHue", y_label='Flipper length [mm]', rotation=None,
+                        palette='glasbey_cool')
+# ---
+
+# ***BasicPlotter.stacked_bars
+# For multiple groups per bar, let's look at from which island the penguins came. Plot it once as absolute numbers
+# and again as fraction.
+species_island = penguin_df.groupby(['species', 'island']).size().reset_index().rename(columns={0: 'count'}).pivot(index='species', columns='island', values='count')
+for do_fraction in [True, False]:
+    BasicPlotter.stacked_bars(species_island, x_col='species', y_cols=species_island.columns, y_label='count', sort_stacks=False,
+                              title='Stacked bars '+('fraction' if do_fraction else 'absolute'), output_path=out_dir, legend_out=1.33,
+                              rotation=0, palette='glasbey_cool', fraction=do_fraction, formats=['png'])
+# ---
+# ***BasicPlotter.basic_pie
+# An alternative to stacked barplots when focusing on one group are pie charts.
+species_island_adelie = pd.DataFrame(penguin_df.groupby(['species', 'island']).size().reset_index().rename(columns={0: 'count'}).pivot(index='species', columns='island', values='count').loc['Adelie'])
+BasicPlotter.basic_pie(species_island_adelie, title='Adelie islands', palette='glasbey_cool', numerate=True,
+                       output_path=out_dir, legend_title='island', formats=['png'])
+# ---
+
+# ***BasicPlotter.basic_hist
+# Look at the whole distribution of flipper length by using a histogram and split by species.
+BasicPlotter.basic_hist(penguin_df, x_col='flipper_length_mm', hue_col='species', bin_num=20, title='Flipper length per species',
+                        output_path=out_dir, stat='percent', palette='glasbey_cool', element='step', alpha=0.7, formats=['png'])
+# ---
+
+# ***BasicPlotter.basic_violin
+# An alternative is to separate the species along the x-axis and do violin plots.
+BasicPlotter.basic_violin(penguin_df, y_col='flipper_length_mm', x_col='species', title='Flipper length per species',
+                          output_path=out_dir, numerate=True, palette='glasbey_cool', formats=['png'])
+# Alternatively do boxplots instead and also add the individual data points as jitter.
+BasicPlotter.basic_violin(penguin_df, y_col='flipper_length_mm', x_col='species', title='Flipper length per species',
+                          output_path=out_dir+"BoxplotJitter", numerate=True, palette='glasbey_cool', formats=['png'],
+                          boxplot=True, jitter=True)
+# ---
+
+# ***BasicPlotter.basic_2Dhist
+# Plot the distribution of two features as 2D histogram. This example has very few points, so a scatter would work better.
+BasicPlotter.basic_2Dhist(penguin_df, columns=['flipper_length_mm', 'body_mass_g'], bin_num=20, title='Flipper length vs body mass',
+                          output_path=out_dir, cbar=True, formats=['png'])
+# ---
+
+# ***BasicPlotter.multi_mod_plot
+# This one is a scatterplot with a lot of additional options.
+# Start with a scatterplot where we colour the dots by the species, each dot being one penguin.
+BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_mass_g'], colour_col='species',
+                            output_path=out_dir, title='#1: Flipper length vs body mass', alpha=1, palette='glasbey_cool',
+                            msize=25, formats=['png'])
+# Next, let's add markers to show the island where the penguin was measured.
+BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_mass_g'], colour_col='species',
+                            marker_col='island', output_path=out_dir, title='#2 Flipper length vs body mass',
+                            alpha=1, palette='glasbey_cool', msize=25, formats=['png'])
+# Alternatively to having the colours categorical, we can also add a third continuous feature as colour.
+BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_mass_g'], colour_col='bill_length_mm',
+                            marker_col='island', output_path=out_dir, title='#3 Flipper length vs body mass',
+                            alpha=1, msize=25, formats=['png'])
+# In addition, label the five heaviest for which we need an additional boolean column saying
+# whether a dot should be labelled. The text for the label could be anything, here we write the body mass itself.
+top5_index = penguin_df.sort_values('body_mass_g', ascending=False).index[:5]
+penguin_df['add_label'] = [i in top5_index for i in penguin_df.index]
+BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_mass_g'], colour_col='bill_length_mm',
+                            marker_col='island', label_dots=['add_label', 'body_mass_g'], output_path=out_dir+"doLabel",
+                            title='#4 Flipper length vs body mass',
+                            alpha=1, msize=25, formats=['png'])
+# ---
+
+
+
+# ***BasicPlotter.basic_venn
+# Plot the overlap of lists of ingredients (incomplete) as a Venn diagram.
+ingredients = {"Cookies": {'butter', 'sugar', 'flour', 'baking powder', 'chocolate'},
+               'Apple pie': {'butter', 'sugar', 'flour', 'baking powder', 'apples'},
+               'Bread': {'flour', 'yeast', 'oil', 'salt'}}
+BasicPlotter.basic_venn(input_sets=ingredients, plot_path=out_dir+"Ingredients", formats=['png'])
 # ---
 
 # ***BasicPlotter.overlap_heatmap
-# Plot the overlap of lists of ingredients (incomplete), once with the Jaccard index and once as fraction.
+# Do the overlap again but now once with the Jaccard index and once as fraction.
 ingredients = {"Cookies": {'butter', 'sugar', 'flour', 'baking powder', 'chocolate'},
                'Apple pie': {'butter', 'sugar', 'flour', 'baking powder', 'apples'},
                'Bread': {'flour', 'yeast', 'oil', 'salt'}}
@@ -456,18 +540,90 @@ CoveragePlots.plotHeatmap(beds_to_plot=[peaks, shuffled_peaks], bed_labels=['Ori
                           scaled_size=500, start_label='Peak start', end_label='Peak end')
 # ---
 
+
 # _________________________________________________________________________________________________________
-# JaccardMaps
+# Heatmaps
 # _________________________________________________________________________________________________________
-# ***JaccardMaps.jc_heatmap
-import BasicPlotter
+# ***Heatmaps.base_code
+# Block that has to be executed for all.
+import Heatmaps
+import seaborn as sns
+import numpy as np
 out_dir = 'docs/gallery/'
-# Plot the overlap of lists of ingredients (incomplete), once with the Jaccard index and once as fraction.
-ingredients = {"Cookies": {'butter', 'sugar', 'flour', 'baking powder', 'chocolate'},
-               'Apple pie': {'butter', 'sugar', 'flour', 'baking powder', 'apples'},
-               'Bread': {'flour', 'yeast', 'oil', 'salt'}}
-BasicPlotter.overlap_heatmap(inter_sets=ingredients, title="Ingredients overlap", plot_path=out_dir+"Ingredients_JC",
-                             xsize=10, ysize=6, mode='JC', annot_type='JC', annot_size=13)
+penguin_df = sns.load_dataset('penguins')   # Example data from seaborn.
 # ---
+
+# ***Heatmaps.heatmap_cols
+# Create a heatmap with several blocks that allow separate metrics to be shown side-by-side.
+# For an example pick a few random rows and give them names so we can recognize them in the heatmaps.
+sub_penguin_df = penguin_df.sample(5, random_state=12)
+sub_penguin_df['Name'] = ['Pesto', 'Pickles', 'Popcorn', 'Pretzel', 'Pudding']
+# Now we need to define which heatmap-blocks we want to show.
+cmap_cols = {0: {'cols': ['bill_length_mm', 'bill_depth_mm'],
+                 'cmap': 'mako',
+                 'cbar_label': 'mm'},
+             1: {'cols': ["body_mass_g"],
+                 'cmap': 'viridis',  # Just for the sake of a different colour.
+                 'cbar_label': 'g'}
+             }
+# We can additionally choose to add labels into cells, can be any other column.
+annot_cols = {"body_mass_g": 'island'}
+Heatmaps.heatmap_cols(sub_penguin_df, cmap_cols=cmap_cols, plot_out=out_dir+"SubPenguins", row_label_col='Name', class_col='species',
+                 x_size=14, y_size=5, annot_cols=annot_cols, width_ratios=None, wspace=0.8,
+                 annot_s=10, ticksize=14, heat_ticksize=14, square=False, x_rotation=0, formats=['png'])
+# ---
+
+# ***Heatmaps.clustermap
+# Let's cluster some penguins based on their measured features, after removing entries with NAs.
+non_na_penguins = penguin_df[~penguin_df.isna().values.any(axis=1)]
+# Once with the original values and once with z-scoring the columns (flag takes None or the axis).
+# The row names will be the index numbers, which are not meaningful here, but suffices for illustration.
+for do_z in [None, 0]:
+    cmap = 'mako' if do_z is None else 'bwr'
+    centre = None if do_z is None else 0
+    Heatmaps.clustermap(non_na_penguins, columns=['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm'],
+                        row_column='index', z_score=do_z, centre=centre, cbar_label='mm', class_col='species',
+                        title="Clustered penguins", plot_out=out_dir+"Penguins_"+str(do_z)+'ZScore', cmap=cmap,
+                        x_size=8, y_size=10, row_cluster=True, col_cluster=True, formats=['png'])
+# ---
+
+
+# _________________________________________________________________________________________________________
+# MEME_Formatting
+# _________________________________________________________________________________________________________
+# ***MEME_Formatting.base_code
+# Block that has to be executed for all.
+import MEME_Formatting
+out_dir = 'docs/gallery/'
+meme_file = 'ExampleData/Jaspar_Hocomoco_Kellis_human_meme.txt'
+annotation = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'  # It's not the full one, so fewer hits expected.
+# ---
+
+# ***MEME_Formatting.meme_id_map
+# Get the Ensembl ID for the TFs in our motif meme-file.
+tf_ids, all_tf_names, misses = MEME_Formatting.meme_id_map(meme_file=meme_file, gtf_file=annotation, species='human')
+print('TBXT', tf_ids['TBXT'])
+print('MAX::MYC', tf_ids['MAX::MYC'])
+# ---
+open("docs/gallery/src.MEME_Formatting.meme_id_map.txt", 'w').write('TBXT' + '\t' + str(tf_ids['TBXT']) + '\n' + 'MAX::MYC' + '\t' + str(tf_ids['MAX::MYC']))
+
+# ***MEME_Formatting.meme_monomer_map
+# Useful when in need of the individual monomers or removal of the motif versions.
+tf_monomer_map, all_monomer_names = MEME_Formatting.meme_monomer_map(meme_file=meme_file)
+print('BHLHA15(MA0607.2)', tf_monomer_map['BHLHA15(MA0607.2)'])
+print('MAX::MYC', tf_monomer_map['MAX::MYC'])
+print('all monomers', all_monomer_names[:4])
+# ---
+open("docs/gallery/src.MEME_Formatting.meme_monomer_map.txt", 'w').write('BHLHA15(MA0607.2)' + '\t' + str(tf_ids['BHLHA15(MA0607.2)']) +
+                                                                         '\n' + 'MAX::MYC' + '\t' + str(tf_ids['MAX::MYC']) +
+                                                                         '\n' + 'all monomers' + '\t' + str(all_monomer_names[:4]))
+
+# ***MEME_Formatting.subset_meme
+# Subset a meme-file, which is useful for example for excluding TFs that are not expressed.
+MEME_Formatting.subset_meme(meme_file, motif_names=['MAX::MYC', 'TBXT'], out_file=out_dir+"Subset_meme.txt",
+                            include_dimers=True, exact_match=False)
+print(open(out_dir+"Subset_meme.txt").read())
+# ---
+
 
 

@@ -1,7 +1,8 @@
 import argparse
 
 """For each gene call TFBS in a promoter window at the 5'TSS with Fimo. Then convert Fimo's output into a matrix
-of genes x TFs with the counted binding sites. Only genes with at least one binding site are written to output."""
+of genes x TFs with the counted binding sites. Only genes with at least one binding site are written to output.
+CARE: Tested for meme5.4.1, later versions handle sequence names differently."""
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--gtf", required=True, help='GENCODE gtf-file to take the genes and locations from.')

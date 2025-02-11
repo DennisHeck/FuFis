@@ -8,7 +8,7 @@ gallery_blocks = open(gallery_script).read().split("# ***")[1:]
 gallery_code = {x.split('\n')[0]: '\n'.join(x.split('\n')[1:]).split('# ---')[0] for x in gallery_blocks}
 
 rst_files = [x for x in os.listdir('.') if x.endswith('.rst') and 'formatted' not in x and x != 'index.rst'
-             and x != 'Main.rst']
+             and x != 'Main.rst' and x != 'DocuDocu.rst']
 for rst_file in rst_files:
     rst_text = open(rst_file).read()
     for gall in gallery_code:

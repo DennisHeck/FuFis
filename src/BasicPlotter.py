@@ -121,7 +121,13 @@ def stacked_bars(plot_df, x_col, y_cols, y_label='', title=None, output_path='',
     Plots a stacked barplot, with a stack for each y_col.
 
     Args:
+        x_col: Column name to use for splitting on the x-axis, if not an existant column will take the index.
+        y_cols: List of the columns to use for the stacks.
         fraction: If True take all values as fraction of the row sum.
+        numerate: Whether to add the total number per x-group to the x-label.
+        sort_stacks: Whether to sort the stack groups by size.
+        legend_out: False to let seaborn place the legend, otherwise a float by how much it should be shifted in x-direction.
+        vertical: Whether to swap the layout of the plot from horizontal to vertical.
         hatches: If given assumes the colour list is meant for the x-axis.
     """
     plot_df = copy.deepcopy(plot_df)
@@ -213,7 +219,13 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
             such that bar heights sum to 100. density: normalize such that the total area of the histogram equals 1.
         element: {“bars”, “step”, “poly”}.
         multiple: {“layer”, “dodge”, “stack”, “fill”}
+        cumulative: If a cumulative distribution should be plotted instead of a histogram.
+        kde: Whether to plot the kernel density estimate.
         discrete: If True, each data point gets their own bar with binwidth=1 and bin_num is ignored.
+        legend_out: False to let seaborn place the legend, otherwise a float by how much it should be shifted in x-direction.
+        hlines: Plot horizontal dashed grey lines at all positions listed in hlines.
+        vlines: Same as hlines but vertical.
+        shrink: Float to shrink the size of the bar-width to.
     """
 
     if x_col not in plot_df.columns:  # Reformat so that seaborn can interpret x_col as hue.
@@ -268,10 +280,17 @@ def basic_2Dhist(plot_df, columns, hue_col=None, hue_order=None, bin_num=200, ti
                  xsize=12, ysize=8, palette='tab10', cbar=False, cmap='mako', hlines=[], vlines=[], binrange=None,
                  diagonal=False, grid=True, font_s=14, formats=['pdf']):
     """
-    Plots a basic 2D histogram as heatmap which allows for hue, whose order can be defined as well.
+    Plots a basic 2D histogram as heatmap which allows for hue, whose order can be defined as well. Useful when
+    a scatterplot would be just a big blob of dots.
 
     Args:
         columns: List with 2 entries representing the columns from plot_df for the x- and y-axis.
+        bin_num: Number of bins to use, the higher the finer the resolution. It behaves it a odd though.
+        cbar: Whether to plot the colorbar that shows the number of counts.
+        hlines: Plot horizontal dashed grey lines at all positions listed in hlines.
+        vlines: Same as hlines but vertical.
+        binrange: Boundaries for the histogram.
+        diagonal: Whether to add a line on the diagonal.
     """
     if len(columns) != 2:
         print("ERROR: the 2Dhist can only work with 2 columns")
@@ -315,10 +334,18 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
                  jitter_colour='black', jitter_size=5, vertical_grid=False, legend_title=True, legend=True, grid=True,
                  formats=['pdf']):
     """
-    Plots a basic violin plot which allows for hue, whose order can be defined as well.
+    Plots a basic violin plot which allows for hue, whose order can be defined as well. Optionally plot boxplot, or
+    add jitter points for the individual data points.
     Use y_col=None and x_col=None for seaborn to interpret the columns as separate plots on the x-asis.
 
     Args:
+        numerate: Whether to add the total number per x-group to the x-label.
+        numerate_break: Whether to add a line break before writing the size of the x-group.
+        jitter: Whether to add jitter points for each data point on top.
+        jitter_colour: Colour for the jitter points.
+        jitter_size: Dot size for the jitter points.
+        saturation: Controls the saturation of the colours.
+        boxplot: Whether to plot boxplots instead of violinplots.
         boxplot_meanonly: Remove all lines from the boxplot and show just the mean as horizontal line.
     """
     if palette and 'glasbey' in palette:
@@ -344,7 +371,7 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
                               palette='tab10' if hue_col and not palette else palette, hue_order=hue_order)
     if jitter:
         sns.stripplot(data=plot_df, x=x_col, y=y_col, jitter=True, ax=ax, hue=hue_col, hue_order=hue_order, zorder=10,
-                      order=x_order, palette=jitter_colour, dodge=True, legend=False, edgecolor='black', linewidth=1,
+                      order=x_order, color=jitter_colour, dodge=True, legend=False, edgecolor='black', linewidth=1,
                       size=jitter_size)
     ax.tick_params(axis='both', labelsize=font_s+4)
     ax.set_ylabel(y_col, fontsize=font_s+8)
@@ -383,7 +410,12 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
 def basic_pie(plot_df, title='', palette=None, numerate=True, legend_perc=True, output_path='', legend_title='',
               formats=['pdf']):
     """
-    plot_df can be either a DataFrame with the categories as index or a dictionary with {category: count}.
+    A pie chart.
+
+    Args:
+        plot_df: Either a DataFrame with each category as index or a dictionary with {category: count}.
+        numerate: Whether to add the summed count across categories to the title.
+        legend_perc: Whether the legend should write the percentages or absolute numbers.
     """
     if type(palette) == list:
         clrs = palette
@@ -420,14 +452,21 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
                    xlim=None, ylim=None, msize=30, vlines=[], hlines=[], add_spear=False, na_colour='black', grid=True,
                    label_dots=None, font_s=14, adjust_labels=True, formats=['pdf']):
     """
-    Compares two scores. For each entry in plot_df plot one dot with [x,y] based on score_col and
+    Scatterplot that compares two scores. For each entry in plot_df plot one dot with [x,y] based on score_col and
     allows to colour all dots based on colour_col, and if marker_col is selected assigns each class a different
     marker.
 
     Args:
+        score_cols: List of two column names to use for the x- and y-axis.
         line_plot: 2D list of dots which will be connected to a lineplot.
+        hlines: Plot horizontal dashed grey lines at all positions listed in hlines.
+        vlines: Same as hlines but vertical.
+        diagonal: Whether to add a line on the diagonal.
+        add_spear: CARE not properly tested. Whether to add the spearman correlation coefficient between the score_cols to the title.
+        na_colour: How to colour dots where the colour_col is NA.
         label_dots: A pair of columns [do_label, label_col] with boolean do_label telling which entries should get a
             text label within the plot, and label_col giving the string of the label.
+        adjust_labels: Whether to use the adjustText package to try to avoid overlap of text labels.
     """
     main_list = plot_df[[x for x in score_cols+[colour_col, marker_col] if x is not None]].values.tolist()
     main_idx = {x: i for i, x in enumerate([y for y in score_cols+[colour_col, marker_col] if y is not None])}
@@ -444,6 +483,9 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
                     palette = ColoursAndShapes.glasbey_palettes['glasbey']
                 else:
                     palette = ColoursAndShapes.tol_vibrant
+            else:
+                if 'glasbey' in palette:
+                    palette = ColoursAndShapes.glasbey_palettes[palette]
             if colour_order:
                 colour_dict = {c: palette[i] for i, c in
                                enumerate(colour_order)}
@@ -494,7 +536,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         legend_list = [Line2D([0], [0], marker=marker_dict[mark], color='black' if not marker_col == colour_col else colour_dict[mark], linestyle='None') for mark in marker_dict]
         source_legend = plt.legend(legend_list, list(marker_dict.keys()), markerscale=1.49,
                                    scatterpoints=1, fontsize=font_s-4, title=marker_col, loc='best',
-                                   bbox_to_anchor=None if len(legend_list) < 7 else (1.04, 1))
+                                   bbox_to_anchor=None if len(legend_list) < 7 and not colour_col else (1.03, 1))
         source_legend.get_title().set_fontsize(11)
         plt.gca().add_artist(source_legend)
     else:
@@ -503,9 +545,10 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
 
     if colour_col and (is_string_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool) and colour_col != marker_col:
         legend_list = [mpatches.Patch([0], [0], color=colour_dict[col], linestyle='None') for col in colour_dict]
+        y_offset = 0 if not marker_col else 0.08 * len(marker_dict)
         colour_legend = plt.legend(legend_list, list(colour_dict.keys()), markerscale=1,
                                    scatterpoints=1, fontsize=font_s-4, title=colour_col, loc='best',
-                                   bbox_to_anchor=None if len(legend_list) < 7 else (1.04, 1))
+                                   bbox_to_anchor=None if len(legend_list) < 7 and not marker_col else (1.03, 1 - y_offset))
         colour_legend.get_title().set_fontsize(font_s-3)
         plt.gca().add_artist(colour_legend)
 
@@ -552,40 +595,41 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         return spear_r
 
 
-
-def venn_from_list(plot_list, label_list, plot_path, blob_colours=ColoursAndShapes.tol_highcontrast, title='',
-                   scaled=True, linestyle='', number_size=11, xsize=5, ysize=5, formats=['pdf']):
+def basic_venn(input_sets, plot_path, blob_colours=ColoursAndShapes.tol_highcontrast, title='',
+               scaled=True, linestyle='', number_size=11, xsize=5, ysize=5, formats=['pdf']):
     """
-    Based on a list with the size of the sets and the respective labels, plot a non-scaled / scaled Venn diagram
-    for up to three sets. If sets are given, the intersection will be done automatically.
-    Choose non-scaled if the difference is too high.
-    two sets: [a-b, b-a, a∩b]
-    three sets: [a-b-c, b-a-c, a∩b-c, c-a-b, a∩c-b, b∩c-a, a∩b∩c]
+    Based on a dictionary of {key: set} with either two or three entries do the intersection of sets and create a
+    Venn diagram from it.
+
+    Args:
+        input_sets: {key: set} for all bubbles that should be plotted.
+        scaled: If the bubble sizes should be scaled to the set sizes. Choose False if the size difference is too high.
+        linestyle: Linestyle for the rim of the bubbles.
      """
     if 'glasbey' in blob_colours:
-        blob_colours = ColoursAndShapes.glasbey_palettes[blob_colours][:len(plot_list)]
-    if len(plot_list) > 3:
+        blob_colours = ColoursAndShapes.glasbey_palettes[blob_colours][:len(input_sets)]
+    if len(input_sets) > 3:
         print("ERROR, only making Venns for three or two sets")
         return
-    if sum([type(x) == set for x in plot_list]) == len(plot_list):
-        if len(plot_list) == 2:
-            a, b = plot_list
-            plot_list = [len(a - b), len(b - a), len(a & b)]
-        elif len(plot_list) == 3:
-            a, b, c = plot_list
-            plot_list = [len(a - b - c), len(b - a - c), len(a & b - c), len(c-a-b), len(a & c - b), len(b & c - a), len(a & b & c)]
+    key_order = list(input_sets.keys())
+    if len(key_order) == 2:
+        a, b = [input_sets[x] for x in key_order]
+        plot_list = [len(a - b), len(b - a), len(a & b)]
+    elif len(key_order) == 3:
+        a, b, c = [input_sets[x] for x in key_order]
+        plot_list = [len(a - b - c), len(b - a - c), len(a & b - c), len(c-a-b), len(a & c - b), len(b & c - a), len(a & b & c)]
     f, ax = plt.subplots(figsize=(xsize, ysize))
     if scaled and len(plot_list) == 3:
-        v = matplotlib_venn.venn2(subsets=plot_list, set_labels=label_list, ax=ax, set_colors=blob_colours,
+        v = matplotlib_venn.venn2(subsets=plot_list, set_labels=key_order, ax=ax, set_colors=blob_colours,
                                   normalize_to=0.5)
     elif not scaled and len(plot_list) == 3:
-        v = matplotlib_venn.venn2_unweighted(subsets=plot_list, set_labels=label_list, ax=ax,
+        v = matplotlib_venn.venn2_unweighted(subsets=plot_list, set_labels=key_order, ax=ax,
                                              set_colors=blob_colours, normalize_to=0.5)
     elif scaled and len(plot_list) == 7:
-        v = matplotlib_venn.venn3(subsets=plot_list, set_labels=label_list, ax=ax, set_colors=blob_colours,
+        v = matplotlib_venn.venn3(subsets=plot_list, set_labels=key_order, ax=ax, set_colors=blob_colours,
                                   normalize_to=0.5)
     elif not scaled and len(plot_list) == 7:
-        v = matplotlib_venn.venn3_unweighted(subsets=plot_list, set_labels=label_list, ax=ax, set_colors=blob_colours,
+        v = matplotlib_venn.venn3_unweighted(subsets=plot_list, set_labels=key_order, ax=ax, set_colors=blob_colours,
                                   normalize_to=0.5)
     if len(plot_list) == 3:
         matplotlib_venn.venn2_circles(subsets=plot_list, linestyle=linestyle, linewidth=1, color="grey", normalize_to=0.5)
@@ -901,11 +945,11 @@ def cumulative_plot(plot_df, x_col, hue_col, hue_order=None, output_path='', num
         table_width: Width of the KS table.
         table_x_pos: X-position of the KS table, to avoid it overlapping the plot.
         """
-    p_df = plot_df.copy()  # Otherwise, updates for the enumeration would be references back to the function caller.
+    p_df = plot_df.copy()  # Otherwise, updates for the enumeration would be referenced back to the function caller.
     if add_all:
         all_copy = p_df.copy()
         all_copy[hue_col] = 'All'
-        p_df = pd.concat([all_copy, p_df])
+        p_df = pd.concat([all_copy, p_df], ignore_index=True)
 
     sns.set_style('ticks')
     sns.set_context('talk', font_scale=1.15)

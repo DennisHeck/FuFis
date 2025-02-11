@@ -1,0 +1,26 @@
+name: fufis
+
+channels:
+   - conda-forge
+   - bioconda
+
+dependencies:
+  - adjustText==0.7.3
+  - colorcet==3.0.1
+  - gprofiler_official==1.0.0
+  - liftover==1.1.13
+  - matplotlib==3.5.3
+  - matplotlib_venn==0.11.6
+  - multiprocess==0.70.11.1
+  - networkx==2.5
+  - numpy==1.21.6
+  - pandas==1.1.3
+  - pybedtools==0.8.1
+  - pyBigWig==0.3.17
+  - Requests==2.32.3
+  - scikit_learn==1.0.2
+  - scipy==1.7.3
+  - seaborn==0.13.2
+  - statsmodels==0.13.2
+  - UpSetPlot==0.9.0
+

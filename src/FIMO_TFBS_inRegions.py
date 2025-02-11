@@ -4,7 +4,8 @@ import argparse
  with the counted binding sites. Only regions with at least one binding site are written to output. 
  Overlapping TFBS of the same TF on the same strand are merged and counted as 1. 
  Includes the steps of writing the sequence of the regions, forcing the regions to be within the genome boundaries, 
- and adjusting the TF motif meme-file so that the base content of the bed-regions is used as background frequencies."""
+ and adjusting the TF motif meme-file so that the base content of the bed-regions is used as background frequencies.
+ CARE: Tested for meme5.4.1, later versions handle sequence names differently."""
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--bed_file", required=True, help='Bed-file with regions for which TFBS should be annotated.')

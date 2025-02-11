@@ -17,6 +17,8 @@ Both are called via the command line.
 If the genome sequence file doesn't have an index, `samtools <https://www.htslib.org/>`_ has to be installed and on the
 PATH for the function to create it.
 
+CARE: Tested for meme5.4.1, later versions handle sequence names differently.
+
 ***************************
 TFBS in regions
 ***************************

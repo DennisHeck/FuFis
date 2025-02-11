@@ -18,18 +18,31 @@ import itertools
 def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels=None, class_col=None,
                  x_size=20, y_size=40, title="", annot_cols=None, width_ratios=None, wspace=0.4, rasterized=True,
                  annot_s=10, ticksize=14, heat_ticksize=14, square=False, x_rotation=70, y_rotation=0,
-                 ax_fontweight='normal', row_label_first=False):
-    """ Multiple heatmaps side-by-side.
-    @param cmap_cols: {0: {'cols': ['Mean_Control_FM', 'Mean_FM_Mock_Ctrl', 'Mean_Tcf15_FM', 'Mean_FM_Tcf15_OE'],
-                     'centre': 0,
+                 ax_fontweight='normal', row_label_first=False, formats=['pdf']):
+    """
+    Multiple heatmaps side-by-side but the same rows. Allows to show several metrics for the same rows with different
+    colourmaps etc. E.g. for a list of top differential genes first a heatmap of baseline expression coloured by TPM,
+    followed by a separate heatmap-block with the log2FC for the same genes.
+
+    Args:
+        cmap_cols: Dictionary with one entry for each block. The keys don't matter as long as they are unique. E.g.
+            {0: {'cols': ['Mean_Control_FM', 'Mean_FM_Mock_Ctrl', 'Mean_Tcf15_FM', 'Mean_FM_Tcf15_OE'],
+                     'centre': 0, (optional)
                      'cmap': 'mako',
                      'cbar_label': 'TPM',
-                     'vmax': 200,
-                     'vmin': 0,
+                     'vmax': 200, (optional)
+                     'vmin': 0, (optional)
                      }
-    @param annot_cols: {"column": "column with annotation string"}
-    @param row_label_first: Only write the row names for the first entry and skip for the others.
-                     """
+        row_label_col: Column where to fetch the row-strings from.
+        column_labels: Alternative to using the column names as indicated in cmap_cols.
+        class_col: Column that should be added as separate first heatmap-block, should be categorical.
+        annot_cols: Dictionary of {"column": "column with annotation string"} to write the strings in the value into the cells of columns.
+        width_ratios: Ratios of the widths of each heatmap-block.
+        wspace: Additional horizontal space between blocks.
+        rasterized: Whether to draw thin white lines around cells.
+        square: Whether cells should be squares.
+        row_label_first: Only write the row names for the first entry and skip for the others.
+    """
     all_cols = list(chain(*[c['cols'] for c in cmap_cols.values()]))
     f, axes = plt.subplots(nrows=1, ncols=len(cmap_cols)+bool(class_col), figsize=(x_size, y_size),
                            gridspec_kw={'width_ratios': [0.1] * bool(class_col) + [0.9*len(c['cols'])/len(all_cols) for c in cmap_cols.values()] if not width_ratios else width_ratios})
@@ -91,17 +104,38 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
     if title:
         plt.title(title, size=18, fontweight='bold')
     plt.subplots_adjust(wspace=0.4 if not wspace else wspace)
-    plt.savefig((plot_out + "_MultiColHeatmap.pdf").replace(' ', '_'), bbox_inches='tight')
+    if type(formats) != list:
+        formats = [formats]
+    for form in formats:
+        plt.savefig((plot_out + "_MultiColHeatmap."+form).replace(' ', '_'), bbox_inches='tight', format=form)
     plt.close()
 
 
 def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row='', title="", plot_out="", vmin=None,
                vmax=None, annot_cols=None, cmap='viridis', x_size=12, y_size=10, y_dendro=False, x_dendro=True,
                column_labels=None, row_cluster=True, col_cluster=True, centre=None, tick_size=12, mask=None,
-               metric='euclidean', z_score=None, class_col_colour=None, formats=['pdf'], return_linkage=False):
+               metric='euclidean', z_score=None, class_col_colour=None, formats=['pdf']):#, return_linkage=False):
     # TODO allow col_colors and also allow to give indices instead of columns.
     """
-    @param class_col_colour: Allows a list that will be taken iteratively or a dict with {label: colour}.
+    Create a heatmap that can be additionally clustered with seaborn. CARE: the class_col_order and class_row parameters
+    are not properly tested.
+
+    Args:
+        columns: List of the columns, should be present in the plot_df.
+        row_column: Column with which rows should be taken, set to 'index' to take the df.index.
+        class_col: Add a column into the plot with a categorical value that will be coloured and gets a separate colourbar.
+        class_col_colour: Allows a list that will be taken iteratively, or a dict with {label: colour}.
+        class_row: Same as class_col but add a row instead.
+        annot_cols: Dictionary {col: other-col} to add text into the entries from col taken from other_col.
+        y_dendro: Whether to plot the dendrogram on y.
+        x_dendro: Whether to plot the dendrogram on x.
+        column_labels: List that will replace the names from columns if given.
+        row_cluster: Whether to cluster the rows.
+        col_cluster: Whether co cluster the columns.
+        centre: Centre for the colormap, e.g. 0 for bwr.
+        mask: Must match the dimensions of the plot_df. If given will not show data where entries are True.
+        metric: Metric for clustering for the scipy function, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html#scipy.spatial.distance.pdist.
+        z_score: Whether to do z-score normalization before clustering. If None won't do z-scoring, otherwise takes 0 or 1 for the axis along which the normalization should be done.
     """
     if z_score is not None:  # Not using seaborns z_score flag as it messes with the separate colourbar.
         plot_part = zscore(plot_df[columns], axis=z_score)
