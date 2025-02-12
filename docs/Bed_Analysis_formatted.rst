@@ -14,7 +14,9 @@ To run the example code for this module, we will always start with this block of
     out_dir = 'docs/gallery/'  # Replace with wherever you want to store it.
     
 
-
+.. .--------------------------------------------------------------------------------------------------------------------
+.. gene_location_bpwise
+.. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: Bed_Analysis.gene_location_bpwise
 
 .. code-block:: python
@@ -40,7 +42,9 @@ To run the example code for this module, we will always start with this block of
 .. |pic2| image:: gallery/InclExternalExample_peaks_GeneFeatureLocation_bpwiseOverlap_PieChart.png
    :width: 45%
 
-
+.. .--------------------------------------------------------------------------------------------------------------------
+.. intersection_heatmap
+.. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: Bed_Analysis.intersection_heatmap
 
 .. image:: gallery/IGV_MultiBed.png
@@ -94,7 +98,9 @@ Don't expect a very meaningful result here. The data is limited to chr1 and the 
 .. |pic4| image:: gallery/HockerATAC_MultiIntersectHeat_Fisher.png
    :width: 45%
 
-
+.. .--------------------------------------------------------------------------------------------------------------------
+.. upset_to_reference
+.. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: Bed_Analysis.upset_to_reference
 
 .. code-block:: python
@@ -116,6 +122,9 @@ Don't expect a very meaningful result here. The data is limited to chr1 and the 
 .. image:: gallery/_UpSet_Subset_peaks.png
    :width: 80%
 
+.. .--------------------------------------------------------------------------------------------------------------------
+.. peaks_peaks_overlap
+.. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: Bed_Analysis.peaks_peaks_overlap
 
 .. code-block:: python
@@ -131,6 +140,9 @@ Don't expect a very meaningful result here. The data is limited to chr1 and the 
 .. include:: gallery/src.Bed_Analysis.peaks_peaks_overlap.txt
     :literal:
 
+.. .--------------------------------------------------------------------------------------------------------------------
+.. peaks_promoter_overlap
+.. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: Bed_Analysis.peaks_promoter_overlap
 
 .. code-block:: python
@@ -146,7 +158,9 @@ Don't expect a very meaningful result here. The data is limited to chr1 and the 
 .. include:: gallery/src.Bed_Analysis.peaks_promoter_overlap.txt
     :literal:
 
-
+.. .--------------------------------------------------------------------------------------------------------------------
+.. peaks_fetch_col
+.. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: Bed_Analysis.peaks_fetch_col
 
 .. code-block:: python
@@ -183,7 +197,29 @@ DiffATAC/DiffATAC_TCells.txt
 .. include:: gallery/src.Bed_Analysis.peaks_fetch_col.txt
     :literal:
 
+.. .--------------------------------------------------------------------------------------------------------------------
+.. promoter_fetch_col
+.. .--------------------------------------------------------------------------------------------------------------------
+.. autofunction:: Bed_Analysis.promoter_fetch_col
 
+.. code-block:: python
+
+    # This one is very similar to the previous, but starts from genes to get their promoter regions to then get the
+    # values from other bed files in those promoters.
+    diff_atac_pattern = 'ExampleData/DiffATAC/DiffATAC_*.txt'
+    annotation = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'
+    promoter_log2FC, matched_ids = Bed_Analysis.promoter_fetch_col(pattern=diff_atac_pattern, gtf_file=annotation, tss_type='5',
+                                                                   gene_set={'ENSG0000MOCK1', 'ENSG0000MOCK2'}, fetch_col='log2FC')
+    print(promoter_log2FC)
+    
+
+.. include:: gallery/src.Bed_Analysis.promoter_fetch_col.txt
+    :literal:
+
+
+.. .--------------------------------------------------------------------------------------------------------------------
+.. peaks_genebody_overlap
+.. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: Bed_Analysis.peaks_genebody_overlap
 
 .. code-block:: python
@@ -199,6 +235,10 @@ DiffATAC/DiffATAC_TCells.txt
 .. include:: gallery/src.Bed_Analysis.peaks_genebody_overlap.txt
     :literal:
 
+
+.. .--------------------------------------------------------------------------------------------------------------------
+.. possible_interactions
+.. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: Bed_Analysis.possible_interactions
 
 .. code-block:: python

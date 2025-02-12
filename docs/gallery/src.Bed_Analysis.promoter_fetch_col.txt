@@ -1,0 +1,1 @@
+{'ENSG0000MOCK2': {'Macs': nan, 'TCells': 5.0}, 'ENSG0000MOCK1': {'Macs': -4.0, 'TCells': nan}}

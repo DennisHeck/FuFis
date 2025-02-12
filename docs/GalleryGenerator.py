@@ -1,6 +1,8 @@
 import pandas as pd
 pd.options.display.max_columns = None
 pd.options.display.max_rows = None
+import sys
+sys.path.append("src/")
 
 """Gather the code that creates plots and output to be shown in the documentation. The code blocks also serve
 as template for the code in the documentation itself. This is why the imports are above the clode blocks directly."""
@@ -460,7 +462,6 @@ BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_m
 # ---
 
 
-
 # ***BasicPlotter.basic_venn
 # Plot the overlap of lists of ingredients (incomplete) as a Venn diagram.
 ingredients = {"Cookies": {'butter', 'sugar', 'flour', 'baking powder', 'chocolate'},
@@ -526,7 +527,6 @@ open("docs/gallery/src.UniProtAPI.uniprot_domains.txt", 'w').write(str(protein_d
 # _________________________________________________________________________________________________________
 # CoveragePlots
 # _________________________________________________________________________________________________________
-# NOTE: Make sure deeptools is on path
 # ***CoveragePlots.plotHeatmap
 from pybedtools import BedTool
 import CoveragePlots
@@ -548,7 +548,6 @@ CoveragePlots.plotHeatmap(beds_to_plot=[peaks, shuffled_peaks], bed_labels=['Ori
 # Block that has to be executed for all.
 import Heatmaps
 import seaborn as sns
-import numpy as np
 out_dir = 'docs/gallery/'
 penguin_df = sns.load_dataset('penguins')   # Example data from seaborn.
 # ---

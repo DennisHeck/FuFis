@@ -302,7 +302,7 @@ def match_gene_identifiers(gene_identifiers, gtf_file='', species='human', scope
     and symbols first check in a gtf-file, all not found there are queried via the API of https://mygene.info/
     (how to cite: https://mygene.info/citation/). See the documentation of mygene for further specifications
     of the options: https://docs.mygene.info/en/latest/doc/query_service.html. Note, there might be cases where
-    multiple matches are found per gene. For Ensembl IDs the first one is taken.
+    multiple matches are found per gene. For Ensembl IDs the first one is taken. Pay attention to upper case and lower case of symbols.
     Name mapping is fun.
 
     Args:
@@ -330,7 +330,7 @@ def match_gene_identifiers(gene_identifiers, gtf_file='', species='human', scope
 
     mapped_identifiers = {}
     if not return_full and gtf_file and ('ensembl' in fields or 'symbol' in fields):
-        lower_identifier = [x.lower() for x in gene_identifiers]  # To avoid misses due to different capitalization.
+        print("Checking gtf-file for matches")
         if gtf_file.endswith('.gz'):
             opener = gzip.open(gtf_file, 'rt')
         else:
@@ -339,8 +339,8 @@ def match_gene_identifiers(gene_identifiers, gtf_file='', species='human', scope
             if not line.startswith("#") and line.split('\t')[2] == 'gene':
                 gene_id = line.split('\t')[8].split('gene_id "')[-1].split('";')[0].split('.')[0]
                 gene_name = line.split('\t')[8].split('gene_name "')[-1].split('";')[0]
-                if gene_id in gene_identifiers or gene_name in lower_identifier:
-                    mapped_identifiers[gene_name if gene_name in lower_identifier else gene_id] = {'ensembl': gene_id,
+                if gene_id in gene_identifiers or gene_name in gene_identifiers:
+                    mapped_identifiers[gene_name if gene_name in gene_identifiers else gene_id] = {'ensembl': gene_id,
                                                                                                    'symbol': gene_name}
         gtf_missed = [g for g in gene_identifiers if g not in mapped_identifiers]
 

@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-from multiprocessing import Pool
+from multiprocess import Pool
 from timeit import default_timer as clock
 from time import sleep
 
@@ -104,6 +104,8 @@ def uniprot_domains(protein_names, species='human', n_cores=1):
     process_pool = Pool(processes=n_cores)
     fetched_batches = process_pool.map(api_helper, [[uniprot_base_url, n_b, batch] for n_b, batch in enumerate(batches)])
     process_pool.close()
+    # fetched_batches = [api_helper([uniprot_base_url, n_b, batch]) for n_b, batch in enumerate(batches)]
+
 
     protein_domains = {k: v for d in [x[0] for x in fetched_batches if x[0]] for k, v in d.items()}
     protein_regions = {k: v for d in [x[1] for x in fetched_batches if x[1]] for k, v in d.items()}
@@ -115,4 +117,8 @@ def uniprot_domains(protein_names, species='human', n_cores=1):
     return protein_domains, protein_regions, missed_proteins, failed_requests
 
 
+def test(n):
+    return n
+
+a = map(test, [i for i in range(5)])
 
