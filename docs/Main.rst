@@ -27,8 +27,8 @@ Disclaimers:
 Add your own functions:
     If you also have functions which could be useful to others, it would be great if you open a pull request to add
     it to the collection! If you submit anything, please:
-     - Provide code how to run it.
      - Have the code properly annotated, ideally with a docstring that is readable by Sphinx.
+     - Provide code how to run it.
      - Add example data if necessary and how the output should look like.
      - List the package requirements.
 
