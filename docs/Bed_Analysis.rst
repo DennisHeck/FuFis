@@ -47,7 +47,8 @@ To run the example code for this module, we will always start with this block of
 
     *Bed_Analysis.intersection_heatmap_fisher*
 
-Don't expect a very meaningful result here. The data is limited to chr1 and the activity filter of the peaks per cell type rather crude.
+Don't expect a very meaningful result here. The data is limited to chr1 and the activity filter of the peaks per cell type rather crude. Also,
+please note that if you do overlap with SNVs, you should consider their linkage disequilibrium structure.
 
 |pic3| |pic4|
 
