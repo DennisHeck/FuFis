@@ -309,7 +309,7 @@ def match_gene_identifiers(gene_identifiers, gtf_file='', species='human', scope
         gene_identifiers: List of identifiers, e.g. symbols, Ensembl IDs or Entrez IDs.
         gtf_file: Gene annotation in gtf-style, can be gzipped. Only needed for symbols and Ensembl IDs.
         species: Give the name of the species, see below for the available ones.
-        scopes: Where mygene.info will search for the gene symbols.
+        scopes: Where mygene.info will search for the gene symbols. For Ensembl ID use 'ensembl.gene'.
         fields: csv-string to which fields the output will be limited to. E.g. 'ensembl,symbol'. Can also be 'all'.
         ensemblonly: If only to return the hits with valid Ensembl gene ids.
         return_full: If to return the full dictionary as it is received by mygene. Contains more information such as
@@ -388,7 +388,7 @@ def match_gene_identifiers(gene_identifiers, gtf_file='', species='human', scope
                 if field in entry:
                     if entry['query'] not in mapped_identifiers:
                         mapped_identifiers[entry['query']] = {}
-                    if field == 'ensembl':  # There it's nested.
+                    if field == 'ensembl' or field == 'ensembl.gene':  # There it's nested.
                         if type(entry['ensembl']) == list:
                             mapped_identifiers[entry['query']][field] = entry['ensembl'][0]['gene']  # Only keep the first hit.
                         else:

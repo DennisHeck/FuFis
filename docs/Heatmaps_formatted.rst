@@ -10,7 +10,6 @@ PyComplexHeatmap.
     # Block that has to be executed for all.
     import Heatmaps
     import seaborn as sns
-    import numpy as np
     out_dir = 'docs/gallery/'
     penguin_df = sns.load_dataset('penguins')   # Example data from seaborn.
     

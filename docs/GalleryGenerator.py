@@ -624,5 +624,17 @@ MEME_Formatting.subset_meme(meme_file, motif_names=['MAX::MYC', 'TBXT'], out_fil
 print(open(out_dir+"Subset_meme.txt").read())
 # ---
 
-
+# _________________________________________________________________________________________________________
+# MakeTitlesGreatAgain
+# _________________________________________________________________________________________________________
+# ***MakeTitlesGreatAgain
+# Run it with a mini example with one bib entry, here from Python, but you can also run the command
+# that's sent to subprocess in your bash.
+import subprocess
+subprocess.call("python3 src/MakeTitlesGreatAgain.py ExampleData/ExampleBib.bib > ExampleData/ExampleBib_great.bib", shell=True)
+print(open('ExampleData/ExampleBib.bib').readlines()[2])
+print(open('ExampleData/ExampleBib_great.bib').readlines()[2])
+# ---
+open('docs/gallery/MakeTitlesGreatAgain_1.txt', 'w').write(open('ExampleData/ExampleBib.bib').readlines()[2])
+open('docs/gallery/MakeTitlesGreatAgain_2.txt', 'w').write(open('ExampleData/ExampleBib_great.bib').readlines()[2])
 
