@@ -967,8 +967,8 @@ def cumulative_plot(plot_df, x_col, hue_col, hue_order=None, output_path='', num
     if numerate:
         hue_order = []
         for i, x in enumerate(gene_set_cols):
-            gene_set_cols_num.append(str(gene_set_cols[i]) + ' (#' + str(sum(p_df[hue_col] == x)) + ')')
-            hue_order.append(str(gene_set_cols[i]) + ' (#' + str(sum(p_df[hue_col] == x)) + ')')
+            gene_set_cols_num.append(str(gene_set_cols[i]) + ' (n=' + str(sum(p_df[hue_col] == x)) + ')')
+            hue_order.append(str(gene_set_cols[i]) + ' (n=' + str(sum(p_df[hue_col] == x)) + ')')
         for i, x in enumerate(gene_set_cols):
             p_df.loc[p_df[hue_col] == x, hue_col] = gene_set_cols_num[i]
     if not palette:
@@ -1004,7 +1004,7 @@ def cumulative_plot(plot_df, x_col, hue_col, hue_order=None, output_path='', num
     for spine in cumu.ax.spines.values():  # Increase spline width.
         spine.set_linewidth(3)
     p_nested, p_background, samples = ks_test(p_df, hue_col, x_col)
-    samples = [(str(x).split('(#')[0][:int(len(str(x).split('(#')[0]) / 2)] + '\n' + str(x).split('(#')[0][int(len(str(x).split('(#')[0]) / 2):]) if len(str(x).split('(#')[0]) > 8 else x.split('(#')[0]
+    samples = [(str(x).split('(n=')[0][:int(len(str(x).split('(#')[0]) / 2)] + '\n' + str(x).split('(n=')[0][int(len(str(x).split('(#')[0]) / 2):]) if len(str(x).split('(n=')[0]) > 8 else x.split('(n=')[0]
                for x in samples]
     if len(samples) > 1:
         ks_table = plt.table(cellText=np.asarray(p_nested).T, cellColours=np.asarray(p_background).T,
@@ -1021,6 +1021,6 @@ def cumulative_plot(plot_df, x_col, hue_col, hue_order=None, output_path='', num
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        cumu.savefig((output_path + x_col.replace(' ', '') + '_' + hue_col + '.' + form).replace(' ', '_'), bbox_inches='tight',
+        cumu.savefig((output_path + x_col.replace(' ', '') + '_' + hue_col + '_CumulativeDistribution.' + form).replace(' ', '_'), bbox_inches='tight',
                      format=form)
     plt.close()
