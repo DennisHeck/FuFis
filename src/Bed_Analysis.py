@@ -335,7 +335,7 @@ def intersection_heatmap(bed_dict, region_label, plot_path, fisher=False, fisher
             formats = [formats]
         for form in formats:
             plt.savefig((plot_path + "_MultiIntersectHeat"+"_Fisher"*fisher_iteration+"."+form).replace(" ", '_'), bbox_inches='tight', format=form)
-        plt.close('All')
+            plt.close('All')
 
 
 def upset_to_reference(bed_files, ref_tag, y_label='Intersecting regions', title_tag='', plot_path='', font_s=16,
