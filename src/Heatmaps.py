@@ -219,7 +219,7 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
 
     clustermap.fig.suptitle(title, y=0.95, size=20, fontweight='bold')
     if type(formats) != list:
-        formats = list(formats)
+        formats = [formats]
     for form in formats:
         clustermap.savefig(plot_out + "_Clustermap."+form, bbox_inches='tight', format=form)
     plt.close()

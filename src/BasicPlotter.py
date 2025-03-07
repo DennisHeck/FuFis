@@ -1024,3 +1024,7 @@ def cumulative_plot(plot_df, x_col, hue_col, hue_order=None, output_path='', num
         cumu.savefig((output_path + x_col.replace(' ', '') + '_' + hue_col + '_CumulativeDistribution.' + form).replace(' ', '_'), bbox_inches='tight',
                      format=form)
     plt.close()
+
+
+
+
