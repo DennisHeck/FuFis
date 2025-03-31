@@ -2,7 +2,7 @@
 """As the sphinx markdown for read the docs has a horrific way of displaying and formatting tables, we take the
 easier to write csv-tables and convert them into the better formatted one which are terrible to write by hand."""
 
-table_file = "/Users/dennis/Dev/FuFis/RST_Tables/TableCSV.txt"
+table_file = "/Users/dennis/Dev/FuFis_Legacy/RST_Tables/TableCSV.txt"
 out_file = table_file.replace('.txt', '_formed.txt')
 
 header = [x.strip() for x in open(table_file).read().split(':header: "')[1].split('\n')[0].replace('"', '').split(',')]

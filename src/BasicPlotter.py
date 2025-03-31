@@ -232,7 +232,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
         plot_df = pd.DataFrame(list(chain(*[[[c, x] for x in plot_df[c].to_numpy()] for c in hue_order])),
                                columns=[hue_col, x_col])
     if palette and 'glasbey' in palette:
-        palette = ColoursAndShapes.glasbey_palettes[palette][:len(set(plot_df[hue_col]))]
+        palette = ColoursAndShapes.glasbey_palettes[palette][: 1 if not hue_col else len(set(plot_df[hue_col]))]
     f, ax = plt.subplots(figsize=(xsize, ysize))
     ax.set_axisbelow(True)
     if grid:

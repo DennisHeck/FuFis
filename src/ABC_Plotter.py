@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import Heatmaps
 import BasicPlotter
+import JaccardMaps
 
 
 def harry_plotter(abc_folder, tag_order=None, plot_path='', same_enhancer=True, colnaming=True):
@@ -85,5 +86,14 @@ def harry_plotter(abc_folder, tag_order=None, plot_path='', same_enhancer=True, 
         Heatmaps.interaction_intersection_diff_enhancer(abc_folder=abc_folder, tag_order=tag_order,
                                                         plot_path=plot_path, x_size=16, y_size=10, annot_s=15)
     else:
-        Heatmaps.interaction_intersection_diff_enhancer(abc_folder=abc_folder, tag_order=tag_order, plot_path=plot_path)
+        interaction_sets = {c: set() for c in abc_files.keys()}
+        for tag, file in abc_files.items():
+            inter_head = {x: i for i, x in enumerate(gzip.open(file, 'rt').readline().strip().split('\t'))}
+            for line in gzip.open(file, 'rt').read().strip().split('\n')[1:]:
+                this_gene = line.split('\t')[inter_head['Ensembl ID']].split('_')[0]
+                this_peak = line.split('\t')[inter_head['PeakID']]
+                interaction_sets[tag].add(this_gene + '#' + this_peak)
+
+        BasicPlotter.overlap_heatmap(interaction_sets, title="ABC interaction overlap", plot_path=plot_path,
+                                     mode='Fraction', annot_type='Absolute', xsize=12, ysize=8)
 

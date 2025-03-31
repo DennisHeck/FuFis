@@ -162,6 +162,7 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
                 class_cmap = ColoursAndShapes.glasbey_palettes['glasbey']
             class_colours = {c: class_cmap[i] for i, c in enumerate(class_list)}
 
+    row_colors = None if not class_col else pd.Series([class_colours[cl] for cl in plot_df[class_col].values])
     annot_mat = np.full([len(plot_df), len(columns)], '', dtype=object)  # Numpy complains otherwise.
     if annot_cols:
         for c, col in enumerate(columns):

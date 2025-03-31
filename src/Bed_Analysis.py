@@ -393,10 +393,7 @@ def peaks_peaks_overlap(peak_file, other_peak_file):
         dict:
             - **peak_dict**: A dictionary with {chr\tstart\tend: {other peaks}}. Values are empty if there was no intersection.
     """
-    if type(peak_file) == str:
-        peak_dict = {'\t'.join(x.strip().split('\t')[:3]): set() for x in open(peak_file).readlines()}
-    else:
-        peak_dict = {'\t'.join(x.fields[:3]): set() for x in peak_file}
+    peak_dict = {'\t'.join(x.fields[:3]): set() for x in BedTool(peak_file)}
     peaks_inter = BedTool(peak_file).intersect(BedTool(other_peak_file), wo=True)
     other_start = len(BedTool(peak_file)[0].fields)
     for inter in peaks_inter:
@@ -469,6 +466,7 @@ def peaks_fetch_col(base_regions, pattern, same_peaks=False, fetch_col='log2FC')
         comp_head = {x: i for i, x in enumerate(open(comp_file).readline().strip().split('\t'))}
         # Get a bed-object of the differential peaks to intersect with the enhancers, then get the average in case of
         # multiple overlaps. Works for both versions from DiffBind, with and w/o recentering on the summits.
+        comp_fill = {x: [] for x in fill_dict}
         if not same_peaks:
             comp_peaks = []
             for entry in open(comp_file).readlines()[1:]:
@@ -476,17 +474,17 @@ def peaks_fetch_col(base_regions, pattern, same_peaks=False, fetch_col='log2FC')
                 comp_peaks.append('\t'.join(entry))
             comp_peaks_inter = fill_bed.intersect(BedTool('\n'.join(comp_peaks), from_string=True), wo=True)
             # Collect the fetch_col of all peaks that intersect the enhancers.
-            comp_hits = {x: [] for x in fill_dict}
             for inter in comp_peaks_inter:
-                comp_hits['\t'.join(inter.fields[:3])] += [
+                comp_fill['\t'.join(inter.fields[:3])] += [
                     float(inter.fields[len(fill_bed[0].fields) + comp_head[fetch_col]])]
-            # And now take the average.
-            for hit in comp_hits:
-                fill_dict[hit][comp] = np.mean(comp_hits[hit]) if comp_hits[hit] else np.nan
         else:
             for entry in open(comp_file).readlines()[1:]:
                 entry = entry.strip().split('\t')
-                fill_dict['\t'.join(entry[:3])][comp] = float(entry[comp_head[fetch_col]])
+                comp_fill['\t'.join(entry[:3])] = float(entry[comp_head[fetch_col]])
+        # And now take the average and without a hit fill with nan. If it's the same peaks we only have one value
+        for hit in comp_fill:
+            fill_dict[hit][comp] = np.mean(comp_fill[hit]) if comp_fill[hit] else np.nan
+
     return fill_dict, list(comparison_files.values())
 
 
