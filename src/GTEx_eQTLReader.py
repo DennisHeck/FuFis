@@ -15,7 +15,8 @@ def get_eqtls(gtex_folder, gtex_tissues, hg38_annotation, max_distance=None):
     Args:
         gtex_folder: Path to the directory with the files from the three fine-mapping methods provided on GTEx.
         gtex_tissues: List of GTEx tissues (must match exactly), one entry can be a comma-separated list of GTEx tissues. Set to False to get all.
-        max_distance: Maximum allowed distance between eQTL and the gene's TSS.
+        hg38_annotation: The GENCODE hg38 annotation. Must be hg38 to match the fixed versions expected in the gtex_folder.
+        max_distance: Maximum allowed distance between eQTL and the gene's TSS. Don't define to get all.
 
     Returns:
         tuple:
@@ -70,12 +71,12 @@ def get_eqtls(gtex_folder, gtex_tissues, hg38_annotation, max_distance=None):
                     entry = entry.strip().split('\t')
                     this_eqtl = '_'.join(entry[2].split('_')[:2])
                     for sub_entry in entry[5].split('|'):
-                        if not gtex_tissues or (sub_entry and sub_entry.split('@')[1].split('=')[0] in gtex_tissues):
+                        if sub_entry and (not gtex_tissues or sub_entry.split('@')[1].split('=')[0] in gtex_tissues):
                             this_gene = sub_entry.split('.')[0]
                             if max_distance and not (this_gene in hg38_tss and \
                                     abs(int(this_eqtl.split('_')[1]) - list(hg38_tss[this_gene]['tss'])[0]) <= max_distance):
                                 continue
-                            if sub_entry and sub_entry.split('@')[1].split('=')[0] not in eqtl_lists:
+                            if sub_entry.split('@')[1].split('=')[0] not in eqtl_lists:
                                 eqtl_lists[sub_entry.split('@')[1].split('=')[0]] = {e: [] for e in eqtl_types}
                             eqtl_lists[sub_entry.split('@')[1].split('=')[0]][eqtl].append(this_gene + '\t' + this_eqtl)
 
