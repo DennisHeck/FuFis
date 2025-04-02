@@ -522,7 +522,7 @@ def promoter_fetch_col(pattern, gtf_file, tss_type='all', extend=200, gene_set=(
     for prom, val in fill_dict.items():
         for f_col in fill_cols:
             hit_val = float(val[f_col])
-            if not np.isnan(hit_val):  # If not all promoter had a value we can still form the mean after excluding NaNs.
+            if not np.isnan(hit_val):  # If not all promoter had a value we can form the mean after excluding NaNs.
                 gene_values[prom_gene_map[prom]][f_col].append(hit_val)
     gene_values = {g: {c: np.mean(val[c]) if val[c] else np.nan for c in fill_cols} for g, val in gene_values.items()}
     return gene_values, fill_cols
