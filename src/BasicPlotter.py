@@ -596,7 +596,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
 
 
 def basic_venn(input_sets, plot_path, blob_colours=ColoursAndShapes.tol_highcontrast, title='',
-               scaled=True, linestyle='', number_size=11, xsize=5, ysize=5, formats=['pdf']):
+               scaled=True, linestyle='', number_size=11, xsize=5, ysize=5, normalize_to=0.5, formats=['pdf']):
     """
     Based on a dictionary of {key: set} with either two or three entries do the intersection of sets and create a
     Venn diagram from it.
@@ -605,6 +605,7 @@ def basic_venn(input_sets, plot_path, blob_colours=ColoursAndShapes.tol_highcont
         input_sets: {key: set} for all bubbles that should be plotted.
         scaled: If the bubble sizes should be scaled to the set sizes. Choose False if the size difference is too high.
         linestyle: Linestyle for the rim of the bubbles.
+        normalize_to: Factor to scale the bubble size. If bubbles get cut, try decreasing it.
      """
     if 'glasbey' in blob_colours:
         blob_colours = ColoursAndShapes.glasbey_palettes[blob_colours][:len(input_sets)]
@@ -621,20 +622,20 @@ def basic_venn(input_sets, plot_path, blob_colours=ColoursAndShapes.tol_highcont
     f, ax = plt.subplots(figsize=(xsize, ysize))
     if scaled and len(plot_list) == 3:
         v = matplotlib_venn.venn2(subsets=plot_list, set_labels=key_order, ax=ax, set_colors=blob_colours,
-                                  normalize_to=0.5)
+                                  normalize_to=normalize_to)
     elif not scaled and len(plot_list) == 3:
         v = matplotlib_venn.venn2_unweighted(subsets=plot_list, set_labels=key_order, ax=ax,
-                                             set_colors=blob_colours, normalize_to=0.5)
+                                             set_colors=blob_colours, normalize_to=normalize_to)
     elif scaled and len(plot_list) == 7:
         v = matplotlib_venn.venn3(subsets=plot_list, set_labels=key_order, ax=ax, set_colors=blob_colours,
-                                  normalize_to=0.5)
+                                  normalize_to=normalize_to)
     elif not scaled and len(plot_list) == 7:
         v = matplotlib_venn.venn3_unweighted(subsets=plot_list, set_labels=key_order, ax=ax, set_colors=blob_colours,
-                                  normalize_to=0.5)
+                                  normalize_to=normalize_to)
     if len(plot_list) == 3:
-        matplotlib_venn.venn2_circles(subsets=plot_list, linestyle=linestyle, linewidth=1, color="grey", normalize_to=0.5)
+        matplotlib_venn.venn2_circles(subsets=plot_list, linestyle=linestyle, linewidth=1, color="grey", normalize_to=normalize_to)
     elif len(plot_list) == 7:
-        matplotlib_venn.venn3_circles(subsets=plot_list, linestyle=linestyle, linewidth=1, color="grey", normalize_to=0.5)
+        matplotlib_venn.venn3_circles(subsets=plot_list, linestyle=linestyle, linewidth=1, color="grey", normalize_to=normalize_to)
     for text in v.set_labels:
         if text:
             text.set_fontsize(14)

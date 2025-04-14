@@ -114,7 +114,8 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
 def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row='', title="", plot_out="", vmin=None,
                vmax=None, annot_cols=None, cmap='viridis', x_size=12, y_size=10, y_dendro=False, x_dendro=True,
                column_labels=None, row_cluster=True, col_cluster=True, centre=None, tick_size=12, mask=None,
-               metric='euclidean', z_score=None, class_col_colour=None, formats=['pdf']):#, return_linkage=False):
+               metric='euclidean', z_score=None, class_col_colour=None, formats=['pdf'], hlines=[], vlines=[],
+               main_space=0.82, col_colours=None):#, return_linkage=False):
     # TODO allow col_colors and also allow to give indices instead of columns.
     """
     Create a heatmap that can be additionally clustered with seaborn. CARE: the class_col_order and class_row parameters
@@ -136,6 +137,9 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
         mask: Must match the dimensions of the plot_df. If given will not show data where entries are True.
         metric: Metric for clustering for the scipy function, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html#scipy.spatial.distance.pdist.
         z_score: Whether to do z-score normalization before clustering. If None won't do z-scoring, otherwise takes 0 or 1 for the axis along which the normalization should be done.
+        hlines: List of indices where white horizontal lines will be added, e.g. for grouping subsets.
+        vlines: Same but vertical.
+        main_space: How much space the main heatmap will be given. Reduce if the colourbar overlaps the heatmap.
     """
     if z_score is not None:  # Not using seaborns z_score flag as it messes with the separate colourbar.
         plot_part = zscore(plot_df[columns], axis=z_score)
@@ -180,14 +184,14 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
                                 xticklabels=columns if not column_labels else column_labels, row_cluster=row_cluster,
                                 col_cluster=col_cluster, row_colors=None if not class_col else pd.Series(
                                     [class_colours[cl] for cl in plot_df[class_col].values], index=plot_df.index),
-                                # col_colors=None if not class_col else pd.Series(
+                                col_colors=None if not col_colours else col_colours,# else pd.Series(
                                 #     [class_colors[cl] for cl in plot_df.loc[class_col].values], index=plot_df.columns),
                                 dendrogram_ratio=0.1, mask=mask, metric=metric)
     clustermap.ax_col_dendrogram.set_visible(y_dendro)
     clustermap.ax_row_dendrogram.set_visible(x_dendro)
     clustermap.ax_heatmap.tick_params(labelsize=tick_size)
     clustermap.cax.set_visible(False)
-    clustermap.gs.update(right=0.82)
+    clustermap.gs.update(right=main_space)
     # Add a manual colormap to be able to edit it.
     gs2 = matplotlib.gridspec.GridSpec(1, 1, right=0.95, left=0.9, bottom=0.2, top=0.8)
     cbar_ax = clustermap.fig.add_subplot(gs2[0])
@@ -203,9 +207,13 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
         cbar_label = 'column zscore ' + cbar_label
     elif z_score == 1:
         cbar_label = 'row zscore ' + cbar_label
-    sep_cbar = colorbar.ColorbarBase(cbar_ax, cmap=cm.get_cmap(cmap), norm=norm,
-                                     label=cbar_label)
+    sep_cbar = colorbar.ColorbarBase(cbar_ax, cmap=cm.get_cmap(cmap), norm=norm, label=cbar_label)
     sep_cbar.ax.yaxis.label.set_fontsize(12)
+
+    if hlines:
+        clustermap.ax_heatmap.hlines(hlines, *clustermap.ax_heatmap.get_xlim(), colors='white', linewidth=5)
+    if vlines:
+        clustermap.ax_heatmap.vlines(vlines, *clustermap.ax_heatmap.get_xlim(), colors='white', linewidth=5)
 
     if class_col:
         # Add the class bar.
