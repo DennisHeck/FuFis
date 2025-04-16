@@ -239,6 +239,7 @@ def fn_patternmatch(pattern):
     """
     Grabs all files in the file system that match the pattern and returns a dictionary with {file: wildcard}.
     Only works if the wildcard is in the file name and not in a directory name.
+    Files that start with ._ (e.g. temporary or system files) will be skipped.
     E.g. for a directory BirdCollection/ that contains Bird_Kakapo.txt and Bird_Kea.txt:
     fn_patternmatch("BirdCollection/*.txt" = {"BirdCollection/Bird_Kakapo.txt": "Kakao", "BirdCollection/Bird_Kea.txt": "Kea"}
      """
@@ -246,7 +247,8 @@ def fn_patternmatch(pattern):
     children_pattern = pattern.split('/')[-1]
     re_pattern = re.compile(children_pattern.replace('*', '(.*)'))
     matched_files = {parent_folder + x: re_pattern.search(x).group(1)
-                     for x in os.listdir(parent_folder) if fnmatch.fnmatch(x, children_pattern)}
+                     for x in os.listdir(parent_folder)
+                     if fnmatch.fnmatch(x, children_pattern) and not x.startswith('._')}
     return matched_files
 
 
