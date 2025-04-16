@@ -738,8 +738,8 @@ def overlap_heatmap(inter_sets, title="", plot_path='', xsize=12, ysize=8, annot
         return
     set_tags = list(inter_sets.keys())
     combos = list(itertools.combinations(set_tags, 2))
-    shared_mat = np.ones([len(inter_sets), len(inter_sets)])
-    annot_mat = np.ones([len(inter_sets), len(inter_sets)])
+    shared_mat = np.zeros([len(inter_sets), len(inter_sets)])
+    annot_mat = np.zeros([len(inter_sets), len(inter_sets)])
 
     for comb in combos:
         shared = len(inter_sets[comb[0]] & inter_sets[comb[1]])
@@ -759,12 +759,14 @@ def overlap_heatmap(inter_sets, title="", plot_path='', xsize=12, ysize=8, annot
             annot_mat[set_tags.index(comb[1])][set_tags.index(comb[0])] = len(inter_sets[comb[0]] & inter_sets[comb[1]])
     if annot_type == 'Jaccard' or annot_type == 'Fraction':
         annot_mat = annot_mat.round(3)
-    elif annot_type == 'Absolute':
-        for n in range(len(set_tags)):  # Fill the diagonal with the absolute number of items.
-            annot_mat[n][n] = len(inter_sets[set_tags[n]])
-            if len(inter_sets[set_tags[n]]) > 0:
-                shared_mat[n][n] = 1
+
+    # Fill the diagonal.
+    np.fill_diagonal(shared_mat, 1)
+    if annot_type == 'Absolute':
+        np.fill_diagonal(annot_mat, [len(inter_sets[set_tags[n]]) for n in range(len(set_tags))])
         annot_mat = annot_mat.astype(int)
+    else:
+        np.fill_diagonal(annot_mat, 1)
 
     if matrix_only:
         shared_df = pd.DataFrame(shared_mat, columns=set_tags, index=set_tags)
