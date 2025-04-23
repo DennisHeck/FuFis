@@ -23,7 +23,7 @@ import ColoursAndShapes
 
 def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None, title=None, output_path='', y_label='',
                x_size=8, y_size=6, rotation=None, palette=None, legend=True, font_s=14, legend_out=False, ylim=None,
-               formats=['pdf']):
+               hlines=[], vlines=[], formats=['pdf']):
     """
     Plots a basic barplot, allows to select hue levels.
 
@@ -59,6 +59,10 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
                       bbox_to_anchor=(2 if type(legend_out) == bool else legend_out, 1))
         else:
             ax.legend(prop={'size': 14, 'weight': 'bold'})
+    for pos in hlines:
+        plt.axhline(pos, color="#a7a8a7", linestyle="--")
+    for pos in vlines:
+        plt.axvline(pos, color="#a7a8a7", linestyle="--")
     if not legend and ax.get_legend():
         ax.get_legend().remove()
     plt.title(title, fontsize=font_s+4, fontweight='bold')
