@@ -83,7 +83,7 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
                     if len(curr_df[curr_df['name'] == term]) == 1:
                         hits += 1
                         pvals.append(next(iter(curr_df[curr_df['name'] == term]['p_value'].values)))
-            term_occs.append([term, hits, min(pvals)])
+            term_occs.append([term, hits, 1 if not pvals else min(pvals)])
         sorted_terms = [x[0] for x in sorted(term_occs, key=lambda x: (x[1], -x[2]))]
 
         main_list = []  # X-pos, Y-pos, gene fraction, p-value.
