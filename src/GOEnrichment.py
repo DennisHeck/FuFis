@@ -12,7 +12,8 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
     """Requires a dictionary with sets of genes. Will run GO enrichment for each of the sets. One plot will be written
     for each GO source. For only one gene set uses the x-axis for indicating the FDR, multiple sets will be
     separated on the x-axis and the FDR value shown as colour. Note, root terms of the databases are manually
-    filtered out (e.g., HP root), but some might be missed. Uses the Python package of g:Profiler:
+    filtered out (e.g., HP root), but some might be missed. If there are multiple terms with the same name, the first
+    one is picked. Uses the Python package of g:Profiler:
      https://biit.cs.ut.ee/gprofiler/gost.
 
     Args:
@@ -80,10 +81,9 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
             for cell in dict_keys:
                 curr_df = term_fetcher[cell][source]
                 if len(curr_df) > 0:
-                    if len(curr_df[curr_df['name'] == term]) == 1:
-                        hits += 1
-                        pvals.append(next(iter(curr_df[curr_df['name'] == term]['p_value'].values)))
-            term_occs.append([term, hits, 1 if not pvals else min(pvals)])
+                    hits += 1
+                    pvals.append(next(iter(curr_df[curr_df['name'] == term]['p_value'].values)))
+            term_occs.append([term, hits, min(pvals)])
         sorted_terms = [x[0] for x in sorted(term_occs, key=lambda x: (x[1], -x[2]))]
 
         main_list = []  # X-pos, Y-pos, gene fraction, p-value.
@@ -93,9 +93,8 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
                 curr_df = term_fetcher[cell][source]
                 if len(curr_df) > 0:
                     match_entry = curr_df[curr_df['name'] == term]
-                    if len(match_entry) == 1:
-                        main_list.append([x, y, match_entry['intersection_size'].values[0] / num_genes,
-                                          match_entry['p_value'].values[0]])
+                    main_list.append([x, y, match_entry['intersection_size'].values[0] / num_genes,
+                                      match_entry['p_value'].values[0]])
         if main_list:
             size_col = [s[2] for s in main_list]
             scaled_min, scaled_max = 20, 200
