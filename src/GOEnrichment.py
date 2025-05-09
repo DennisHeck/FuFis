@@ -80,9 +80,10 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
             pvals = []
             for cell in dict_keys:
                 curr_df = term_fetcher[cell][source]
-                if len(curr_df) > 0:
+                curr_df = curr_df[curr_df['name'] == term]
+                if not curr_df.empty:
                     hits += 1
-                    pvals.append(next(iter(curr_df[curr_df['name'] == term]['p_value'].values)))
+                    pvals.append(next(iter(curr_df['p_value'].values)))
             term_occs.append([term, hits, min(pvals)])
         sorted_terms = [x[0] for x in sorted(term_occs, key=lambda x: (x[1], -x[2]))]
 
@@ -93,8 +94,9 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
                 curr_df = term_fetcher[cell][source]
                 if len(curr_df) > 0:
                     match_entry = curr_df[curr_df['name'] == term]
-                    main_list.append([x, y, match_entry['intersection_size'].values[0] / num_genes,
-                                      match_entry['p_value'].values[0]])
+                    if not match_entry.empty:
+                        main_list.append([x, y, match_entry['intersection_size'].values[0] / num_genes,
+                                        match_entry['p_value'].values[0]])
         if main_list:
             size_col = [s[2] for s in main_list]
             scaled_min, scaled_max = 20, 200
