@@ -437,6 +437,13 @@ BasicPlotter.basic_2Dhist(penguin_df, columns=['flipper_length_mm', 'body_mass_g
                           output_path=out_dir, cbar=True, formats=['png'])
 # ---
 
+# ***BasicPlotter.basic_lineplot
+# Plot a lineplot with optional markers and dashes, even though a lineplot isn't that meaningful for our pingouin data.
+BasicPlotter.basic_lineplot(penguin_df, x_col='flipper_length_mm', y_col='body_mass_g', hue_col='species',
+                            title="Flipper length vs body mass", output_path=out_dir, markers=['o', 'd', 's'],
+                            palette='glasbey_cool', dashes=True, formats=['png'])
+# ---
+
 # ***BasicPlotter.multi_mod_plot
 # This one is a scatterplot with a lot of additional options.
 # Start with a scatterplot where we colour the dots by the species, each dot being one penguin.
