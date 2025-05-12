@@ -47,7 +47,7 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
             if len(go_genes[cell]) >= 1:
                 query_df = gp.profile(organism=organism, query=list(go_genes[cell]), no_evidences=False,
                                       background=None if not background else list(background[cell]))
-                query_df = query_df[(~query_df['name'].str.contains("REACTOME")) & (query_df['name'] != 'WIKIPATHWAYS')
+                query_df = query_df[(~query_df['name'].str.contains("REACTOME")) & (query_df['name'] != 'WIKIPATHWAYS') & (query_df['name'] != 'biological_process')
                                     & (~query_df['name'].str.contains("KEGG")) & (~query_df['name'].str.contains('HP root'))]
                 query_df['Gene fraction'] = query_df['intersection_size'] / len(go_genes[cell])
                 df_fetcher[cell] = query_df
