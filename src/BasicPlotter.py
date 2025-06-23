@@ -22,14 +22,17 @@ import ColoursAndShapes
 
 
 def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None, title=None, output_path='', y_label='',
-               x_size=8, y_size=6, rotation=None, palette=None, legend=True, font_s=14, legend_out=False, ylim=None,
-               hlines=[], vlines=[], formats=['pdf']):
+               x_size=8, y_size=6, rotation=None, palette=None, legend=True, font_s=14, legend_out=False, xlim=None, ylim=None,
+               hlines=[], vlines=[], flip_y=False, flip_pad=-30, colour='#2d63ad', edgecolour='black', formats=['pdf']):
     """
     Plots a basic barplot, allows to select hue levels.
 
     Args:
         y_col: Can be list, then the df will be transformed long format and var_name set to hue_col.
         y_label: to have an appropriate y-axis label.
+        flip_y: Very specific case, where the y-ticklabels are flipped into the plot.
+        flip_pad: If flip_y, the padding by which the y-ticklabels are moved.
+        colour: Colour of the bars, only used if no hue_cols is given.
     """
     if x_col not in plot_df.columns:  # Assumes the x_col is the index if the column doesn't exist.
         plot_df[x_col] = plot_df.index
@@ -44,10 +47,12 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
     ax.set_axisbelow(True)
     ax.grid(True, axis='y', color='#f2f2f2', linewidth=1, which='major')
     sns.barplot(data=plot_df, x=x_col, y=y_col, order=x_order, hue=hue_col, hue_order=hue_order, ax=ax, alpha=1,
-                errorbar=None, edgecolor='k', linewidth=1, color='#2d63ad',
+                errorbar=None, edgecolor=edgecolour, linewidth=1, color=colour,
                 palette='tab10' if hue_col and not palette else palette)
     if ylim:
         ax.set_ylim(ylim)
+    if xlim:
+        ax.set_xlim(xlim)
     ax.tick_params(axis='both', labelsize=font_s)
     ax.set_ylabel(y_col if not y_label else y_label, fontsize=font_s+2)
     ax.set_xlabel(x_col, fontsize=font_s+2)
@@ -65,7 +70,13 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
         plt.axvline(pos, color="#a7a8a7", linestyle="--")
     if not legend and ax.get_legend():
         ax.get_legend().remove()
+    if flip_y:
+        ax.tick_params(axis='y', direction='in', pad=flip_pad, length=0)
+        for label in ax.get_yticklabels():
+            label.set_horizontalalignment('left')
+        ax.set_axisbelow(False)
     plt.title(title, fontsize=font_s+4, fontweight='bold')
+
     if type(formats) != list:
         formats = [formats]
     for form in formats:
@@ -210,7 +221,7 @@ def stacked_bars(plot_df, x_col, y_cols, y_label='', title=None, output_path='',
 def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title=None, output_path='', stat='count',
                cumulative=False, palette='tab10', binrange=None, xsize=12, ysize=8, colour='#2d63ad', font_s=14,
                ylabel=None, element='step', alpha=0.3, kde=False, legend_out=False, legend_title=True, fill=True,
-               edgecolour=None, multiple='layer', shrink=1, hlines=[], vlines=[], discrete=False, grid=True,
+               edgecolour=None, multiple='layer', shrink=1, hlines=[], vlines=[], discrete=False, grid=True, 
                linewidth=None, formats=['pdf']):
     """
     Plots a basic layered histogram which allows for hue, whose order can be defined as well.
@@ -263,10 +274,10 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
         if not legend_title:
             hist.get_legend().set_title('')
         if legend_out:
-            sns.move_legend(hist, prop={'size': font_s, 'weight': 'bold'}, loc='upper right',
+            sns.move_legend(hist, prop={'size': font_s, 'weight': 'normal'}, loc='upper right',
                             bbox_to_anchor=(2 if type(legend_out) == bool else legend_out, 1))
         else:
-            sns.move_legend(hist, prop={'size': font_s, 'weight': 'bold'}, loc='best')
+            sns.move_legend(hist, prop={'size': font_s, 'weight': 'normal'}, loc='best')
     for pos in hlines:
         plt.axhline(pos, color="#a7a8a7", linestyle="--")
     for pos in vlines:
@@ -394,7 +405,7 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
         plt.setp(vio.get_legend().get_title(), fontsize=font_s+2)
         if not legend_title:
             vio.get_legend().set_title('')
-        sns.move_legend(vio, prop={'size': 14, 'weight': 'bold'}, loc='best')
+        sns.move_legend(vio, prop={'size': 14, 'weight': 'normal'}, loc='best')
     if rotation:
         plt.xticks(rotation=rotation, ha='center')
     if vertical_grid:  # Fun part is minor ticks are always x5.

@@ -122,10 +122,10 @@ def pre_rec_plotter(plot_df, sig_col, plot_cols, steps=10000, output_path='', co
         #         output.write('\t'.join([str(e) for e in entry]) + '\n')
 
     if legend_out:
-        ax.legend(prop={'size': legend_s, 'weight': 'bold'}, loc='upper right',
+        ax.legend(prop={'size': legend_s, 'weight': 'normal'}, loc='upper right',
                   bbox_to_anchor=(2 if type(legend_out) == bool and not legend_out else legend_out, 1))
     else:
-        ax.legend(prop={'size': legend_s, 'weight': 'bold'})
+        ax.legend(prop={'size': legend_s, 'weight': 'normal'})
     plt.xlabel('Recall' if mode == 'pr' else 'FPR', size=22)
     plt.ylabel('Precision' if mode == 'pr' else 'TPR', size=22)
     ax.tick_params(axis='both', labelsize=18)
@@ -169,7 +169,7 @@ def pr_thresh_coloured(binning, plot_df, score_col, true_set, thresh, output_pat
     plt.xlabel('Recall', size=22)
     plt.ylabel('Precision', size=22)
     ax.tick_params(axis='both', labelsize=18)
-    ax.legend(markerscale=3, scatterpoints=1, fontsize=16, labelspacing=0.4, prop={'weight': 'bold', 'size': 18})
+    ax.legend(markerscale=3, scatterpoints=1, fontsize=16, labelspacing=0.4, prop={'weight': 'normal', 'size': 18})
 
     plt.ylim(0, 1)
     plt.xlim(0, 1)
