@@ -343,6 +343,54 @@ def basic_2Dhist(plot_df, columns, hue_col=None, hue_order=None, bin_num=200, ti
     plt.close()
 
 
+def basic_lineplot(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=None, output_path='', markers=False,
+                   x_size=8, y_size=6, palette=None, font_s=14, legend_out=False, ylim=None, xlim=None, dashes=True,
+                   linewidth=1, hlines=[], vlines=[], grid=True, formats=['pdf']):
+    """
+    Plots a basic lineplot, allows to select hue levels.
+
+    Args:
+        markers: Whether to add markers add each point, can be a list of markers.
+        dashes: Whether to distinguish groups by linestyle, can be a list or dictionary of dashes, as defined by pyplot
+            (https://matplotlib.org/stable/gallery/lines_bars_and_markers/line_demo_dash_control.html).
+    """
+    if x_col not in plot_df.columns:  # Assumes the x_col is the index if the column doesn't exist.
+        plot_df[x_col] = plot_df.index
+    if palette and 'glasbey' in palette:
+        palette = ColoursAndShapes.glasbey_palettes[palette][:len(set(plot_df[hue_col]))]
+
+    f, ax = plt.subplots(figsize=(x_size, y_size))
+    ax.set_axisbelow(True)
+    if grid:
+        ax.grid(True, axis='y', color='#f2f2f2', linewidth=1, which='major')
+    sns.lineplot(data=plot_df, x=x_col, y=y_col, hue=hue_col, hue_order=hue_order, ax=ax, alpha=1, markers=markers,
+                 linewidth=linewidth, palette='tab10' if hue_col and not palette else palette, dashes=dashes, style=hue_col)
+    ax.tick_params(axis='both', labelsize=font_s)
+    if xlim:
+        ax.set_xlim(xlim)
+    if ylim:
+        ax.set_ylim(ylim)
+    ax.set_xlabel(x_col, fontsize=font_s+2)
+    ax.set_ylabel(y_col, fontsize=font_s+2)
+    if hue_col:
+        if legend_out:
+            ax.legend(prop={'size': 14, 'weight': 'bold'}, loc='upper right',
+                      bbox_to_anchor=(2 if type(legend_out) == bool else legend_out, 1))
+        else:
+            ax.legend(prop={'size': 14, 'weight': 'bold'})
+    for pos in hlines:
+        plt.axhline(pos, color="#a7a8a7", linestyle="--")
+    for pos in vlines:
+        plt.axvline(pos, color="#a7a8a7", linestyle="--")
+    plt.title(title, fontsize=font_s+4, fontweight='bold')
+    if type(formats) != list:
+        formats = [formats]
+    for form in formats:
+        f.savefig((output_path + '_'.join([str(x_col), str(y_col)]) + '_Lineplot.'+form).replace(' ', ''),
+                  bbox_inches='tight', format=form)
+    plt.close()
+
+
 def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=None, title=None, output_path='',
                  numerate=False, ylim=None, palette=None, xsize=12, ysize=8, boxplot=False, boxplot_meanonly=False,
                  rotation=None, numerate_break=True, jitter=False, colour='#2d63ad', font_s=14, saturation=0.75,
@@ -535,7 +583,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         ax.grid(True, axis='both', color='#f2f2f2', linewidth=1, which='major')
     if marker_col:
         if len(set(plot_df[marker_col].values)) == 2:
-            marker_selection = ['o', '*']
+            marker_selection = ['o', 'd']
         else:
             marker_selection = ColoursAndShapes.marker_shapes * max(1, math.ceil(len(set(plot_df[marker_col])) / len(ColoursAndShapes.marker_shapes)))
         if marker_order:
