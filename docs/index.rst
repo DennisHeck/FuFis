@@ -10,6 +10,7 @@ FuFis (Frequently used Functions)
     Bed_Analysis_formatted.rst
     BigWig_Counter_formatted.rst
     CoveragePlots_formatted.rst
+    ClassificationPerformanceCurves_formatted.rst
     FIMO_TFBS_formatted.rst
     GenomeLifter_formatted.rst
     GTF_Processing_formatted.rst

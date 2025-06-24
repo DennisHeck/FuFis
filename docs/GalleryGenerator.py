@@ -384,7 +384,7 @@ open("docs/gallery/src.BasicPlotter_base_code.txt", 'w').write(str(penguin_df.he
 
 
 # Barplot with one bar per group.
-# ***BasicPlotter.basic_bars
+# ***BasicPlotter.basic_bars1
 # Make a basic barplot with the average flipper length per species.
 avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
 BasicPlotter.basic_bars(avg_flipper_length, x_col='species', y_col='flipper_length_mm', formats=['png'],
@@ -397,6 +397,18 @@ BasicPlotter.basic_bars(avg_flipper_length_sex, x_col='species', y_col='flipper_
                         hue_col='sex', x_order=['Chinstrap', 'Adelie', 'Gentoo'], title='Example bar plot with hue',
                         output_path=out_dir + "SexHue", y_label='Flipper length [mm]', rotation=None,
                         palette='glasbey_cool')
+# ---
+
+# ***BasicPlotter.basic_bars2
+# For specific use-cases, there's also the option to flip the y-axis labels into the plot, for example to have
+# a different visualization of GO plots.
+# BasicPlotter.basic_bars(sub_gsea.iloc[:5], x_col='NES', y_col='name', title='', output_path=plot_out+"GSEASTDInteractionsAcrossSamples",
+#                         y_label='', x_size=8.5, y_size=6, xlim=[0, -18], flip_y=True, flip_pad=-6, colour='#6ba0db', edgecolour='#6ba0db', font_s=19)
+avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
+BasicPlotter.basic_bars(avg_flipper_length, x_col='flipper_length_mm', y_col='species', formats=['png'],
+                        title='Example bar plot with flipped y-axis labels', flip_y=True, flip_pad=-6,
+                        colour='#6ba0db', edgecolour='#6ba0db', font_s=19,
+                        output_path=out_dir+'FlipY')
 # ---
 
 # ***BasicPlotter.stacked_bars
@@ -507,6 +519,35 @@ rna_table['binned H3K79me2 GB Coverage'] = pd.cut(rna_table['H3K79me2 GB Coverag
 BasicPlotter.cumulative_plot(rna_table, x_col='logFC', hue_col='binned H3K79me2 GB Coverage', palette='glasbey_cool', xlimit=[-1.5, 2],
                              add_all=True, output_path=out_dir, numerate=True, title=None, vertical_line=0, table_width=0.4, table_x_pos=1.2, formats=['png'])
 # ---
+
+# _________________________________________________________________________________________________________
+# ClassificationPerformanceCurves
+# _________________________________________________________________________________________________________
+# ***ClassificiationPerformance.classification_plotter
+# For the example, we load the penguin data and try the classification of pinguins into Gentoo and non-Gentoo
+# based on their body mass or flipper length.
+import ClassificationPerformanceCurves
+import seaborn as sns
+out_dir = 'docs/gallery/'
+penguin_df = sns.load_dataset('penguins')   # Example data from seaborn.
+penguin_df['is Gentoo'] = penguin_df['species'] == 'Gentoo'  # We need a boolean to tell true from false entries.
+
+# We try a ROC curve and a Precision-Recall curve, and add curve for random guessing.
+for mode in ['roc', 'pr']:
+    auc_output, performance_dict = ClassificationPerformanceCurves.classification_plotter(df=penguin_df, sig_col='is Gentoo', score_cols=['body_mass_g', 'flipper_length_mm'],
+                                                           steps=1000, mode=mode, title_tag=mode+' pinguin classification', output_path=out_dir+"GentooClassification", add_random=True,
+                                                           colours='glasbey_cool', formats=['png'])
+
+# And we can do a version where we do a scatter plot instead, and colour the dots by the used threshold.
+# In that case, it only makes sense to use columns that have the same metric.
+auc_output, performance_dict = ClassificationPerformanceCurves.classification_plotter(df=penguin_df, sig_col='is Gentoo', score_cols=['bill_depth_mm', 'flipper_length_mm'],
+                                                       steps=100, mode='pr', title_tag='PRC coloured by threshold', output_path=out_dir+"GentooClassification",
+                                                       colour_by_threshold=True, formats=['png'])
+# As a side-note, the classification based on the bill depth works so bad for Gintoo, because their average bill depth
+# is smaller than that of the other species, and for the function we assume high score means high likelihood to be true.
+# ---
+
+
 # _________________________________________________________________________________________________________
 # Various
 # _________________________________________________________________________________________________________
