@@ -523,7 +523,7 @@ BasicPlotter.cumulative_plot(rna_table, x_col='logFC', hue_col='binned H3K79me2 
 # _________________________________________________________________________________________________________
 # ClassificationPerformanceCurves
 # _________________________________________________________________________________________________________
-# ***ClassificiationPerformance.classification_plotter
+# ***ClassificationPerformanceCurves.classification_plotter
 # For the example, we load the penguin data and try the classification of pinguins into Gentoo and non-Gentoo
 # based on their body mass or flipper length.
 import ClassificationPerformanceCurves

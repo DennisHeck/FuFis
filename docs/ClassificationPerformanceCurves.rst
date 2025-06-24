@@ -15,13 +15,14 @@ the curve.
 
     *ClassificationPerformanceCurves.classification_plotter*
 
-|pic1| |pic2| |pic3|
+|pic1| |pic2|
+|pic3|
 
 .. |pic1| image:: gallery/GentooClassification_roc.png
-   :width: 33%
+   :width: 50%
 
 .. |pic2| image:: gallery/GentooClassification_pr.png
-   :width: 33%
+   :width: 50%
 
 .. |pic3| image:: gallery/GentooClassification_pr_ColouredbyThreshold.png
-   :width: 33%
+   :width: 50%
