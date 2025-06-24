@@ -19,10 +19,10 @@ the curve.
 |pic3|
 
 .. |pic1| image:: gallery/GentooClassification_roc.png
-   :width: 50%
+   :width: 45%
 
 .. |pic2| image:: gallery/GentooClassification_pr.png
-   :width: 50%
+   :width: 45%
 
 .. |pic3| image:: gallery/GentooClassification_pr_ColouredbyThreshold.png
    :width: 50%

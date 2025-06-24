@@ -402,8 +402,6 @@ BasicPlotter.basic_bars(avg_flipper_length_sex, x_col='species', y_col='flipper_
 # ***BasicPlotter.basic_bars2
 # For specific use-cases, there's also the option to flip the y-axis labels into the plot, for example to have
 # a different visualization of GO plots.
-# BasicPlotter.basic_bars(sub_gsea.iloc[:5], x_col='NES', y_col='name', title='', output_path=plot_out+"GSEASTDInteractionsAcrossSamples",
-#                         y_label='', x_size=8.5, y_size=6, xlim=[0, -18], flip_y=True, flip_pad=-6, colour='#6ba0db', edgecolour='#6ba0db', font_s=19)
 avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
 BasicPlotter.basic_bars(avg_flipper_length, x_col='flipper_length_mm', y_col='species', formats=['png'],
                         title='Example bar plot with flipped y-axis labels', flip_y=True, flip_pad=-6,

@@ -35,7 +35,7 @@ penguins are great.
     *BasicPlotter.basic_bars2*
 
 .. image:: gallery/FlipYflipper_length_mm_species_Bars.png
-  :width: 40%
+  :width: 65%
 
 .. .--------------------------------------------------------------------------------------------------------------------
 .. basic_stacked_bars
