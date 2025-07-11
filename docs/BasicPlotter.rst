@@ -20,7 +20,7 @@ penguins are great.
 
 .. code-block:: python
 
-    *BasicPlotter.basic_bars*
+    *BasicPlotter.basic_bars1*
 
 |basic_bars| |basic_bars_hue|
 
@@ -29,6 +29,13 @@ penguins are great.
 
 .. |basic_bars_hue| image:: gallery/SexHuespecies_flipper_length_mm_Bars.png
    :width: 45%
+
+.. code-block:: python
+
+    *BasicPlotter.basic_bars2*
+
+.. image:: gallery/FlipYflipper_length_mm_species_Bars.png
+  :width: 65%
 
 .. .--------------------------------------------------------------------------------------------------------------------
 .. basic_stacked_bars
