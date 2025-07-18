@@ -87,7 +87,7 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
 
 def jitter_bars(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=None, output_path='', x_size=8, y_size=6,
                rotation=None, palette=None, font_s=14, ylim=None, numerate=True, numerate_break=True, x_order=None,
-                jitter_colour='black', formats=['pdf']):
+                jitter_colour='black', jitter_hue_col=None, formats=['pdf']):
     """
     Plot the average across the x-column groups as bar plot and overlay the individual entries as jitter.
     """
@@ -101,7 +101,7 @@ def jitter_bars(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=None,
     ax.grid(True, axis='both', color='#f2f2f2', linewidth=1, which='major')
     bars = sns.barplot(data=plot_df, x=x_col, y='mean x', hue=hue_col, hue_order=hue_order, ax=ax, alpha=1, edgecolor='k',
                 linewidth=1, color='#2d63ad', palette='tab10' if hue_col and not palette else palette, order=x_order)
-    sns.stripplot(data=plot_df, x=x_col, y=y_col, jitter=True, ax=ax, hue=hue_col, order=x_order,
+    sns.stripplot(data=plot_df, x=x_col, y=y_col, jitter=True, ax=ax, hue=jitter_hue_col, order=x_order,
                   color=jitter_colour, dodge=True)
     ax.tick_params(axis='both', labelsize=font_s+4)
     ax.set_ylabel(y_col, fontsize=font_s+8)
@@ -136,7 +136,7 @@ def stacked_bars(plot_df, x_col, y_cols, y_label='', title=None, output_path='',
     Plots a stacked barplot, with a stack for each y_col.
 
     Args:
-        x_col: Column name to use for splitting on the x-axis, if not an existant column will take the index.
+        x_col: Column name to use for splitting on the x-axis, if not an existent column will take the index.
         y_cols: List of the columns to use for the stacks.
         fraction: If True take all values as fraction of the row sum.
         numerate: Whether to add the total number per x-group to the x-label.
