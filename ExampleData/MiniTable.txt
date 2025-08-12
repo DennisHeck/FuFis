@@ -1,0 +1,5 @@
+# meta line to ditch
+column1	column2	column3	column4	duck
+1	2	3	4	duck
+1	2	3	4	duck
+1	2	3	4	goose

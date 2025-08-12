@@ -230,7 +230,6 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
     return df_fetcher
 
 
-
 def gsea_prerank(go_genes, weight=0, gsea_plot_out=None, out_tag='', title_tag='', max_terms='all', numerate=False, godf_only=False, translate_ensembl=False,
                  wanted_sources=['c5.hpo', 'c2.cp.wikipathways', 'c5.go.mf', 'c2.cp.reactome', 'c5.go.bp'], nes_sign='both',
                  gmt_path_pattern="/projects/abcpp/work/base_data/GSEA_gmt/human/*.v2024.1.Hs.symbols.gmt",

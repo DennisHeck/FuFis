@@ -281,6 +281,20 @@ go_dict = GOEnrichment.go_enrichment(gene_sets, title_tag='CAD gene sets', keywo
                                    numerate=True, wanted_sources=['GO:BP'], rotation=45, font_s=16, formats='png')
 # ---
 
+# ***GOEnrichment.gsea_prerank
+# Instead of the enrichment test with g:profiler, we can also run GSEA on ranked list of genes to test whether
+# the top of the list is enriched for functions from the databases. But it requires stored gmt files.
+gene_sets = {"CAD-van der Harst": set(open('ExampleData/VanderHarst2018_names.txt').read().strip().split('\n')),
+             'CAD-Schnitzler ': set(open('ExampleData/Schnitzler2024_names.txt').read().strip().split('\n'))}
+gsea_genes = {g_set: pd.DataFrame([[g, i] for i, g in enumerate(genes)]).set_index(0) for g_set, genes in gene_sets.items()}
+
+go_dict = GOEnrichment.gsea_prerank(gsea_genes, weight=0, gsea_plot_out=None, out_tag=out_dir+"GSEA", title_tag='',
+                                    max_terms=5, numerate=True, godf_only=False, translate_ensembl=True,
+                                    wanted_sources=['c5.go.mf'], nes_sign='both',
+                 gmt_path_pattern="ExampleData/*.v2024.1.Hs.symbols.gmt",
+                 fig_height=None, legend_out=None, rotation=45, font_s=16, cores=20, formats=['png'])
+# ---
+
 
 # _________________________________________________________________________________________________________
 # GenomeLifter
@@ -683,4 +697,19 @@ print(open('ExampleData/ExampleBib_great.bib').readlines()[2])
 # ---
 open('docs/gallery/MakeTitlesGreatAgain_1.txt', 'w').write(open('ExampleData/ExampleBib.bib').readlines()[2])
 open('docs/gallery/MakeTitlesGreatAgain_2.txt', 'w').write(open('ExampleData/ExampleBib_great.bib').readlines()[2])
+
+
+# _________________________________________________________________________________________________________
+# ReadLargeMatrix
+# _________________________________________________________________________________________________________
+# ***ReadLargeMatrix
+# We only read a mini gtf file for illustration.
+import ReadLargeMatrix
+table_path = 'ExampleData/MiniTable.txt'
+read_table = ReadLargeMatrix.file_read(table_path, sep='\t', header=1, cores=1, batch_rows=100),
+                                       df_dtypes={"column1": int, 'column2': 'string', 'column3': bool, 'column4': int, 'duck': 'string'},
+                                       string_comparison='duck', string_comparison_start=4)
+
+
+
 

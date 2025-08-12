@@ -31,3 +31,17 @@ for cell in ['vCM', 'MAC', 'LC']:
     cell_df[['# chr', 'start', 'end']].to_csv(inter_heat_out + "Hocker2021_ATAC_" + cell+ "_chr1.bed", sep='\t',
                                                 header=False, index=False)
 
+# ---------------------------------------------------------------------------------------------------
+# GO_Enrichment - translate the Ensembl IDs
+# ---------------------------------------------------------------------------------------------------
+import GTF_Processing
+annotation = '/Users/dennis/Desktop/DataEssentials/Annotations/gencode.v38.annotation.gtf.gz'
+gene_sets = {"CAD-van der Harst": set(open('ExampleData/VanderHarst2018.txt').read().strip().split('\n')),
+             'CAD-Schnitzler ': set(open('ExampleData/Schnitzler2024.txt').read().strip().split('\n'))}
+for g_set in gene_sets:
+    mapped_ids, missed_ids = GTF_Processing.match_gene_identifiers(gene_sets[g_set], gtf_file=annotation, species='human',
+                                                               fields="symbol")
+    out_name = 'ExampleData/VanderHarst2018_names.txt' if'Harst' in g_set else 'Exampledata/Schnitzler2024_names.txt'
+    open(out_name, 'w').write('\n'.join([val['symbol'] for val in mapped_ids.values()]))
+
+
