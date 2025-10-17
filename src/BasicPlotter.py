@@ -34,6 +34,7 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
         flip_pad: If flip_y, the padding by which the y-ticklabels are moved.
         colour: Colour of the bars, only used if no hue_cols is given.
     """
+    plot_df = copy.deepcopy(plot_df)
     if x_col not in plot_df.columns:  # Assumes the x_col is the index if the column doesn't exist.
         plot_df[x_col] = plot_df.index
     if palette and 'glasbey' in palette:

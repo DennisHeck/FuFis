@@ -54,7 +54,7 @@ def plot_go(mode, wanted_sources, term_fetcher, keywords, cmap, fig_width, fig_h
                     if not match_entry.empty:
                         if mode == 'hypergeometric':
                             main_list.append([x, y, match_entry['Gene fraction'].values[0],
-                                            abs(np.log2(match_entry['FDR'].values[0]))])
+                                              match_entry['FDR'].values[0]])
                         elif mode == 'prerank':
                             main_list.append([x, y, match_entry['Gene fraction'].values[0],
                                               match_entry['NES'].values[0]])
@@ -112,7 +112,7 @@ def plot_go(mode, wanted_sources, term_fetcher, keywords, cmap, fig_width, fig_h
 
             else:  # If we only have one group, use the x-axis for the log-q value.
                 if mode == 'hypergeometric':
-                    plt.scatter(x=[x[3] for x in main_list], y=[y[1] for y in main_list],
+                    plt.scatter(x=[abs(np.log2(x[3])) for x in main_list], y=[y[1] for y in main_list],
                             c=['#112791' for c in main_list], s=scaled_sizes, 
                             edgecolors=['#112791' for c in main_list], zorder=12)
                     ax.set_xlim(3, max([x[3] for x in main_list])*1.1)
@@ -225,7 +225,6 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
     plot_go(mode='hypergeometric', wanted_sources=wanted_sources, term_fetcher=term_fetcher, keywords=keywords, cmap=cmap, fig_width=fig_width, fig_height=fig_height,
             go_genes=go_genes, dict_keys=dict_keys, numerate=numerate, font_s=font_s, rotation=rotation,
             title_tag=title_tag, legend_out=legend_out, max_terms=max_terms, out_tag=out_tag, formats=formats)
-
 
     return df_fetcher
 
