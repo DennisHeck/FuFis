@@ -15,6 +15,7 @@ parser.add_argument("--fimo_src", required=True, help='Path to the Fimo executab
 parser.add_argument("--out_dir", required=True, help='Path to which to write the output to.')
 parser.add_argument("--write_sequence", default='False', help='If Fimo should write the sequence matched '
                                                                        'to the motif in its output file [True, False].')
+parser.add_argument("--thresh", default='0.0001', help='p-value cutoff for the FIMO output.')
 
 
 if __name__ == '__main__':
@@ -38,7 +39,7 @@ if __name__ == '__main__':
 
     new_meme_file = FIMO_TFBS_Helper.meme_fitbackground(args.PWMs, seq_out, args.out_dir)
 
-    FIMO_TFBS_Helper.fimo_runner(args, seq_out, fimo_out, new_meme_file)
+    FIMO_TFBS_Helper.fimo_runner(args, seq_out, fimo_out, new_meme_file, args.thresh)
 
     FIMO_TFBS_Helper.fimo_processor(args, fimo_out)
 

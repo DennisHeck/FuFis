@@ -51,7 +51,7 @@ def meme_fitbackground(meme_file, sequence_file, out_dir):
     return new_meme_file
 
 
-def fimo_runner(args, seq_out, fimo_out, new_meme_file):
+def fimo_runner(args, seq_out, fimo_out, new_meme_file, thresh=0.0001):
     """
     A wrapper to call FIMO to avoid redundant code for catching specific flags.
     """
@@ -61,7 +61,7 @@ def fimo_runner(args, seq_out, fimo_out, new_meme_file):
     out_suffix = '--oc '+args.out_dir if args.write_sequence else ""
     std_out_suffix = '' if args.write_sequence else " > " + fimo_out.replace('.gz', '')
 
-    bashCommand = args.fimo_src + " --thresh 0.0001 " + out_suffix + ' ' + write_seq + " --verbosity 1 --bfile --motif-- " + new_meme_file \
+    bashCommand = args.fimo_src + " --thresh " + str(thresh) + " " + out_suffix + ' ' + write_seq + " --verbosity 1 --bfile --motif-- " + new_meme_file \
                   + " " + seq_out + std_out_suffix
     subprocess.call(bashCommand, shell=True)
 
