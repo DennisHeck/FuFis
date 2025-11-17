@@ -292,7 +292,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + str(x_col) + '_' + str(hue_col) + '_Hist.'+form).replace(' ', ''),
+        f.savefig((output_path + log_scale*'log' + str(x_col) + '_' + str(hue_col) + '_Hist.'+form).replace(' ', ''),
                   bbox_inches='tight', format=form)
     plt.close()
 
