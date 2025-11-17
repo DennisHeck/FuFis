@@ -88,7 +88,7 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
 
 def jitter_bars(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=None, output_path='', x_size=8, y_size=6,
                rotation=None, palette=None, font_s=14, ylim=None, numerate=True, numerate_break=True, x_order=None,
-                jitter_colour='black', jitter_hue_col=None, formats=['pdf']):
+                jitter_colour='black', jitter_hue_col=None, legend_out=None, formats=['pdf']):
     """
     Plot the average across the x-column groups as bar plot and overlay the individual entries as jitter.
     """
@@ -121,6 +121,11 @@ def jitter_bars(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=None,
         plt.setp(bars.get_legend().get_title(), fontsize=font_s+2)
     if rotation:
         plt.xticks(rotation=rotation, ha='center')
+    if legend_out:
+        ax.legend(prop={'size': font_s, 'weight': 'bold'}, loc='upper right',
+                  bbox_to_anchor=(2 if type(legend_out) == bool else legend_out, 1))
+    else:
+        ax.legend(prop={'size': font_s, 'weight': 'bold'})
     plt.title(title, fontsize=22, fontweight='bold', y=1.01)
     if type(formats) != list:
         formats = [formats]
@@ -223,7 +228,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
                cumulative=False, palette='tab10', binrange=None, xsize=12, ysize=8, colour='#2d63ad', font_s=14,
                ylabel=None, element='step', alpha=0.3, kde=False, legend_out=False, legend_title=True, fill=True,
                edgecolour=None, multiple='layer', shrink=1, hlines=[], vlines=[], discrete=False, grid=True, 
-               linewidth=None, formats=['pdf']):
+               linewidth=None, log_scale=False, formats=['pdf']):
     """
     Plots a basic layered histogram which allows for hue, whose order can be defined as well.
     If x_col is not a column in the df, it will be assumed that hue_col names all the columns which are supposed to be
@@ -256,7 +261,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
     hist = sns.histplot(data=plot_df, x=x_col, hue=hue_col, ax=ax, alpha=alpha, bins=bin_num if bin_num else 'auto',
                         linewidth=linewidth if linewidth is not None else (1 if fill else 3), color=colour, palette=palette if hue_col else None,
                         hue_order=hue_order, multiple=multiple, fill=fill, element=element, stat=stat,
-                        discrete=discrete,
+                        discrete=discrete, log_scale=log_scale,
                         common_norm=False, cumulative=cumulative, binrange=binrange, kde=kde, shrink=shrink)
     for patch in ax.patches:
         if not edgecolour:
@@ -435,7 +440,7 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
                               palette='tab10' if hue_col and not palette else palette, hue_order=hue_order)
     if jitter:
         sns.stripplot(data=plot_df, x=x_col, y=y_col, jitter=True, ax=ax, hue=hue_col, hue_order=hue_order, zorder=10,
-                      order=x_order, color=jitter_colour, dodge=True, legend=False, edgecolor='black', linewidth=1,
+                      order=x_order, palette=jitter_colour, dodge=True, legend=False, edgecolor='black', linewidth=1,
                       size=jitter_size)
     ax.tick_params(axis='both', labelsize=font_s+4)
     ax.set_ylabel(y_col, fontsize=font_s+8)
