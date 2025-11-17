@@ -7,20 +7,21 @@ import GTF_Processing
 """Functions to read-in the GTEx files. Is fixed for the specific GTEx paths."""
 
 
-def get_eqtls(gtex_folder, gtex_tissues, hg38_annotation, max_distance=None):
+def get_eqtls(hg38_annotation, gtex_folder, gtex_tissues=None, max_distance=None):
     """
     From the three fine-mapping methods provided on GTEx, go through the fixed file paths, and get the 
     eQTL-gene pairs matching the tissues queried.
 
     Args:
-        gtex_folder: Path to the directory with the files from the three fine-mapping methods provided on GTEx.
-        gtex_tissues: List of GTEx tissues (must match exactly), one entry can be a comma-separated list of GTEx tissues. Set to False to get all.
         hg38_annotation: The GENCODE hg38 annotation. Must be hg38 to match the fixed versions expected in the gtex_folder.
+        gtex_folder: Path to the directory with the files from the three fine-mapping methods provided on GTEx. "/projects/apog/work/IHEC/ValidateInteractions/eQTL_Validation/"
+        gtex_tissues: List of GTEx tissues (must match exactly), one entry can be a comma-separated list of GTEx tissues. Set to False to get all.
         max_distance: Maximum allowed distance between eQTL and the gene's TSS. Don't define to get all.
 
     Returns:
         tuple:
-            - **eqtl_beds**: Dict of {tissues: {eqtl_type: bed object}} with the bed-object being all eQTL-gene pairs in format EnsemblID|POS-1|POS
+            - **eqtl_beds**: Dict of {tissues: {eqtl_type: bed object}} with the bed-object being all eQTL-gene pairs in format EnsemblID|POS-1|POS.
+            - **unique_eqtls_beds**: Dict of {tissues: {eqtl_type: bed object}} with the entries being unique eQTLs and all their associated genes in the last field as CHR|POS-1|POS|CSV targets.
             - **tissue_genes**: Dict of {tissues: {eqtl_type: gene set}} with gene set being the genes which had at least one eQTL in the tissue and the eQTL type.
     """
     start = clock()
@@ -48,7 +49,7 @@ def get_eqtls(gtex_folder, gtex_tissues, hg38_annotation, max_distance=None):
                             continue
                         if entry[caviar_head['TISSUE']] not in eqtl_lists:
                             eqtl_lists[entry[caviar_head['TISSUE']]] = {e: [] for e in eqtl_types}
-                        eqtl_lists[entry[caviar_head['TISSUE']]][eqtl].append(this_gene + '\t' + this_eqtl)
+                        eqtl_lists[entry[caviar_head['TISSUE']]][eqtl].append([this_gene, this_eqtl])
 
         if eqtl == "CaVEMaN":
             with gzip.open(eqtl_types[eqtl], 'rt') as caveman:
@@ -63,7 +64,7 @@ def get_eqtls(gtex_folder, gtex_tissues, hg38_annotation, max_distance=None):
                             continue
                         if entry[cave_head['TISSUE']] not in eqtl_lists:
                             eqtl_lists[entry[cave_head['TISSUE']]] = {e: [] for e in eqtl_types}
-                        eqtl_lists[entry[cave_head['TISSUE']]][eqtl].append(this_gene + '\t' + this_eqtl)
+                        eqtl_lists[entry[cave_head['TISSUE']]][eqtl].append([this_gene, this_eqtl])
 
         if eqtl == "DAP-G":
             with gzip.open(eqtl_types[eqtl], 'rt') as dapg:
@@ -78,16 +79,24 @@ def get_eqtls(gtex_folder, gtex_tissues, hg38_annotation, max_distance=None):
                                 continue
                             if sub_entry.split('@')[1].split('=')[0] not in eqtl_lists:
                                 eqtl_lists[sub_entry.split('@')[1].split('=')[0]] = {e: [] for e in eqtl_types}
-                            eqtl_lists[sub_entry.split('@')[1].split('=')[0]][eqtl].append(this_gene + '\t' + this_eqtl)
+                            eqtl_lists[sub_entry.split('@')[1].split('=')[0]][eqtl].append([this_gene, this_eqtl])
 
     eqtl_beds = {t: {} for t in eqtl_lists.keys()}
+    unique_eqtl_beds = {t: {} for t in eqtl_lists.keys()}
     tissue_genes = {t: {e: set() for e in eqtl_types} for t in eqtl_lists.keys()}  # To know the genes with eQTL in a tissue.
     for tissue in eqtl_lists.keys():
         for eqtl in eqtl_types:
-            eqtl_bed = pybedtools.BedTool('\n'.join(set([x.split('\t')[0] + '\t' + str(int(x.split('_')[1])-1) + '\t' + x.split('_')[1] for x in eqtl_lists[tissue][eqtl]])), from_string=True)
+            # EnsemblID|POS-1|POS
+            eqtl_bed = pybedtools.BedTool('\n'.join(set([x[0] + '\t' + str(int(x[1].split('_')[1])-1) + '\t' + x[1].split('_')[1] for x in eqtl_lists[tissue][eqtl]])), from_string=True)
             eqtl_beds[tissue][eqtl] = eqtl_bed
+
+            # CHR|POS-1|POS|CSV targets
+            unique_eqtl_bed = pybedtools.BedTool('\n'.join(set([x[1].split('_')[0] + '\t' + str(int(x[1].split('_')[1])-1) + '\t' + x[1].split('_')[1] + '\t' + x[0] for x in eqtl_lists[tissue][eqtl]])), from_string=True)
+            unique_eqtl_bed = unique_eqtl_bed.sort().merge(c=4, o='distinct')
+            unique_eqtl_beds[tissue][eqtl] = unique_eqtl_bed
+
             tissue_genes[tissue][eqtl] |= set([x.fields[0] for x in eqtl_bed])
     print('eQTL-beds collected', clock() - start)
-    
-    return eqtl_beds, tissue_genes
+
+    return eqtl_beds, unique_eqtl_beds, tissue_genes
 
