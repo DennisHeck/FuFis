@@ -270,7 +270,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
         else:
             patch.set_edgecolor(edgecolour)
     ax.tick_params(axis='both', labelsize=font_s)
-    ax.set_ylabel(stat, fontsize=font_s+2)
+    ax.set_ylabel("log "*log_scale + stat, fontsize=font_s+2)
     if ylabel:
         ax.set_ylabel(ylabel, fontsize=font_s+2)
     ax.set_xlabel(str(x_col), fontsize=font_s+2)
