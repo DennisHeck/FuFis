@@ -261,7 +261,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
     hist = sns.histplot(data=plot_df, x=x_col, hue=hue_col, ax=ax, alpha=alpha, bins=bin_num if bin_num else 'auto',
                         linewidth=linewidth if linewidth is not None else (1 if fill else 3), color=colour, palette=palette if hue_col else None,
                         hue_order=hue_order, multiple=multiple, fill=fill, element=element, stat=stat,
-                        discrete=discrete, log_scale=log_scale,
+                        discrete=discrete, log_scale=[False, log_scale],
                         common_norm=False, cumulative=cumulative, binrange=binrange, kde=kde, shrink=shrink)
     for patch in ax.patches:
         if not edgecolour:
