@@ -100,7 +100,7 @@ def match_scores(args):
                 
 
 def get_crispris_from_joint(to_validate, joint_file, screens=['gasperini', 'tap', 'fulco', 'gschwind'],
-                            all_required=True, distance=False, meta_out='', meta_tag='', n_cores=1):
+                            all_required=True, distance=False, meta_out='', meta_tag='', n_cores=1, tmp_dir=''):
     """
     Very similar to the other function below, and admittedly ugly, but we don't need all the screen-specific 
     catches in this one here. And it's all in hg38.
@@ -119,6 +119,7 @@ def get_crispris_from_joint(to_validate, joint_file, screens=['gasperini', 'tap'
     :param meta_out: Directory where to write the JSON file to with the metadata of the function call.
     :param meta_tag: Prefix for the metadata file. The filename will also include the distance and all_required info.
     :param n_cores: Parallelized over the files in to_validate, as read-in is usually the most time-consuming step.
+    :param tmp_dir: Optional dictionary for temporary BedTool files.
     :return: A dictionary for each screen with a df with the validated interactions and the score from the given
     interaction file, also has entries for which columns were retrieved.
     """

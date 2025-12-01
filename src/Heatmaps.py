@@ -18,7 +18,7 @@ import itertools
 def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels=None, class_col=None,
                  x_size=20, y_size=40, title="", annot_cols=None, width_ratios=None, wspace=0.4, rasterized=True,
                  annot_s=10, ticksize=14, heat_ticksize=14, square=False, x_rotation=70, y_rotation=0,
-                 ax_fontweight='normal', row_label_first=False, formats=['pdf']):
+                 ax_fontweight='normal', row_label_first=False, x_label_pos='top', formats=['pdf']):
     """
     Multiple heatmaps side-by-side but the same rows. Allows to show several metrics for the same rows with different
     colourmaps etc. E.g. for a list of top differential genes first a heatmap of baseline expression coloured by TPM,
@@ -78,7 +78,10 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
         heat.set_yticklabels(heat.get_ymajorticklabels(), fontsize=ticksize, rotation=y_rotation, fontweight=ax_fontweight)
         if 'row_labels' in c_attrs and not c_attrs['row_labels']:
                 heat.axes.get_yaxis().set_visible(False)
-        this_ax.tick_params(axis='x', labeltop=True, top=True, labelbottom=False, bottom=False)
+        if x_label_pos == 'top':
+            this_ax.tick_params(axis='x', labeltop=True, top=True, labelbottom=False, bottom=False)
+        else:
+            this_ax.tick_params(axis='x', labeltop=False, top=False, labelbottom=True, bottom=True)
         heat_cbar = heat.collections[0].colorbar
         heat_cbar.ax.tick_params(labelsize=heat_ticksize)
         heat_cbar.ax.yaxis.label.set_fontsize(heat_ticksize)

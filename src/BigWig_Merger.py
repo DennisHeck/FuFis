@@ -6,7 +6,7 @@ from timeit import default_timer as clock
 converted to a bigwig again. Written as callable function and not commandline-callable script to
 have the list of bigwig files more flexible."""
 
-
+# CARE the UCSC merger behaves weirdly, wiggletools looks better
 
 def merge_bws(bw_files, wiggle_exe, wigToBigWig_exe, chromsize_file, bw_out):
     """

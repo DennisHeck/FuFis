@@ -231,7 +231,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
                linewidth=None, log_scale=False, formats=['pdf']):
     """
     Plots a basic layered histogram which allows for hue, whose order can be defined as well.
-    If x_col is not a column in the df, it will be assumed that hue_col names all the columns which are supposed to be
+    If x_col is not a column in the df, it will be assumed that hue_order names all the columns which are supposed to be
     plotted.
 
     Args:
@@ -397,7 +397,7 @@ def basic_lineplot(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=No
     plt.close()
 
 
-def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=None, title=None, output_path='',
+def basic_violin(plot_df, y_col, x_col, y_label=None, x_order=None, hue_col=None, hue_order=None, title=None, output_path='',
                  numerate=False, ylim=None, palette=None, xsize=12, ysize=8, boxplot=False, boxplot_meanonly=False,
                  rotation=None, numerate_break=True, jitter=False, colour='#2d63ad', font_s=14, saturation=0.75,
                  jitter_colour='black', jitter_size=5, vertical_grid=False, legend_title=True, legend=True, grid=True,
@@ -405,7 +405,7 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
     """
     Plots a basic violin plot which allows for hue, whose order can be defined as well. Optionally plot boxplot, or
     add jitter points for the individual data points.
-    Use y_col=None and x_col=None for seaborn to interpret the columns as separate plots on the x-asis.
+    Use y_col=None and x_col=None for seaborn to interpret the columns as separate distributions on the x-asis.
 
     Args:
         numerate: Whether to add the total number per x-group to the x-label.
@@ -444,6 +444,8 @@ def basic_violin(plot_df, y_col, x_col, x_order=None, hue_col=None, hue_order=No
                       size=jitter_size)
     ax.tick_params(axis='both', labelsize=font_s+4)
     ax.set_ylabel(y_col, fontsize=font_s+8)
+    if y_label:
+        ax.set_ylabel(y_label, fontsize=font_s + 8)
     ax.set_xlabel(x_col, fontsize=font_s+8)
     if ylim:
         ax.set_ylim(ylim)
@@ -847,8 +849,8 @@ def overlap_heatmap(inter_sets, title="", plot_path='', xsize=12, ysize=8, annot
                               yticklabels=set_tags, xticklabels=set_tags, fmt='',
                               annot=None if not annot else annot_mat,
                               annot_kws={'size': font_s-2}, cbar_kws={'label': cbar_label, 'pad': 0.01})
-    shared_heat.set_xticklabels(shared_heat.get_xmajorticklabels(), fontsize=font_s-2, rotation=90, fontweight='bold')
-    shared_heat.set_yticklabels(shared_heat.get_ymajorticklabels(), fontsize=font_s-2, rotation=0, fontweight='bold')
+    shared_heat.set_xticklabels(shared_heat.get_xmajorticklabels(), fontsize=font_s-2, rotation=90)#, fontweight='bold')
+    shared_heat.set_yticklabels(shared_heat.get_ymajorticklabels(), fontsize=font_s-2, rotation=0)#, fontweight='bold')
     shared_heat_cbar = shared_heat.collections[0].colorbar
     shared_heat_cbar.ax.tick_params(labelsize=font_s)
     shared_heat_cbar.ax.yaxis.label.set_fontsize(font_s)
