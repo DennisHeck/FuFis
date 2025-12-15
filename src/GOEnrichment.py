@@ -19,14 +19,15 @@ def plot_go(mode, wanted_sources, term_fetcher, keywords, cmap, fig_width, fig_h
         term_collection = set()
         for g_set in dict_keys:
             if len(term_fetcher[g_set][source]) > 0:
-                if str(max_terms).lower() == 'all':
-                    term_collection = term_collection.union(set(term_fetcher[g_set][source]['name'].values))
-                else:
-                    term_collection = term_collection.union(set(term_fetcher[g_set][source]['name'].values[:int(max_terms)]))
+                terms_to_add = term_fetcher[g_set][source]['name'].values
+                if source in keywords:  # Filter for keywords before filtering for the top terms.
+                    terms_to_add = [x for x in terms_to_add if np.any([k.lower() in x.lower() for k in keywords[source]])]
+                if str(max_terms).lower() != 'all':
+                    terms_to_add = terms_to_add[:int(max_terms)]
+                term_collection |= set(terms_to_add)
 
         these_terms = list(term_collection)
-        if source in keywords:
-            these_terms = [x for x in these_terms if np.any([k.lower() in x.lower() for k in keywords[source]])]
+
         # First count in how many gene sets a term is present and sort according to that and secondarily either by
         # minimum p-value or the NES.
         term_occs = []
@@ -113,9 +114,9 @@ def plot_go(mode, wanted_sources, term_fetcher, keywords, cmap, fig_width, fig_h
             else:  # If we only have one group, use the x-axis for the log-q value.
                 if mode == 'hypergeometric':
                     plt.scatter(x=[abs(np.log2(x[3])) for x in main_list], y=[y[1] for y in main_list],
-                            c=['#112791' for c in main_list], s=scaled_sizes, 
-                            edgecolors=['#112791' for c in main_list], zorder=12)
-                    ax.set_xlim(3, max([x[3] for x in main_list])*1.1)
+                                c=['#112791' for c in main_list], s=scaled_sizes,
+                                edgecolors=['#112791' for c in main_list], zorder=12)
+                    ax.set_xlim(3, max([abs(np.log2(x[3])) for x in main_list])*1.1)
                     ax.set_xlabel('-log2 FDR', size=font_s - 4)
 
                 else:
@@ -221,6 +222,7 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
             return df_fetcher
     else:
         term_fetcher = custom_dfs
+    print("Enrichment results fetched")
 
     plot_go(mode='hypergeometric', wanted_sources=wanted_sources, term_fetcher=term_fetcher, keywords=keywords, cmap=cmap, fig_width=fig_width, fig_height=fig_height,
             go_genes=go_genes, dict_keys=dict_keys, numerate=numerate, font_s=font_s, rotation=rotation,

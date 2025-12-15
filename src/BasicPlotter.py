@@ -572,6 +572,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
                 cmap = cm.get_cmap('viridis' if not palette else palette)
                 norm = plt.Normalize(plot_df[colour_col].min(), plot_df[colour_col].max())
 
+
     def give_colour(entry):
         """Takes the entry that is supposed to be plotted, and checks whether we have categorical colours, or numerical
         ones."""
@@ -627,8 +628,9 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         texts = []
         to_label_df = plot_df[plot_df[label_dots[0]]]
         for i, entry in to_label_df.iterrows():
-            texts.append(plt.text(x=entry[score_cols[0]], y=entry[score_cols[1]], s=entry[label_dots[1]],
-                                  fontsize=font_s-2, color=give_colour([None, None, entry[colour_col]]), zorder=42))
+            texts.append(plt.text(x=entry[score_cols[0]], y=entry[score_cols[1]], s=entry[label_dots[1]], fontsize=font_s-2,
+                                  color=give_colour([None, None, entry[colour_col], entry[colour_col]]),  # Repeat the colour col entry for cases where we have both colour and marker col.
+                                  zorder=42))
         if adjust_labels:
             adjust_text(texts, arrowprops=dict(arrowstyle="-", color='black', lw=0.5))
     ax.set_xlabel(score_cols[0], fontsize=font_s)

@@ -33,7 +33,7 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
                      'vmax': 200, (optional)
                      'vmin': 0, (optional)
                      }
-        row_label_col: Column where to fetch the row-strings from.
+        row_label_col: Column where to fetch the row-strings from. Set to None to use the index.
         column_labels: Alternative to using the column names as indicated in cmap_cols.
         class_col: Column that should be added as separate first heatmap-block, should be categorical.
         annot_cols: Dictionary of {"column": "column with annotation string"} to write the strings in the value into the cells of columns.
@@ -118,7 +118,7 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
                vmax=None, annot_cols=None, cmap='viridis', x_size=12, y_size=10, y_dendro=False, x_dendro=True,
                column_labels=None, row_cluster=True, col_cluster=True, centre=None, tick_size=12, mask=None,
                metric='euclidean', z_score=None, class_col_colour=None, formats=['pdf'], hlines=[], vlines=[],
-               main_space=0.82, col_colours=None):#, return_linkage=False):
+               main_space=0.82, col_colours=None, x_rotation=0, y_rotation=0):#, return_linkage=False):
     # TODO allow col_colors and also allow to give indices instead of columns.
     """
     Create a heatmap that can be additionally clustered with seaborn. CARE: the class_col_order and class_row parameters
@@ -135,7 +135,7 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
         x_dendro: Whether to plot the dendrogram on x.
         column_labels: List that will replace the names from columns if given.
         row_cluster: Whether to cluster the rows.
-        col_cluster: Whether co cluster the columns.
+        col_cluster: Whether to cluster the columns.
         centre: Centre for the colormap, e.g. 0 for bwr.
         mask: Must match the dimensions of the plot_df. If given will not show data where entries are True.
         metric: Metric for clustering for the scipy function, see https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html#scipy.spatial.distance.pdist.
@@ -193,6 +193,8 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
     clustermap.ax_col_dendrogram.set_visible(y_dendro)
     clustermap.ax_row_dendrogram.set_visible(x_dendro)
     clustermap.ax_heatmap.tick_params(labelsize=tick_size)
+    plt.setp(clustermap.ax_heatmap.get_yticklabels(), rotation=y_rotation)
+    plt.setp(clustermap.ax_heatmap.get_xticklabels(), rotation=x_rotation)
     clustermap.cax.set_visible(False)
     clustermap.gs.update(right=main_space)
     # Add a manual colormap to be able to edit it.
