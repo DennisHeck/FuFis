@@ -115,7 +115,7 @@ def get_crispris_from_joint(to_validate, joint_file, screens=['gasperini', 'tap'
                        'avg_cols': a list of columns to add to the df, will be averaged instead of summed.}}
     :param screens: Names screens to validate on, can be used to reduce which CRISPRi data sets to include.
     :param all_required: If all score columns must have an intersection with the validated interactions, if False
-    sets the score to 0 of the ones missing a score.
+    sets the score to None of the ones missing a score.
     :param meta_out: Directory where to write the JSON file to with the metadata of the function call.
     :param meta_tag: Prefix for the metadata file. The filename will also include the distance and all_required info.
     :param n_cores: Parallelized over the files in to_validate, as read-in is usually the most time-consuming step.
