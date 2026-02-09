@@ -188,10 +188,10 @@ def stacked_bars(plot_df, x_col, y_cols, y_label='', title=None, output_path='',
                 patch.set_hatch(hatches[s])
                 patch.set_facecolor(palette[p])
     if legend_out:
-        ax.legend(prop={'size': font_s, 'weight': 'bold'}, loc='upper right',
+        ax.legend(prop={'size': font_s, 'weight': 'normal'}, loc='upper right',
                   bbox_to_anchor=(2 if type(legend_out) == bool else legend_out, 1))
     else:
-        ax.legend(prop={'size': font_s, 'weight': 'bold'})
+        ax.legend(prop={'size': font_s, 'weight': 'normal'})
 
     if hatches:  # TODO might not work when the y_cols are sorted in the function
         legend_elements = [Patch(facecolor='w', edgecolor='black', linewidth=2, label=c_label, hatch=hatches[p])

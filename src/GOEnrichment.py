@@ -117,7 +117,7 @@ def plot_go(mode, wanted_sources, term_fetcher, keywords, cmap, fig_width, fig_h
                                 c=['#112791' for c in main_list], s=scaled_sizes,
                                 edgecolors=['#112791' for c in main_list], zorder=12)
                     ax.set_xlim(3, max([abs(np.log2(x[3])) for x in main_list])*1.1)
-                    ax.set_xlabel('-log2 FDR', size=font_s - 4)
+                    ax.set_xlabel('-log2 p.adj', size=font_s - 4)
 
                 else:
                     plt.scatter(x=[x[3] for x in main_list], y=[y[1] for y in main_list],
@@ -142,7 +142,7 @@ def plot_go(mode, wanted_sources, term_fetcher, keywords, cmap, fig_width, fig_h
                 x_offset = 1.1
 
             ax.set_yticks([y for y in range(len(sorted_terms))])
-            ax.set_yticklabels(format_terms, fontweight='bold', size=font_s - 8)
+            ax.set_yticklabels(format_terms, fontweight='normal', size=font_s - 8)
             ax.spines['right'].set_visible(False)
             ax.spines['top'].set_visible(False)
             if len(scaled_sizes) > 2:
@@ -152,11 +152,11 @@ def plot_go(mode, wanted_sources, term_fetcher, keywords, cmap, fig_width, fig_h
                 h3 = Line2D([0], [0], marker='o', markersize=np.sqrt(scaled_max), color='black', linestyle='None')
                 leg = plt.legend([h1, h2, h3], [str(round(min(size_col), 4)), str(round((min(size_col) + max(size_col)) / 2, 4)),
                                             str(round(max(size_col), 4))], loc="upper right", markerscale=1, scatterpoints=1,
-                            fontsize=font_s - 6, title="Gene fraction", bbox_to_anchor=(legend_out if legend_out else x_offset+0.5, 1))
+                            fontsize=font_s - 6, title="Gene fraction", bbox_to_anchor=(legend_out if legend_out else x_offset+0.6, 1))
             else:
                 h3 = Line2D([0], [0], marker='o', markersize=np.sqrt(scaled_max), color='black', linestyle='None')
                 leg = plt.legend([h3], [str(round(max(size_col), 4))], loc="upper right", markerscale=1, scatterpoints=1,
-                            fontsize=font_s - 6, title="Gene fraction", bbox_to_anchor=(legend_out if legend_out else x_offset+0.5, 1))
+                            fontsize=font_s - 6, title="Gene fraction", bbox_to_anchor=(legend_out if legend_out else x_offset+0.6, 1))
             leg.get_title().set_fontsize(11)
             if type(formats) != list:
                 formats = [formats]
