@@ -232,7 +232,7 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
 
 
 def gsea_prerank(go_genes, weight=0, gsea_plot_out=None, out_tag='', title_tag='', max_terms='all', numerate=False, godf_only=False, translate_ensembl=False,
-                 wanted_sources=['c5.hpo', 'c2.cp.wikipathways', 'c5.go.mf', 'c2.cp.reactome', 'c5.go.bp'], nes_sign='both',
+                 wanted_sources=['hpo', 'cp.wikipathways', 'go.mf', 'cp.reactome', 'go.bp'], nes_sign='both', permutation_num=1000,
                  gmt_path_pattern="/projects/abcpp/work/base_data/GSEA_gmt/human/*.v2024.1.Hs.symbols.gmt",
                  annotation='/projects/abcpp/work/base_data/gencode.v38.annotation.gtf', keywords={}, fig_width=None,
                  fig_height=None, legend_out=None, rotation=45, font_s=16, cores=20, formats=['pdf']):
@@ -249,7 +249,8 @@ def gsea_prerank(go_genes, weight=0, gsea_plot_out=None, out_tag='', title_tag='
         godf_only: Skip the plotting step and only return the df from GSEApy.
         translate_ensembl: Set to True if the index in the Series/DataFrame are Ensembl IDs, they will then be translated to gene names.
         wanted_sources: Which databases to plot. Will be checked against the path given in gmt_path_pattern. With the default paths vailable options are: ['c2.cp.kegg_medicus', 'c5.hpo', 'c2.cp.wikipathways', 'c5.go.mf', 'c5.go.cc', 'c2.cp.reactome', 'c5.go.bp'].
-        nes_sign: Whether the enriched terms should be should be filtered for 'positive' or 'negative' NES. By Default keep 'both'.
+        nes_sign: Whether the enriched terms should be filtered for 'positive' or 'negative' NES. By Default keep 'both'.
+        permutation_num: Number of random run to compare to for the NES. Default 1000,
         gmt_path_pattern: File system pattern to the gmt files.
         annotation: Path to a gtf-file, required if Ensembl IDs should be translated to symbols.
         keywords: A dictionary of {source: list of keywords}, e.g. {'c5.go.bp': ['vascular', 'angio']}, to limit the
@@ -281,12 +282,14 @@ def gsea_prerank(go_genes, weight=0, gsea_plot_out=None, out_tag='', title_tag='
                 g_set_df.index = [mapped_identifiers[g]['symbol'] for g in g_set_df.index]
 
             for gmt_file, source in gmt_files.items():
+                # We need to remove the prefix to be flexible across organisms.
+                source = '.'.join(source.split('.')[1:])
                 if source in wanted_sources:
                     pre_res = gp.prerank(rnk=g_set_df,  # CARE sorts again descendingly by the first column.
                                         gene_sets=gmt_file,
                                         min_size=1,
                                         max_size=len(g_set_df)+1,
-                                        permutation_num=1000, 
+                                        permutation_num=permutation_num,
                                         outdir=gsea_plot_out,
                                         threads=cores,
                                         weight=weight,
