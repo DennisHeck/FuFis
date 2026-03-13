@@ -877,7 +877,7 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
         x_col: Column that will be used for the x-axis.
         y_col: Column used for the y-axis that will be -log10-transformed.
         mark_groups: Optional dictionary with {k: list/set} of identifiers that will be coloured differently.
-        mark_indexcol: Optional column holding the index where to look for the identifiers from mark_groups.
+        mark_indexcol: Optional column holding the index where to look for the identifiers from mark_groups. If not in columns will use the index.
         mark_colours: Optional dict with the colours assigned to the mark_groups, has to have the same keys as
             mark_groups. An existing colour palette will be used if not given.
         mark_labels: Optional legend labels for the mark_groups, leave empty to skip the legend.
@@ -896,6 +896,8 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
         mark_colours = {k: ColoursAndShapes.tol_vibrant[i] for i, k in enumerate(mark_groups.keys())}
     if mark_groups and not mark_labels:
         mark_labels = {k: None for k in mark_groups.keys()}
+    if mark_indexcol and mark_indexcol not in plot_df.columns:
+        plot_df[mark_indexcol] = plot_df.index
     if label_col and label_col not in plot_df.columns:  # Assume it's the index then.
         plot_df[label_col] = plot_df.index
 
