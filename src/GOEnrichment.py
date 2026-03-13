@@ -161,7 +161,7 @@ def plot_go(mode, wanted_sources, term_fetcher, keywords, cmap, fig_width, fig_h
             if type(formats) != list:
                 formats = [formats]
             for form in formats:
-                f.savefig((out_tag + "_" + source + "_max"+str(max_terms)+"."+form).replace(' ', '').replace(':', ''),
+                f.savefig(Various.sanitize_path(out_tag + "_" + source + "_max"+str(max_terms)+"."+form),
                             bbox_inches='tight', format=form)
             plt.close()
         else:

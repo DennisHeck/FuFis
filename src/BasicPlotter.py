@@ -19,6 +19,7 @@ import seaborn as sns
 import scipy.stats
 import itertools
 import ColoursAndShapes
+from Various import sanitize_path
 
 
 def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None, title=None, output_path='', y_label='',
@@ -81,7 +82,7 @@ def basic_bars(plot_df, x_col, y_col, x_order=None, hue_col=None, hue_order=None
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + '_'.join([str(x_col), str(y_col)]) + '_Bars.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + '_'.join([str(x_col), str(y_col)]) + '_Bars.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
 
@@ -130,7 +131,7 @@ def jitter_bars(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=None,
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + str(x_col) + '_' + str(y_col) + '_' + str(hue_col) + '_JitterBars.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + str(x_col) + '_' + str(y_col) + '_' + str(hue_col) + '_JitterBars.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
 
@@ -219,7 +220,7 @@ def stacked_bars(plot_df, x_col, y_cols, y_label='', title=None, output_path='',
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + '_'.join([str(x_col), str(y_label)]) + '_'+"Frac"*fraction+'StackedBars.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + '_'.join([str(x_col), str(y_label)]) + '_'+"Frac"*fraction+'StackedBars.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
 
@@ -292,7 +293,7 @@ def basic_hist(plot_df, x_col, hue_col=None, hue_order=None, bin_num=None, title
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + log_scale*'log' + str(x_col) + '_' + str(hue_col) + '_Hist.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + log_scale*'log' + str(x_col) + '_' + str(hue_col) + '_Hist.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
 
@@ -344,7 +345,7 @@ def basic_2Dhist(plot_df, columns, hue_col=None, hue_order=None, bin_num=200, ti
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + columns[0] + "_" + columns[1] + '_' + str(hue_col) + '_2DHist.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + columns[0] + "_" + columns[1] + '_' + str(hue_col) + '_2DHist.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
 
@@ -392,7 +393,7 @@ def basic_lineplot(plot_df, x_col, y_col, hue_col=None, hue_order=None, title=No
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + '_'.join([str(x_col), str(y_col)]) + '_Lineplot.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + '_'.join([str(x_col), str(y_col)]) + '_Lineplot.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
 
@@ -473,7 +474,7 @@ def basic_violin(plot_df, y_col, x_col, y_label=None, x_order=None, hue_col=None
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + str(x_col) + '_' + str(y_col) + '_' + str(hue_col) + '_Violin.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + str(x_col) + '_' + str(y_col) + '_' + str(hue_col) + '_Violin.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
 
@@ -513,7 +514,7 @@ def basic_pie(plot_df, title='', palette=None, numerate=True, legend_perc=True, 
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig(output_path + str(plot_df.columns[0]).replace(' ', '_') + "_PieChart."+form, bbox_inches='tight',
+        f.savefig(sanitize_path(output_path + str(plot_df.columns[0]) + "_PieChart."+form), bbox_inches='tight',
                   format=form)
     plt.close()
 
@@ -660,7 +661,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + str(score_cols[0])+'Vs'+str(score_cols[1])+'_'+str(colour_col)+'_marker'+str(marker_col)+'.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + str(score_cols[0])+'Vs'+str(score_cols[1])+'_'+str(colour_col)+'_marker'+str(marker_col)+'.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
 
@@ -719,7 +720,7 @@ def basic_venn(input_sets, plot_path, blob_colours=ColoursAndShapes.tol_highcont
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        plt.savefig((plot_path + title + '_Venn.'+form).replace(' ', ''), bbox_inches='tight', format=form)
+        plt.savefig(sanitize_path(plot_path + title + '_Venn.'+form), bbox_inches='tight', format=form)
     plt.close('All')
 
 
@@ -786,7 +787,7 @@ def upset_plotter(inter_sets, y_label='Intersection', max_groups=None, min_degre
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        plt.savefig((plot_path + '_UpSet.'+form).replace(' ', ''), bbox_inches='tight', format=form)
+        plt.savefig(sanitize_path(plot_path + '_UpSet.'+form), bbox_inches='tight', format=form)
     plt.close()
 
 
@@ -861,7 +862,7 @@ def overlap_heatmap(inter_sets, title="", plot_path='', xsize=12, ysize=8, annot
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        plt.savefig((plot_path + "_SharedHeatmap."+form).replace(" ", "_"), bbox_inches='tight', format=form)
+        plt.savefig(sanitize_path(plot_path + "_SharedHeatmap."+form), bbox_inches='tight', format=form)
     plt.close()
 
 
@@ -916,7 +917,7 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
         label_entries = pd.DataFrame(columns=plot_df.columns)
         for m in mark_groups:
             top_m = plot_df.loc[plot_df[plot_df[mark_indexcol].isin(mark_groups[m])].sort_values(by=x_col, key=abs, ascending=False).index[:top_labels]]
-            label_entries = label_entries.append(top_m)
+            label_entries = pd.concat([label_entries, top_m])
 
     texts = []
     for i, entry in label_entries.iterrows():
@@ -937,7 +938,7 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig((output_path + "Volcano_" + str(x_col) + '_minuslog10' + str(y_col) + '.'+form).replace(' ', ''),
+        f.savefig(sanitize_path(output_path + "Volcano_" + str(x_col) + '_minuslog10' + str(y_col) + '.'+form),
                   bbox_inches='tight', format=form)
 
 
@@ -969,7 +970,7 @@ def fisher_test_table(fisher_table, fisher_rows, fisher_cols, title='', output_p
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        f.savefig(output_path+('FisherTable_'+'_'.join(fisher_rows+fisher_cols)).replace(' ', '')+'.'+form,
+        f.savefig(sanitize_path(output_path+'FisherTable_'+'_'.join(fisher_rows+fisher_cols)+'.'+form),
                   bbox_inches='tight', format=form)
     plt.close()
     return fish_stat, pval
@@ -1097,7 +1098,7 @@ def cumulative_plot(plot_df, x_col, hue_col, hue_order=None, output_path='', num
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        cumu.savefig((output_path + x_col.replace(' ', '') + '_' + hue_col + '_CumulativeDistribution.' + form).replace(' ', '_'), bbox_inches='tight',
+        cumu.savefig(sanitize_path(output_path + x_col.replace(' ', '') + '_' + hue_col + '_CumulativeDistribution.' + form), bbox_inches='tight',
                      format=form)
     plt.close()
 

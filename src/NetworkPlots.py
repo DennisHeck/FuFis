@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
 import networkx as nx
 from matplotlib import cm, colors, colorbar
+from Various import sanitize_path
 
 
 def directed_network(edge_df, edge_cols, edge_colour_col=None, node_values=None, node_cmap='bwr',
@@ -49,6 +50,6 @@ def directed_network(edge_df, edge_cols, edge_colour_col=None, node_values=None,
         sm = plt.cm.ScalarMappable(cmap=cm.get_cmap(node_cmap), norm=colors.Normalize(vmin=boundlow, vmax=boundup))
         plt.colorbar(sm)
         sm.colorbar.set_label(node_cbar_label)
-    plt.savefig(plot_out + "_DirNetwork.pdf")
+    plt.savefig(sanitize_path(plot_out + "_DirNetwork.pdf"))
     plt.close()
 

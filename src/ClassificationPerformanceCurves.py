@@ -6,6 +6,7 @@ import numpy as np
 import random
 import copy
 import ColoursAndShapes
+from Various import sanitize_path
 
 """Collection of functions to create precision-recall curves or receiver operator characteristic curves and
 calculating the area under them."""
@@ -158,7 +159,7 @@ def classification_plotter(df, sig_col, score_cols, add_random=False, steps=1000
         if type(formats) != list:
             formats = [formats]
         for form in formats:
-            f.savefig(output_path + '_' + mode + ('_ColouredbyThreshold'*colour_by_threshold) + '.'+form, bbox_inches='tight', format=form)
+            f.savefig(sanitize_path(output_path + '_' + mode + ('_ColouredbyThreshold'*colour_by_threshold) + '.'+form), bbox_inches='tight', format=form)
     plt.close()
 
     return auc_output, performance_dict

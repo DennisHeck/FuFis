@@ -16,6 +16,15 @@ import re
 from itertools import chain
 import GTF_Processing
 
+"""Collection of functions that didn't fit well anywhere else. Also includes functions which are
+required by multiple other modules."""
+
+
+def sanitize_path(path_string):
+    """Function to remove unwanted characters from a file path before saving. Put here since we need it for a lot
+    of functions and eases adjustment e.g. for OS."""
+    return path_string.replace(' ', '').replace(':', '')
+
 
 def df_column_binner(df, col, num_bins, string_precision=0, lower_bound=None, upper_bound=None, tag='', numerate=True):
     """Takes a pandas DataFrame and returns it with a column with a string indicating to which bin the

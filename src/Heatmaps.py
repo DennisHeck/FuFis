@@ -13,6 +13,7 @@ import gzip
 from pybedtools import BedTool
 import os
 import itertools
+from Various import sanitize_path
 
 
 def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels=None, class_col=None,
@@ -110,7 +111,7 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        plt.savefig((plot_out + "_MultiColHeatmap."+form).replace(' ', '_'), bbox_inches='tight', format=form)
+        plt.savefig(sanitize_path(plot_out + "_MultiColHeatmap."+form), bbox_inches='tight', format=form)
     plt.close()
 
 
@@ -235,7 +236,7 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
     if type(formats) != list:
         formats = [formats]
     for form in formats:
-        clustermap.savefig(plot_out + "_Clustermap."+form, bbox_inches='tight', format=form)
+        clustermap.savefig(sanitize_path(plot_out + "_Clustermap."+form), bbox_inches='tight', format=form)
     plt.close()
     # if return_linkage:
     #     return clustermap.linkage.dendrogram_row or clustermap.linkage.dendrogram_col
@@ -328,5 +329,5 @@ def interaction_intersection_diff_enhancer(abc_folder, tag_order=None, plot_path
     shared_heat_cbar.ax.yaxis.label.set_fontsize(14)
     plt.suptitle("Shared interactions", y=0.93, size=20, fontweight='bold')
     plt.subplots_adjust(wspace=0.02)
-    plt.savefig(plot_path + "_ABCMultiIntersectHeat.pdf", bbox_inches='tight')
+    plt.savefig(sanitize_path(plot_path + "_ABCMultiIntersectHeat.pdf"), bbox_inches='tight')
     plt.close()

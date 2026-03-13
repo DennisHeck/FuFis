@@ -44,7 +44,7 @@ def bigwig_counts(bed_file, bigwigs, n_cores=1):
 
     Args:
         bed_file: Either a BedTools object or a path to a bed-file.
-        bigwigs: List of bigwigs for which pyBigWig will be used to extract the mean signal for.
+        bigwigs: List/dict of bigwigs for which pyBigWig will be used to extract the mean signal for. If a list of files is given, the column in the resulting DataFrame will have the full file path. If a dict {key: file} is given, the columns will be the keys.
 
     Returns:
         tuple:
@@ -57,17 +57,21 @@ def bigwig_counts(bed_file, bigwigs, n_cores=1):
         bed_regions = [x.strip().split('\t') for x in open(bed_file).readlines() if not x.startswith('#')]
     else:
         bed_regions = [str(x).strip().split('\t') for x in str(bed_file).strip().split('\n')]
+
+    bigwig_order = bigwigs
+    df_columns = bigwig_order
     if type(bigwigs) == set:
-        bigwig_order = list(bigwigs)
-    else:
-        bigwig_order = bigwigs
+        bigwig_order = df_columns = list(bigwigs)
+    if type(bigwigs) == dict:
+        bigwig_order = list(bigwigs.values())
+        df_columns = list(bigwigs.keys())
 
     process_pool = Pool(processes=n_cores)
     bw_counts = process_pool.map(fetch_counts, map(lambda x: (x, bed_regions), bigwig_order))
     process_pool.close()
     region_counts = pd.DataFrame([x[0] for x in bw_counts]).T
     region_counts = pd.concat([pd.DataFrame([x[:3] for x in bed_regions]), region_counts], ignore_index=True, axis=1)
-    region_counts.columns = ['#chr', 'start', 'end'] + bigwig_order
+    region_counts.columns = ['#chr', 'start', 'end'] + df_columns
 
     errors = pd.DataFrame([x[1] for x in bw_counts])
     if not errors.empty:

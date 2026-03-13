@@ -4,6 +4,7 @@ import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt
 import itertools
+from Various import sanitize_path
 
 
 def jc_mat(abc_files, plot_path, tag_order=None):
@@ -45,6 +46,6 @@ def jc_mat(abc_files, plot_path, tag_order=None):
     shared_heat_cbar.ax.yaxis.label.set_fontsize(14)
     plt.suptitle("Jaccard index of ABC interactions", y=0.93, size=20, fontweight='bold')
     plt.subplots_adjust(wspace=0.02)
-    plt.savefig(plot_path + "_JaccardInteractions.pdf", bbox_inches='tight')
+    plt.savefig(sanitize_path(plot_path + "_JaccardInteractions.pdf"), bbox_inches='tight')
     plt.close()
 

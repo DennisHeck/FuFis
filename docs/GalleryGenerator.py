@@ -375,7 +375,8 @@ open("docs/gallery/src.FIMO_TFBS_inPromoter.txt", 'w').write(str(fimo_matrix[['F
 import BigWig_Counter
 # Take a mini bed-file and get the signal from two chr21 bigwig files from IHEC (https://ihec-epigenomes.org/epiatlas/data/).
 bed_file = "ExampleData/H3K27acPeaks_chr21.narrowPeak"
-bigwigs = ['ExampleData/IHECRE00000013_chr21.bigwig', 'ExampleData/IHECRE00000017_chr21.bigwig']
+# You can either give a list of files or a dictionary of {key: file}
+bigwigs = {'IHECRE00000013': 'ExampleData/IHECRE00000013_chr21.bigwig', 'IHECRE00000017': 'ExampleData/IHECRE00000017_chr21.bigwig'}
 bed_counts, errors = BigWig_Counter.bigwig_counts(bed_file, bigwigs, n_cores=1)
 print(bed_counts.head())
 # ---
