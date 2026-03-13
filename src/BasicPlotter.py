@@ -940,6 +940,7 @@ def volcano_plot(plot_df, x_col, y_col, mark_groups=None, mark_indexcol=None, ma
     for form in formats:
         f.savefig(sanitize_path(output_path + "Volcano_" + str(x_col) + '_minuslog10' + str(y_col) + '.'+form),
                   bbox_inches='tight', format=form)
+    plt.close()
 
 
 def fisher_test_table(fisher_table, fisher_rows, fisher_cols, title='', output_path='', xsize=6, ysize=4,
