@@ -23,7 +23,8 @@ required by multiple other modules."""
 def sanitize_path(path_string):
     """Function to remove unwanted characters from a file path before saving. Put here since we need it for a lot
     of functions and eases adjustment e.g. for OS."""
-    return path_string.replace(' ', '').replace(':', '')
+    return re.sub(r'[^A-Za-z0-9._\-]+', '', path_string)
+    # return path_string.replace(' ', '').replace(':', '').replace("°", "Degree").replace()
 
 
 def df_column_binner(df, col, num_bins, string_precision=0, lower_bound=None, upper_bound=None, tag='', numerate=True):
