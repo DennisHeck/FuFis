@@ -23,7 +23,7 @@ required by multiple other modules."""
 def sanitize_path(path_string):
     """Function to remove unwanted characters from a file path before saving. Put here since we need it for a lot
     of functions and eases adjustment e.g. for OS."""
-    return re.sub(r'[^A-Za-z0-9._\-]+', '', path_string)
+    return re.sub(r'[^A-Za-z0-9._\-\\\\////]+', '', path_string)
     # return path_string.replace(' ', '').replace(':', '').replace("°", "Degree").replace()
 
 
