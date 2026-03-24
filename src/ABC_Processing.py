@@ -2,9 +2,12 @@ import os
 import numpy as np
 import gzip
 import pandas as pd
+from pathlib import Path
 from timeit import default_timer as clock
 from multiprocessing import Pool
 import Various
+import GTF_Processing
+import subprocess
 
 
 def score_summer(args):
@@ -120,4 +123,84 @@ def interaction_fetcher(pattern, pooled=True, cutoff=0.02, n_cores=1):
 
     print(clock() - start, 'interactions fetched')
     return inter_dict
+
+
+def reformat_interaction_files(abc_pattern, out_folder, annotation, gene_set=None, max_distance=None, format='interact'):
+    """
+    Takes a gABC-scoring file or a path pattern to multiple and create either interact files or BEDPE files that can 
+    be visualized in the UCSC genome browser, IGV or other tools.
+
+    Args:
+        abc_pattern: Either the file to an individual gABC file (e.g. 'Fish_ABCpp_scoredInteractions_c4.txt.gz'), or a path pattern. For the latter all matching files will be used.
+        gene_set: Optional set of genes to which the output will be limited to. Can be a mix of Ensembl IDs or gene names, will be matched to the gABC file entries.
+        max_distance: If given, limit the files in the output to those spanning ≤ max_distance.
+        format: Either 'interact' for UCSC's interact files or 'bedpe'.
+    """
+    file_ending = ''
+    if gene_set:
+        file_ending += '_GeneSubset'
+    if format == 'bedpe':
+        file_ending += '.bedpe'
+    elif format == 'interact':
+        file_ending += '_interact.bed'
+    else:
+        print("ERROR: unknown format")
+        return    
+    
+    if not os.path.isdir(out_folder):
+        os.mkdir(out_folder)
+
+    # We work with the full file paths. 
+    if '*' in abc_pattern:
+        abc_files = list(Various.fn_patternmatch(abc_pattern).keys())
+    else:  # Assume we have just one file.
+        abc_files = [abc_pattern]
+
+    tss_pos = GTF_Processing.gene_window_bed(annotation, extend=0, tss_type='5', dict_only=True)
+
+    track_meta_row = 'track type=interact name="{} gABC interactions" description="gABC interactions" maxHeightPixels=500:300:50 visibility=full"'
+    track_header = ['#chrom', 'chromStart','chromEnd', 'name', 'score', 'value', 'exp', 'color', 'sourceChrom', 'sourceStart', 'sourceEnd', 'sourceName', 'sourceStrand', 'targetChrom', 'targetStart', 'targetEnd', 'targetName', 'targetStrand']
+
+    start_w = clock()
+    for n_f, file in enumerate(abc_files):
+        out_file = Path(out_folder, Path(file).name.replace(".txt.gz" if file.endswith('.txt.gz') else '.txt', file_ending))
+        with gzip.open(file, 'rt') as abc_in, open(out_file, 'w') as inter_out:
+            
+            if format == 'interact': 
+                inter_out.write(track_meta_row.format(Path(file).name) + '\n' + '\t'.join(track_header) + '\n')
+
+            abc_header = {x: i for i, x in enumerate(abc_in.readline().strip().split('\t'))}
+            for row in abc_in:
+                entry = row.strip().split('\t')
+                entry_gene = entry[abc_header['Ensembl ID']].split('.')[0]
+                if gene_set and entry_gene not in gene_set and entry[abc_header['Gene Name']] not in gene_set:
+                    continue
+                all_pos = [int(entry[abc_header['start']]), int(entry[abc_header['end']]), next(iter(tss_pos[entry_gene]['tss']))-1]
+                
+                distance = min([abs(all_pos[0] - all_pos[2]), abs(all_pos[1] - all_pos[2])])
+                if max_distance and distance > max_distance:
+                    continue
+                
+                inter_name = 'chr'+entry[abc_header['#chr']] + ':' + entry[abc_header['start']] + '-' + entry[abc_header['end']] + '#' + entry[abc_header['Gene Name']]
+                
+                if format == 'interact':
+                    if int(entry[abc_header['end']]) < next(iter(tss_pos[entry_gene]['tss']))-1:
+                        source_name = entry[abc_header['PeakID']]
+                        target_name = entry[abc_header['Gene Name']]
+                    else:
+                        source_name = entry[abc_header['Gene Name']]
+                        target_name = entry[abc_header['PeakID']]
+
+                    inter_out.write('\t'.join(['chr'+entry[abc_header['#chr']], str(min(all_pos)), str(max(all_pos)), inter_name, '0', entry[abc_header['ABC-Score']], '.', 'black',
+                                            'chr'+entry[abc_header['#chr']], entry[abc_header['start']], entry[abc_header['end']], source_name, '.', 
+                                            tss_pos[entry_gene]['chr'], str(next(iter(tss_pos[entry_gene]['tss']))-1), str(next(iter(tss_pos[entry_gene]['tss']))), target_name, '.']) + '\n')
+
+                elif format == 'bedpe':  # Bedpe doesn't care which position is first.
+                    inter_out.write('\t'.join(['chr'+entry[abc_header['#chr']], entry[abc_header['start']], entry[abc_header['end']], 
+                                               tss_pos[entry_gene]['chr'], str(next(iter(tss_pos[entry_gene]['tss']))-1), str(next(iter(tss_pos[entry_gene]['tss']))), 
+                                               inter_name, entry[abc_header['ABC-Score']], '.', '.']) + '\n')
+
+        subprocess.call('gzip -f ' + str(out_file), shell=True)
+        if n_f % 10 == 0 and n_f > 0:
+            print(clock() - start_w, f'{n_f}/{len(abc_files)} files processed')
 
