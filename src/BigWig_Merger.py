@@ -22,8 +22,10 @@ def merge_bws(bw_files, wiggle_exe, wigToBigWig_exe, chromsize_file, bw_out):
     """
     start = clock()
     wig_out = '.'.join(bw_out.split('.')[:-1])+'.wig'
-
-    subprocess.call("time {} write {} mean {}".format(wiggle_exe, wig_out, ' '.join(bw_files)), shell=True)
+    if not os.path.isfile(wig_out):
+        subprocess.call("time {} write {} mean {}".format(wiggle_exe, wig_out, ' '.join(bw_files)), shell=True)
+    else:
+        print("WARNING: wig file already exists, trying conversion to bigwig:", wig_out)
     print("Converting the merged wig to bigwig")
     subprocess.call("time {} {} {} {}".format(wigToBigWig_exe, wig_out, chromsize_file, wig_out.replace('.wig', '.bw')), shell=True)
     if os.path.isfile(wig_out.replace('.wig', '.bw')):
