@@ -122,7 +122,7 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
     print('Plotting heatmap')
     heatmap_cmd = "plotHeatmap -m " + matrix_out + ' --perGroup'*perGroup + (" --plotTitle '" + title+"'")*bool(title) +\
                     " --startLabel " + "'" + start_label + "'" + " --endLabel " + "'" + end_label + "'" + " --colorMap " + cmap + " --zMin "+str(vmin)+" --zMax "+str(vmax)+\
-                    " --xAxisLabel " + x_label +" --yAxisLabel 'coverage'" + " --regionsLabel "+ ' '.join(["'"+b+"'" for b in filtered_labels])+\
+                    " --xAxisLabel " + "'"+x_label+"'" +" --yAxisLabel 'coverage'" + " --regionsLabel "+ ' '.join(["'"+b+"'" for b in filtered_labels])+\
                     ' --samplesLabel '+' '.join(bw_labels)+' --outFileName ' + sanitize_path(matrix_out.replace('.gz', '_Heatmap.pdf'))+ \
                     " --legendLocation " + legend_loc.lower() + " --whatToShow "+"'"+show+"'"
     print(heatmap_cmd)
