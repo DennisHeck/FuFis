@@ -4,6 +4,7 @@ import subprocess
 import pybedtools
 import gzip
 from pybedtools import BedTool
+from Various import sanitize_path
 
 """Wrapper for deeptool's computeMatrix followed by plotHeatmap."""
 
@@ -119,7 +120,7 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
     heatmap_cmd = "plotHeatmap -m " + matrix_out + ' --perGroup'*perGroup + (" --plotTitle '" + title+"'")*bool(title) +\
                     " --startLabel " + "'" + start_label + "'" + " --endLabel " + "'" + end_label + "'" + " --colorMap " + cmap + " --zMin "+str(vmin)+" --zMax "+str(vmax)+\
                     " --yAxisLabel 'coverage'" + " --regionsLabel "+ ' '.join(["'"+b+"'" for b in filtered_labels])+\
-                    ' --samplesLabel '+' '.join(bw_labels)+' --outFileName ' + matrix_out.replace('.gz', '_Heatmap.pdf')+ \
+                    ' --samplesLabel '+' '.join(bw_labels)+' --outFileName ' + sanitize_path(matrix_out.replace('.gz', '_Heatmap.pdf'))+ \
                     " --legendLocation " + legend_loc.lower() + " --whatToShow "+"'"+show+"'"
     print(heatmap_cmd)
     subprocess.call(heatmap_cmd, shell=True)
