@@ -10,7 +10,7 @@ from Various import sanitize_path
 
 
 def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, mode, perGroup=True, title='',
-                scaled_size=1000, start_label='TSS', end_label='TES', referencePoint='center', vmin='auto', vmax='auto',
+                scaled_size=1000, start_label='TSS', end_label='TES', referencePoint='center', x_label=None, vmin='auto', vmax='auto',
                 upstream=200, downstream=200, n_cores=1, cmap='plasma', legend_loc='best', show='plot, heatmap and colorbar'):
     """
     Wrapper function that combines the computeMatrix and plotHeatmap function from deeptools to create coverage plots
@@ -32,6 +32,7 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
         scaled_size: For 'scale' mode to what size the regions should be scaled to.
         start_label: For 'scale' mode how to label the start position.
         end_label: Same as above but for the end.
+        x_label: Label for the x-axis if the columns represent conditions (Default: gene distance). Care, empty strings don't work.
         referencePoint: From where to extend the regions in the 'reference' mode:
             'TSS' for region start, 'TES' for region end or 'center'.
         vmin: Minimum value for the heatmap. The curves are unaffected by this.
@@ -49,6 +50,8 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
 
     start_label = start_label.replace('-', '\-')  # Otherwise it crashes the process call.
     end_label = end_label.replace('-', '\-')
+    if not x_label:
+        x_label = 'gene distance'
 
     if type(beds_to_plot) != list:
         beds_to_plot = list(beds_to_plot)
@@ -119,7 +122,7 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
     print('Plotting heatmap')
     heatmap_cmd = "plotHeatmap -m " + matrix_out + ' --perGroup'*perGroup + (" --plotTitle '" + title+"'")*bool(title) +\
                     " --startLabel " + "'" + start_label + "'" + " --endLabel " + "'" + end_label + "'" + " --colorMap " + cmap + " --zMin "+str(vmin)+" --zMax "+str(vmax)+\
-                    " --yAxisLabel 'coverage'" + " --regionsLabel "+ ' '.join(["'"+b+"'" for b in filtered_labels])+\
+                    " --xAxisLabel " + x_label +" --yAxisLabel 'coverage'" + " --regionsLabel "+ ' '.join(["'"+b+"'" for b in filtered_labels])+\
                     ' --samplesLabel '+' '.join(bw_labels)+' --outFileName ' + sanitize_path(matrix_out.replace('.gz', '_Heatmap.pdf'))+ \
                     " --legendLocation " + legend_loc.lower() + " --whatToShow "+"'"+show+"'"
     print(heatmap_cmd)
