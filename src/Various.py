@@ -7,6 +7,7 @@ import pybedtools
 import sys
 from pybedtools import BedTool
 import gzip
+from multiprocess import Pool
 import copy
 import scipy.stats
 import statsmodels.stats.multitest
@@ -301,24 +302,33 @@ def random_sampler_percentiled(df, var_col, idx_col, hit_list, iterations=1, per
     return random_sets
 
 
-def gene_cre_overlap_fisher(interaction_df, overlap_col, peak_id_col='peak_id'):
+def cre_fisher(args):
+    """Separate function to enable parallelization."""        
+    gene, fish_table = args
+    _, pval = scipy.stats.fisher_exact(fish_table, alternative='greater')
+    return [gene, pval]
+
+
+def gene_cre_overlap_fisher(interaction_df, overlap_col, peak_id_col='peak_id', ncores=1):
     """CARE: the input df is quite specific.
     Takes a pandas df of interactions (gene in Ensembl ID and a peak identifier in peak_id_col) and tests for each gene
     in the Df if its CREs more often have a hit in overlap_col (e.g. ChIP-seq peak overlap) than compared to the whole
     set of CREs that form interactions."""
-    inter_genes = set(interaction_df['Ensembl ID'])
+    inter_genes = list(set(interaction_df['Ensembl ID']))
     inter_cres = len(set(interaction_df[peak_id_col]))
     gene_num_cres = Counter(interaction_df['Ensembl ID'])
     hits_only = interaction_df[interaction_df[overlap_col] > 0]
     cres_w_hits = len(set(hits_only[peak_id_col]))
     gene_cre_hits = Counter(hits_only['Ensembl ID'])
-    gene_pvals = []
+    fisher_tables = []
     for gene in inter_genes:
-        fisher_table = [[gene_cre_hits[gene], gene_num_cres[gene] - gene_cre_hits[gene]],
-                        [cres_w_hits - gene_cre_hits[gene], inter_cres - cres_w_hits - (gene_num_cres[gene] - gene_cre_hits[gene])]]
-        fish_stat, pval = scipy.stats.fisher_exact(fisher_table, alternative='greater')
-        gene_pvals.append([gene, pval])
-    fisher_df = pd.DataFrame(gene_pvals, columns=['Ensembl ID', overlap_col+' p-value']).set_index('Ensembl ID')
+        fisher_tables.append([[gene_cre_hits[gene], gene_num_cres[gene] - gene_cre_hits[gene]],
+                              [cres_w_hits - gene_cre_hits[gene], inter_cres - cres_w_hits - (gene_num_cres[gene] - gene_cre_hits[gene])]])
+    
+    process_pool = Pool(processes=ncores)
+    fish_pool = process_pool.map(cre_fisher, [[g, fisher_tables[i]] for i, g in enumerate(inter_genes)])
+    process_pool.close()
+    fisher_df = pd.DataFrame(fish_pool, columns=['Ensembl ID', overlap_col+' p-value']).set_index('Ensembl ID')
     fisher_df[overlap_col+' FDR'] = statsmodels.stats.multitest.fdrcorrection(fisher_df[overlap_col+' p-value'],
                                                                               alpha=0.05, method='indep', is_sorted=False)[1]
     return fisher_df
