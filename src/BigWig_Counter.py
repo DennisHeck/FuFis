@@ -73,12 +73,12 @@ def bigwig_counts(bed_file, bigwigs, n_cores=1):
     region_counts = pd.concat([pd.DataFrame([x[:3] for x in bed_regions]), region_counts], ignore_index=True, axis=1)
     region_counts.columns = ['#chr', 'start', 'end'] + df_columns
 
-    errors = pd.DataFrame([x[1] for x in bw_counts])
+    errors = pd.DataFrame([x[1] for x in bw_counts][0])
     if not errors.empty:
+        print("WARNING: some regions returned errors, see returned errors df.")
         errors.columns = ['region', 'error']
 
     print('Bigwig counts fetched', clock() - start)
-
     return region_counts, errors
 
 
