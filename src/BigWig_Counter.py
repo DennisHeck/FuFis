@@ -49,7 +49,7 @@ def bigwig_counts(bed_file, bigwigs, n_cores=1):
     Returns:
         tuple:
             - **region_counts**: Will give a dataframe of the bed-file's regions with a column for each bigwig file and the file name as column.
-            - **errors**: List of regions that are also part of the bed_regions but failed due to not returning a count or throwing an error of invalid interval bounds. Those have a count of 0. Note, the errors are rather unreliable, the behaviour of the pyBigWig is a bit elusive.
+            - **errors**: Dictionary with an entry for each biwgig file holding a DataFrame with the regions that are also part of the bed_regions but failed due to not returning a count or throwing an error of invalid interval bounds. Those have a count of 0. Note, the errors are rather unreliable, the behaviour of the pyBigWig is a bit elusive.
     """
     start = clock()
 
@@ -73,10 +73,12 @@ def bigwig_counts(bed_file, bigwigs, n_cores=1):
     region_counts = pd.concat([pd.DataFrame([x[:3] for x in bed_regions]), region_counts], ignore_index=True, axis=1)
     region_counts.columns = ['#chr', 'start', 'end'] + df_columns
 
-    errors = pd.DataFrame([x[1] for x in bw_counts][0])
-    if not errors.empty:
+    errors = {}
+    for i_bw, bw_errors in enumerate([x[1] for x in bw_counts]):
+        if bw_errors:
+            errors[df_columns[i_bw]] = pd.DataFrame(bw_errors, columns=['region', 'error'])
+    if errors:
         print("WARNING: some regions returned errors, see returned errors df.")
-        errors.columns = ['region', 'error']
 
     print('Bigwig counts fetched', clock() - start)
     return region_counts, errors
