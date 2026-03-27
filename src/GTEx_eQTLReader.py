@@ -101,7 +101,3 @@ def get_eqtls(hg38_annotation, gtex_folder, gtex_tissues=None, max_distance=None
 
     return eqtl_beds, unique_eqtl_beds, tissue_genes
 
-
-e_bed, u_bed, tissues = get_eqtls(hg38_annotation='/Users/dennis/Desktop/DataEssentials/Annotations/gencode.v38.annotation.gtf.gz',
-                                  gtex_folder='/Users/dennis/Dev/STARE_GAZE/eQTLs', gtex_tissues={"Thyroid"}, max_distance=1000)
-
