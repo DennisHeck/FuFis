@@ -92,11 +92,16 @@ def get_eqtls(hg38_annotation, gtex_folder, gtex_tissues=None, max_distance=None
 
             # CHR|POS-1|POS|CSV targets
             unique_eqtl_bed = pybedtools.BedTool('\n'.join(set([x[1].split('_')[0] + '\t' + str(int(x[1].split('_')[1])-1) + '\t' + x[1].split('_')[1] + '\t' + x[0] for x in eqtl_lists[tissue][eqtl]])), from_string=True)
-            unique_eqtl_bed = unique_eqtl_bed.sort().merge(c=4, o='distinct')
+            if len(unique_eqtl_bed) > 0:  # Can only merge if we have a hit.
+                unique_eqtl_bed = unique_eqtl_bed.sort().merge(c=4, o='distinct')
             unique_eqtl_beds[tissue][eqtl] = unique_eqtl_bed
 
             tissue_genes[tissue][eqtl] |= set([x.fields[0] for x in eqtl_bed])
     print('eQTL-beds collected', clock() - start)
 
     return eqtl_beds, unique_eqtl_beds, tissue_genes
+
+
+e_bed, u_bed, tissues = get_eqtls(hg38_annotation='/Users/dennis/Desktop/DataEssentials/Annotations/gencode.v38.annotation.gtf.gz',
+                                  gtex_folder='/Users/dennis/Dev/STARE_GAZE/eQTLs', gtex_tissues={"Thyroid"}, max_distance=1000)
 
