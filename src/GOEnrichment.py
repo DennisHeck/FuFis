@@ -3,9 +3,13 @@ from matplotlib import cm
 from matplotlib.lines import Line2D
 from matplotlib import pyplot as plt
 import copy
+import os
 import numpy as np
 import pandas as pd
-import gseapy as gp
+from multiprocess import Pool
+import scipy.stats
+import statsmodels.stats.multitest
+# import gseapy as gp  # TODO
 import GTF_Processing
 import Various
 
@@ -195,7 +199,7 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
             a g:Profiler was customized, to just use the plotting part. Must have the same format as the g:Profiler DFs.
 
     Returns:
-        - Returns a dict of {key df} with a df for each gene set as provided by the gprofiler package, which includes which genes matched to which terms.
+        - Returns a dict of {key: df} with a df for each gene set as provided by the gprofiler package, which includes which genes matched to which terms.
     """
     keywords = {k: [t.lower() for t in vals] for k, vals in keywords.items()}  # We compare lower strings.
 
@@ -223,7 +227,6 @@ def go_enrichment(go_genes, title_tag='', out_tag='', max_terms='all', organism=
     else:
         term_fetcher = custom_dfs
     print("Enrichment results fetched")
-
     plot_go(mode='hypergeometric', wanted_sources=wanted_sources, term_fetcher=term_fetcher, keywords=keywords, cmap=cmap, fig_width=fig_width, fig_height=fig_height,
             go_genes=go_genes, dict_keys=dict_keys, numerate=numerate, font_s=font_s, rotation=rotation,
             title_tag=title_tag, legend_out=legend_out, max_terms=max_terms, out_tag=out_tag, formats=formats)
@@ -260,7 +263,6 @@ def gsea_prerank(go_genes, weight=0, gsea_plot_out=None, out_tag='', title_tag='
     Returns:
         - Returns a dict of {key: {source: df}} with a df for each gene set and GO source as provided by the GSEA package, which includes which genes matched to which terms.
     """
-
 
     keywords = {k: [t.lower() for t in vals] for k, vals in keywords.items()}  # We compare lower strings.
     gmt_files = Various.fn_patternmatch(gmt_path_pattern)
@@ -325,5 +327,88 @@ def gsea_prerank(go_genes, weight=0, gsea_plot_out=None, out_tag='', title_tag='
             title_tag=title_tag, legend_out=legend_out, max_terms=max_terms, out_tag=out_tag, formats=formats)
 
     return df_fetcher
+
+
+def disgenet_enrichment(gene_sets, background='/projects/abcpp/work/base_data/gencode.v38.annotation.gtf',
+                        disgenet_file='/projects/abcpp/work/base_data/DGN_diseases_CURATED_11237_v24.3.gmt',
+                        disease_keys=[], title_tag='', out_tag='', max_terms='all',
+                        numerate=False, df_only=False, cmap='plasma', fig_width=None, fig_height=None,
+                        legend_out=None, rotation=45, font_s=16, ncores=1, formats=['pdf']):
+    """For a dictionary with sets of genes run an enrichment (Fisher's exact with alternative=greater) for genes annotated
+    for disease from DISGENET (https://disgenet.com/). For only one gene set uses the x-axis for indicating the FDR, multiple sets will be
+    separated on the x-axis and the FDR value shown as colour. Requires a file parse from DISGENET with a specific format.
+    FDR-adjustment is done within a gene set.
+
+    Args:
+        gene_sets: {class: [class genes] for class in classes}, or as sets. Safest identifiers are Ensembl IDs.
+        background: Either a dictionary with the same keys as gene_sets and a background set of genes for each, or the path to a gtf-file from which all genes are taken.
+        disgenet_file: Parsed file from DISGENET.
+        disease_keys: List of strings to limit the tested disease terms to. All diseases containing any disease_key as substring are kept.
+        max_terms: Allow a maximum of max_terms per dict key. Use 'all' to get all.
+        numerate: Show the size of the gene sets in parentheses on the x-axis.
+        df_only: Skip the plotting step and only return the df.
+
+    Returns:
+        - Returns a dict of {key: df} with adf for each gene set as provided by the gprofiler package, which includes which genes matched to which terms.
+    """
+
+    if type(background) == str:
+        if not os.path.isfile(background):
+            print("ERROR: if background is a string it is expected to be a gtf-file, file not found", background)
+        print("Background will be all genes from the annotation")
+        tss_dict = GTF_Processing.gene_window_bed(gtf_file=background, dict_only=True)
+        background = {k: set(tss_dict.keys()) for k in gene_sets.keys()}
+
+    disgenet_sets = {}
+    for entry in open(disgenet_file).readlines():
+        disgenet_sets[entry.strip().split('\t')[1]] = set(entry.strip().split('\t')[2:])
+
+    if disease_keys:
+        disgenet_sets = {k: val for k, val in disgenet_sets.items() if any([x.lower() in k.lower() for x in disease_keys])}
+
+    def disgenet_fisher(args):
+        """Separate function to enable parallelization."""
+        disease, f_table = args
+        _, pval = scipy.stats.fisher_exact(f_table, alternative='greater')
+        return [disease, pval]
+
+    plotting_dfs = {}
+    for g_key, g_set in gene_sets.items():
+        fish_tables = []
+        gene_overlaps = {}
+        for dis_key, dis_genes in disgenet_sets.items():
+            gene_overlap = set(g_set) & dis_genes
+            if gene_overlap:
+                gene_overlaps[dis_key] = gene_overlap
+                g_set_hits = len(gene_overlap)
+                g_set_nonhits = len(set(g_set) - dis_genes)
+                background_hits = len(set(background[g_key]) & dis_genes)
+                background_nonhits = len(set(background[g_key]) - dis_genes)
+                fish_table = [[g_set_hits, g_set_nonhits],
+                              [background_hits, background_nonhits]]
+                fish_tables.append([dis_key, fish_table])
+
+        process_pool = Pool(processes=ncores)
+        fish_pool = process_pool.map(disgenet_fisher, fish_tables)
+        process_pool.close()
+
+        # Mimic the g:Profiler df to use the same plotting function.
+        g_set_df = pd.DataFrame(fish_pool, columns=['name', 'p-value'])
+        g_set_df['FDR'] = statsmodels.stats.multitest.fdrcorrection(g_set_df['p-value'], alpha=0.05, method='indep', is_sorted=False)[1]
+        g_set_df = g_set_df[g_set_df['FDR'] <= 0.05]
+        g_set_df['intersections'] = [','.join(gene_overlaps[d]) for d in g_set_df['name']]
+        g_set_df['Gene fraction'] = [len(gene_overlaps[d]) / len(g_set) for d in g_set_df['name']]
+        plotting_dfs[g_key] = {'DISGENET': g_set_df.sort_values(by='FDR', ascending=True)}
+
+    if df_only:
+        return plotting_dfs
+
+    plot_go(mode='hypergeometric', wanted_sources=['DISGENET'], term_fetcher=plotting_dfs, keywords={}, cmap=cmap,
+            fig_width=fig_width, fig_height=fig_height, go_genes=gene_sets, dict_keys=list(gene_sets.keys()),
+            numerate=numerate, font_s=font_s, rotation=rotation, title_tag=title_tag, legend_out=legend_out,
+            max_terms=max_terms, out_tag=out_tag, formats=formats)
+
+    return plotting_dfs
+
 
 

@@ -281,6 +281,17 @@ go_dict = GOEnrichment.go_enrichment(gene_sets, title_tag='CAD gene sets', keywo
                                    numerate=True, wanted_sources=['GO:BP'], rotation=45, font_s=16, formats='png')
 # ---
 
+# gene_sets = {"CAD-van der Harst": set(open('ExampleData/VanderHarst2018.txt').read().strip().split('\n')),
+#              'CAD-Schnitzler ': set(open('ExampleData/Schnitzler2024.txt').read().strip().split('\n'))}
+# disease_keys = None
+# disgenet_file = "/Users/dennis/Desktop/DataEssentials/DGN_diseases_CURATED_11237_v24.3.gmt"
+# background_genes = '/Users/dennis/Desktop/DataEssentials/Annotations/gencode.v38.annotation.gtf.gz'
+#
+# a = disgenet_enrichment(gene_sets=gene_sets, background=background_genes, disgenet_file=disgenet_file, disease_keys=['heart', 'artery', 'cardi'], title_tag='TEST', out_tag='/Users/dennis/Dev/MEWAS/Plots/TESTDGN',
+#                         max_terms=10, numerate=True, ncores=4)
+
+
+#
 # ***GOEnrichment.gsea_prerank
 # Instead of the enrichment test with g:profiler, we can also run GSEA on ranked list of genes to test whether
 # the top of the list is enriched for functions from the databases. But it requires stored gmt files.
@@ -294,6 +305,8 @@ go_dict = GOEnrichment.gsea_prerank(gsea_genes, weight=0, gsea_plot_out=None, ou
                  gmt_path_pattern="ExampleData/*.v2024.1.Hs.symbols.gmt",
                  fig_height=None, legend_out=None, rotation=45, font_s=16, cores=20, formats=['png'])
 # ---
+
+
 
 
 # _________________________________________________________________________________________________________
