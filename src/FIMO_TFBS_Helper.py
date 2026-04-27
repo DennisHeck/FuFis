@@ -67,7 +67,7 @@ def fimo_runner(args, seq_out, fimo_out, new_meme_file, thresh=0.0001):
 
     if args.write_sequence:
         os.rename(args.out_dir + 'fimo.tsv', fimo_out.replace('.gz', ''))
-    subprocess.call('gzip ' + fimo_out.replace('.gz', ''), shell=True)
+    subprocess.call('gzip -f ' + fimo_out.replace('.gz', ''), shell=True)
     print('fimo output at', fimo_out)
 
 
@@ -109,7 +109,7 @@ def fimo_processor(args, fimo_out):
             output.write(region + '\t' + '\t'.join([str(vals[tf]) for tf in tfs]) + '\n')
 
     fimo_count_out = fimo_out.replace('Fimo.tsv.gz', 'Fimo_TFBSMatrix.txt')
-    subprocess.call('gzip ' + fimo_count_out, shell=True)
+    subprocess.call('gzip -f ' + fimo_count_out, shell=True)
     print("FIMO hits counted")
     print(fimo_count_out + '.gz')
 
