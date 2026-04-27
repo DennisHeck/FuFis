@@ -1,6 +1,7 @@
 from collections import Counter
 import subprocess
 import os
+import pandas as pd
 import gzip
 from pybedtools import BedTool
 
@@ -54,6 +55,7 @@ def meme_fitbackground(meme_file, sequence_file, out_dir):
 def fimo_runner(args, seq_out, fimo_out, new_meme_file, thresh=0.0001):
     """
     A wrapper to call FIMO to avoid redundant code for catching specific flags.
+    Additionally, write a bed file with the TFBS that can be loaded into IGV (expanded setting to see all).
     """
     print("Running Fimo")
     write_seq = '' if args.write_sequence else '--skip-matched-sequence'
@@ -69,6 +71,16 @@ def fimo_runner(args, seq_out, fimo_out, new_meme_file, thresh=0.0001):
         os.rename(args.out_dir + 'fimo.tsv', fimo_out.replace('.gz', ''))
     subprocess.call('gzip -f ' + fimo_out.replace('.gz', ''), shell=True)
     print('fimo output at', fimo_out)
+
+    # Write a bed file with the motif positions that can be loaded into IGV.
+    fimo_bed_out = '.'.join(fimo_out.split('.')[:-2])+'.bed.gz'
+    fimo_df = pd.read_table(fimo_out, header=0, sep="\t")
+    fimo_df['#chr'] = fimo_df['sequence_name'].str.split(':').str[0]
+    fimo_df['motif_start'] = fimo_df['sequence_name'].str.split(':').str[1].str.split('-').str[0].astype(int) + \
+                             fimo_df['start'].astype(int)
+    fimo_df['motif_end'] = fimo_df['sequence_name'].str.split(':').str[1].str.split('-').str[0].astype(int) + \
+                           fimo_df['stop'].astype(int)
+    fimo_df[['#chr', 'motif_start', 'motif_end', 'motif_id', 'score', 'strand']].to_csv(fimo_bed_out, header=True, index=False, sep="\t")
 
 
 def fimo_processor(args, fimo_out):

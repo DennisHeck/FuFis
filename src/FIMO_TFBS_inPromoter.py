@@ -12,7 +12,7 @@ parser.add_argument("--open_regions", default=False, type=str, help="Optional be
                                                                     "then only those promoter parts that overlap with open_regions are kept.")
 parser.add_argument("--PWMs", required=True, help='TF motif file in meme format.')
 parser.add_argument("--fasta", required=True, help='Genome sequence file in fasta format.')
-parser.add_argument("--fimo_src", required=True, help='Path to the Fimo executable. If fimo is on path, just type "fimo".')
+parser.add_argument("--fimo_src", required=True, help='Path to the Fimo executable. If fimo is on path, just type "fimo". CARE: Tested for meme5.4.1, later versions handle sequence names differently.')
 parser.add_argument("--out_dir", required=True, help='Path to which to write the output to.')
 parser.add_argument("--write_sequence", default='False', help='If Fimo should write the sequence matched '
                                                                        'to the motif in its output file [True, False].')
