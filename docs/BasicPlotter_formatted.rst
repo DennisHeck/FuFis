@@ -49,6 +49,20 @@ penguins are great.
 .. |basic_bars_hue| image:: gallery/SexHuespecies_flipper_length_mm_Bars.png
    :width: 45%
 
+.. code-block:: python
+
+    # For specific use-cases, there's also the option to flip the y-axis labels into the plot, for example to have
+    # a different visualization of GO plots.
+    avg_flipper_length = pd.DataFrame(penguin_df.groupby('species')['flipper_length_mm'].mean())
+    BasicPlotter.basic_bars(avg_flipper_length, x_col='flipper_length_mm', y_col='species', formats=['png'],
+                            title='Example bar plot with flipped y-axis labels', flip_y=True, flip_pad=-6,
+                            colour='#6ba0db', edgecolour='#6ba0db', font_s=19,
+                            output_path=out_dir+'FlipY')
+    
+
+.. image:: gallery/FlipYflipper_length_mm_species_Bars.png
+  :width: 65%
+
 .. .--------------------------------------------------------------------------------------------------------------------
 .. basic_stacked_bars
 .. .--------------------------------------------------------------------------------------------------------------------
@@ -144,6 +158,22 @@ penguins are great.
   :width: 60%
 
 .. .--------------------------------------------------------------------------------------------------------------------
+.. basic_lineplot
+.. .--------------------------------------------------------------------------------------------------------------------
+.. autofunction:: BasicPlotter.basic_lineplot
+
+.. code-block:: python
+
+    # Plot a lineplot with optional markers and dashes, even though a lineplot isn't that meaningful for our pingouin data.
+    BasicPlotter.basic_lineplot(penguin_df, x_col='flipper_length_mm', y_col='body_mass_g', hue_col='species',
+                                title="Flipper length vs body mass", output_path=out_dir, markers=['o', 'd', 's'],
+                                palette='glasbey_cool', dashes=True, formats=['png'])
+    
+
+.. image:: gallery/flipper_length_mm_body_mass_g_Lineplot.png
+  :width: 60%
+
+.. .--------------------------------------------------------------------------------------------------------------------
 .. multi_mod_plot
 .. .--------------------------------------------------------------------------------------------------------------------
 .. autofunction:: BasicPlotter.multi_mod_plot
@@ -151,8 +181,8 @@ penguins are great.
 .. code-block:: python
 
     # This one is a scatterplot with a lot of additional options.
-    # Start with a scatterplot where we colour the dots by the species, each dot being one penguin.
-    BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_mass_g'], colour_col='species',
+    # Start with a scatterplot where we colour the dots by the species, each dot being one penguin. And add the pearson correlation coefficient.
+    BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_mass_g'], colour_col='species', add_corr='pearson',
                                 output_path=out_dir, title='#1: Flipper length vs body mass', alpha=1, palette='glasbey_cool',
                                 msize=25, formats=['png'])
     # Next, let's add markers to show the island where the penguin was measured.

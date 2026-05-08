@@ -3,15 +3,15 @@ FIMO TFBSs
 #########################
 
 `FIMO <https://meme-suite.org/meme/doc/fimo.html>`_ is a popular tool for predicting TFBS in regions. Here are scripts that make calling FIMO easier, as they
-take over some preprocessing step and also process the output into a matrix of regions x TFs.
+take over some preprocessing step and also process the output into a matrix of regions x TFs and a bed-file which can be loaded into a genome browser.
 The preprocessing includes
   - writing the sequence of the regions
   - forcing the regions to be within the genome boundaries
   - adjusting the TF motif meme-file so that the base content of the bed-regions is used as background frequencies.
 
 In the output matrix, overlapping TFBS of the same TF on the same strand are merged and counted as 1.
-Take care with palindromic motifs, they are still counted on both strands.Only the regions with at least
-one binding site are written into the matrix.
+Take care with palindromic motifs, they are still counted on both strands. Only the regions with at least
+one binding site are written into the matrix. The same collected binding sites are written into the bed file to be displayed in a genome browser.
 The first script starts with a bed-file, the second with a set of genes to get the TFBS in their promoter regions.
 Both are called via the command line.
 If the genome sequence file doesn't have an index, `samtools <https://www.htslib.org/>`_ has to be installed and on the
