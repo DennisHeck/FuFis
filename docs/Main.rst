@@ -20,6 +20,8 @@ installed (conda but fast), just replace the 'conda' in the commands with 'mamba
 
 There might be other software that needs to be installed depending on the function, for example deeptools, which can't be easily added to the conda environment file.
 
+Alternatively, you can also just grab the respective code snippets from the `code source folder <https://github.com/DennisHeck/FuFis/tree/main/src>`_. The documentation of the functions is directly rendered from the source files.
+
 Disclaimers:
  - No warranties. There are no tests to guarantee the correctness of functions. Be sceptical.
  - Double-check whether the packages and APIs of the functions originate from work that needs to be cited. Usually, this is mentioned in the docstring, but this is not kept up-to-date and does not claim to be complete.
