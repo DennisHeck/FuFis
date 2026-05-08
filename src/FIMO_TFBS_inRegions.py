@@ -16,7 +16,7 @@ parser.add_argument("--out_dir", required=True, help='Path to which to write the
 parser.add_argument("--write_sequence", default='False', help='If Fimo should write the sequence matched '
                                                                        'to the motif in its output file [True, False].')
 parser.add_argument("--thresh", default='0.0001', help='p-value cutoff for the FIMO output.')
-parser.add_argument("--fit_background", default=True, help='Whether to adjust the motif file to the base content of the bed-regions.')
+parser.add_argument("--fit_background", default=True, help='Whether to adjust the motif file to the base content of the bed-regions. Otherwise, the base content in the --PWMs file will be used.')
 
 
 if __name__ == '__main__':

@@ -307,8 +307,6 @@ go_dict = GOEnrichment.gsea_prerank(gsea_genes, weight=0, gsea_plot_out=None, ou
 # ---
 
 
-
-
 # _________________________________________________________________________________________________________
 # GenomeLifter
 # _________________________________________________________________________________________________________
@@ -484,8 +482,8 @@ BasicPlotter.basic_lineplot(penguin_df, x_col='flipper_length_mm', y_col='body_m
 
 # ***BasicPlotter.multi_mod_plot
 # This one is a scatterplot with a lot of additional options.
-# Start with a scatterplot where we colour the dots by the species, each dot being one penguin.
-BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_mass_g'], colour_col='species',
+# Start with a scatterplot where we colour the dots by the species, each dot being one penguin. And add the pearson correlation coefficient.
+BasicPlotter.multi_mod_plot(penguin_df, score_cols=['flipper_length_mm', 'body_mass_g'], colour_col='species', add_corr='pearson',
                             output_path=out_dir, title='#1: Flipper length vs body mass', alpha=1, palette='glasbey_cool',
                             msize=25, formats=['png'])
 # Next, let's add markers to show the island where the penguin was measured.
