@@ -1,7 +1,4 @@
 import argparse
-import os
-import subprocess
-from pathlib import Path
 
 """With hicstraw to write the coo-format with one file per chromosome of an hic-file or URL."""
 
@@ -14,6 +11,9 @@ parser.add_argument("--out_folder", required=True, help="Folder where the files 
 
 if __name__ == '__main__':
     import hicstraw  # The import is solely placed so beautifully here, because of the documentation with ReadTheDocs. Some packages have to be hidden or it doesn't render.
+    import os
+    import subprocess
+    from pathlib import Path
 
     args = parser.parse_args()
     hic_source = args.hic
