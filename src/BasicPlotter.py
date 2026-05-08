@@ -521,7 +521,7 @@ def basic_pie(plot_df, title='', palette=None, numerate=True, legend_perc=True, 
 
 def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output_path='', diagonal=False, title=None,
                    colour_order=None, marker_order=None, line_plot=False, alpha=0.7, xsize=8, ysize=6, palette=None,
-                   xlim=None, ylim=None, msize=30, vlines=[], hlines=[], add_spear=False, na_colour='black', grid=True,
+                   xlim=None, ylim=None, msize=30, vlines=[], hlines=[], add_corr=False, na_colour='black', grid=True,
                    label_dots=None, font_s=14, adjust_labels=True, formats=['pdf']):
     """
     Scatterplot that compares two scores. For each entry in plot_df plot one dot with [x,y] based on score_col and
@@ -534,7 +534,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         hlines: Plot horizontal dashed grey lines at all positions listed in hlines.
         vlines: Same as hlines but vertical.
         diagonal: Whether to add a line on the diagonal.
-        add_spear: CARE not properly tested. Whether to add the spearman correlation coefficient between the score_cols to the title.
+        add_corr: Set to one of {'spearman', 'pearson', 'kendall'} to get the respective correlation coefficient added to the title and returned from the function. NaNs are omitted.
         na_colour: How to colour dots where the colour_col is NA.
         label_dots: A pair of columns [do_label, label_col] with boolean do_label telling which entries should get a
             text label within the plot, and label_col giving the string of the label.
@@ -572,7 +572,6 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
             else:
                 cmap = cm.get_cmap('viridis' if not palette else palette)
                 norm = plt.Normalize(plot_df[colour_col].min(), plot_df[colour_col].max())
-
 
     def give_colour(entry):
         """Takes the entry that is supposed to be plotted, and checks whether we have categorical colours, or numerical
@@ -654,9 +653,22 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         plt.plot([x[0] for x in line_plot], [y[1] for y in line_plot], linestyle='-', color='grey', zorder=12)
     if title:
         plt.suptitle(title, fontsize=font_s+6, fontweight='bold', y=1.01)
-    if add_spear:
-        spear_r, pval = scipy.stats.spearmanr(a=[x[0] for x in main_list], b=[x[1] for x in main_list])
-        plt.title('spear_r='+str(round(spear_r, 3)), fontsize=font_s+4)
+
+    if add_corr:
+        if add_corr == 'spearman':
+            corr_r, pval = scipy.stats.spearmanr(a=[x[0] for x in main_list], b=[x[1] for x in main_list], nan_policy='omit')
+        elif add_corr == 'pearson':
+            illegal_vals = [np.inf, np.nan, -np.inf, None]
+            nan_idx = [i for i, x in enumerate(main_list) if x[0] in illegal_vals or x[1] in illegal_vals or pd.isna(x[0]) or pd.isna(x[1])]
+            corr_r, pval = scipy.stats.pearsonr([x[0] for i, x in enumerate(main_list) if i not in nan_idx],
+                                                [x[1] for i, x in enumerate(main_list) if i not in nan_idx])
+        elif add_corr == 'kendall':
+            corr_r, pval = scipy.stats.kendalltau([x[0] for x in main_list], [x[1] for x in main_list], nan_policy='omit')
+        else:
+            print("WARNING: correlation type not recognized: "+add_corr)
+            corr_r = None
+        if corr_r is not None:
+            plt.title(add_corr+'_coeff='+str(round(corr_r, 3)), fontsize=font_s+4)
 
     if type(formats) != list:
         formats = [formats]
@@ -665,8 +677,8 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
                   bbox_inches='tight', format=form)
     plt.close()
 
-    if add_spear:
-        return spear_r
+    if add_corr:
+        return corr_r
 
 
 def basic_venn(input_sets, plot_path, blob_colours=ColoursAndShapes.tol_highcontrast, title='',
