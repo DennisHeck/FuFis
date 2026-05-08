@@ -16,6 +16,7 @@ parser.add_argument("--out_dir", required=True, help='Path to which to write the
 parser.add_argument("--write_sequence", default='False', help='If Fimo should write the sequence matched '
                                                                        'to the motif in its output file [True, False].')
 parser.add_argument("--thresh", default='0.0001', help='p-value cutoff for the FIMO output.')
+parser.add_argument("--fit_background", default=True, help='Whether to adjust the motif file to the base content of the bed-regions.')
 
 
 if __name__ == '__main__':
@@ -37,9 +38,13 @@ if __name__ == '__main__':
     inter_bed.sequence(fi=args.fasta, fo=seq_out)
     print('sequence fasta stored at', seq_out)
 
-    new_meme_file = FIMO_TFBS_Helper.meme_fitbackground(args.PWMs, seq_out, args.out_dir)
+    if args.fit_background:
+        new_meme_file = FIMO_TFBS_Helper.meme_fitbackground(args.PWMs, seq_out, args.out_dir)
+        meme_file = new_meme_file
+    else:
+        meme_file = args.PWMs
 
-    FIMO_TFBS_Helper.fimo_runner(args, seq_out, fimo_out, new_meme_file, args.thresh)
+    FIMO_TFBS_Helper.fimo_runner(args, seq_out, fimo_out, meme_file, args.thresh)
 
     FIMO_TFBS_Helper.fimo_processor(args, fimo_out)
 

@@ -16,6 +16,13 @@ def process_args(args):
     else:
         print("ERROR unrecognized option for write_sequence:", args.write_sequence)
 
+    if args.fit_background.lower() == 'true':
+        args.fit_background = True
+    elif args.fit_background.lower() == 'false':
+        args.fit_background = False
+    else:
+        print("ERROR unrecognized option for fit_background:", args.fit_background)
+
     if not args.out_dir.endswith('/'):
         args.out_dir += '/'
 

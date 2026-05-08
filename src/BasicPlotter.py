@@ -441,7 +441,7 @@ def basic_violin(plot_df, y_col, x_col, y_label=None, x_order=None, hue_col=None
                               palette='tab10' if hue_col and not palette else palette, hue_order=hue_order)
     if jitter:
         sns.stripplot(data=plot_df, x=x_col, y=y_col, jitter=True, ax=ax, hue=hue_col, hue_order=hue_order, zorder=10,
-                      order=x_order, palette=jitter_colour, dodge=True, legend=False, edgecolor='black', linewidth=1,
+                      order=x_order, color=jitter_colour, dodge=True, legend=False, edgecolor='black', linewidth=1,
                       size=jitter_size)
     ax.tick_params(axis='both', labelsize=font_s+4)
     ax.set_ylabel(y_col, fontsize=font_s+8)

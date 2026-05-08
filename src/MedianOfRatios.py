@@ -14,8 +14,22 @@ def mor_df(df):
     df = df.loc[(df != 0).any(axis=1)]
     # We skip 0s for the geometric mean.
     pseudo_reference = {k: gmean([x for x in df.loc[k].to_list() if x > 0]) for k in df.index}
-    median_ratios = {c: np.median([val / pseudo_reference[g] for g, val in df[c].iteritems()]) for c in df.columns}
+    median_ratios = {c: np.median([val / pseudo_reference[g] for g, val in df[c].items()]) for c in df.columns}
     nonzero_ratios = [k for k, ratio in median_ratios.items() if ratio > 0]
     df = df[nonzero_ratios]
     norm_df = df.apply(lambda x: x / median_ratios[x.name], axis=0)
     return norm_df
+
+
+def deseq2_mor(df):
+    """
+    Do the median of ratios as DESeq2 supposedly does it. Not double checked with DESeq2 itself.
+    """
+    df = df.copy()
+    log_data = np.log(df).dropna()
+    row_avg = gmean(log_data, axis=1)
+    ratios = log_data.subtract(row_avg, axis=0)
+    medians = ratios.median(axis=0)
+    scaling_factors = np.e ** medians
+    normalized_data = df / scaling_factors
+    return normalized_data

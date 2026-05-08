@@ -4,22 +4,26 @@ from pybedtools import BedTool
 """Collection of slightly easier access to the MEME suite tools."""
 
 
-def sea(foreground, background, sequence, meme_file, file_tag, out_dir, sea_src='sea'):
+def sea(foreground, background, sequence, meme_file, file_tag, out_dir, sea_src='sea', meme_background=False):
     """Run MEME's SEA motif enrichment for known motifs that are relatively enriched in the foreground
     compred to the background sequences. If background is 'random', then use the shuffled foreground as background."""
     if type(foreground) == str:
         foreground = BedTool(foreground)
     if type(background) == str and background != 'random':
         background = BedTool(background)
+    if meme_background:
+        background_flag = ' --bfile --motif--'
+    else:
+        background_flag = ''
     foreground_path = out_dir + file_tag + "_FG.fa"
     background_path = out_dir + file_tag + "_BG.fa"
     foreground.sequence(fi=sequence, fo=foreground_path, name=False)
     if type(background) == str and background.lower() == 'random':
-        subprocess.call(sea_src+" --p " + foreground_path + " --m " + meme_file +
+        subprocess.call(sea_src+" --p " + foreground_path + background_flag + " --m " + meme_file +
                         " --o " + out_dir + file_tag, shell=True)
     else:
         background.sequence(fi=sequence, fo=background_path, name=False)
-        subprocess.call(sea_src+" --p " + foreground_path + " --n " + background_path + " --m " + meme_file +
+        subprocess.call(sea_src+" --p " + foreground_path + " --n " + background_path + background_flag + " --m " + meme_file +
                         " --o " + out_dir + file_tag, shell=True)
 
 
