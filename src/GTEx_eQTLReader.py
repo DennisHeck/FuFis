@@ -4,13 +4,14 @@ from timeit import default_timer as clock
 import GTF_Processing
 
 
-"""Functions to read-in the GTEx files. Is fixed for the specific GTEx paths."""
+"""Functions to read-in the GTEx files with the fine-mapped SNPs from CAVIAR, DAPG and CaVEMaN. 
+It is fixed for the specific GTEx paths, i.e. the folder and file structure how it is downloaded from GTEx."""
 
 
 def get_eqtls(hg38_annotation, gtex_folder, gtex_tissues=None, max_distance=None):
     """
     From the three fine-mapping methods provided on GTEx, go through the fixed file paths, and get the 
-    eQTL-gene pairs matching the tissues queried.
+    eQTL-gene pairs matching the tissues queried. Written for version phs000424.v8.p2, downloaded from the GTEx portal.
 
     Args:
         hg38_annotation: The GENCODE hg38 annotation. Must be hg38 to match the fixed versions expected in the gtex_folder.
@@ -30,7 +31,6 @@ def get_eqtls(hg38_annotation, gtex_folder, gtex_tissues=None, max_distance=None
                   'CaVEMaN': gtex_folder+"/GTEx_v8_finemapping_CaVEMaN/GTEx_v8_finemapping_CaVEMaN.txt.gz",
                   'DAP-G': gtex_folder+"/GTEx_v8_finemapping_DAPG/GTEx_v8_finemapping_DAPG.CS95.txt.gz"}
 
-    # eqtl_lists = {t: {e: [] for e in eqtl_types} for t in gtex_tissues}
     eqtl_lists = {}
 
     for eqtl in eqtl_types:

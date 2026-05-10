@@ -13,6 +13,7 @@ FuFis (Frequently used Functions)
     ClassificationPerformanceCurves_formatted.rst
     FIMO_TFBS_formatted.rst
     GenomeLifter_formatted.rst
+    GTEx_eQTLReader_formatted.rst
     GTF_Processing_formatted.rst
     GOEnrichment_formatted.rst
     HiC_Processing_formatted.rst

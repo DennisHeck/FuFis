@@ -716,12 +716,28 @@ open('docs/gallery/MakeTitlesGreatAgain_2.txt', 'w').write(open('ExampleData/Exa
 # _________________________________________________________________________________________________________
 # ***ReadLargeMatrix
 # We only read a mini gtf file for illustration.
-import ReadLargeMatrix
-table_path = 'ExampleData/MiniTable.txt'
-read_table = ReadLargeMatrix.file_read(table_path, sep='\t', header=1, cores=1, batch_rows=100),
-                                       df_dtypes={"column1": int, 'column2': 'string', 'column3': bool, 'column4': int, 'duck': 'string'},
-                                       string_comparison='duck', string_comparison_start=4)
+# import ReadLargeMatrix
+# table_path = 'ExampleData/MiniTable.txt'
+# read_table = ReadLargeMatrix.file_read(table_path, sep='\t', header=1, cores=1, batch_rows=100),
+#                                        df_dtypes={"column1": int, 'column2': 'string', 'column3': bool, 'column4': int, 'duck': 'string'},
+#                                        string_comparison='duck', string_comparison_start=4)
 
 
+# _________________________________________________________________________________________________________
+# GTEx_eQTLReader
+# _________________________________________________________________________________________________________
+# ***GTEx_eQTLReader.get_eqtls
+# Get the fine-mapped eQTLs from files subsetted for the first 1k lines from chr21.
+import GTEx_eQTLReader
+annotation = 'ExampleData/gencode.v38.annotation_chr21Genes.gtf'
+gtex_folder = 'ExampleData/GTEx_phs000424.v8.p2_chr21/'
+eqtl_beds, unique_eqtl_beds, tissue_genes = GTEx_eQTLReader.get_eqtls(hg38_annotation=annotation, gtex_folder=gtex_folder, gtex_tissues=None, max_distance=None)
+print(eqtl_beds['Adipose_Subcutaneous']['CaVEMaN'][0])
+print(unique_eqtl_beds['Adipose_Subcutaneous']['CaVEMaN'][0])
+print(list(tissue_genes['Adipose_Subcutaneous']['CaVEMaN'])[:2])
+# ---
+open("docs/gallery/src.GTEx_eQTLReader.get_eqtls_1.txt", 'w').write(str(eqtl_beds['Adipose_Subcutaneous']['CaVEMaN'][0]) + '\n')
+open("docs/gallery/src.GTEx_eQTLReader.get_eqtls_2.txt", 'w').write(str(unique_eqtl_beds['Adipose_Subcutaneous']['CaVEMaN'][0]) + '\n')
+open("docs/gallery/src.GTEx_eQTLReader.get_eqtls_3.txt", 'w').write('\n'.join(list(tissue_genes['Adipose_Subcutaneous']['CaVEMaN'])[:2]) + '\n')
 
 

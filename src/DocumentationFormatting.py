@@ -44,4 +44,29 @@ for g_set in gene_sets:
     out_name = 'ExampleData/VanderHarst2018_names.txt' if'Harst' in g_set else 'Exampledata/Schnitzler2024_names.txt'
     open(out_name, 'w').write('\n'.join([val['symbol'] for val in mapped_ids.values()]))
 
+# ---------------------------------------------------------------------------------------------------
+# GTEx_eQTLReader - get the first lines of the GTEx files
+# ---------------------------------------------------------------------------------------------------
+import gzip
+import os
+from pathlib import Path
+gtex_folder = '/Users/dennis/Dev/STARE_GAZE/eQTLs/'
+out_folder = '/Users/dennis/GitHub/FuFis/ExampleData/GTEx_phs000424.v8.p2_chr21/'
+eqtl_types = {'CAVIAR': gtex_folder + "/GTEx_v8_finemapping_CAVIAR/CAVIAR_Results_v8_GTEx_LD_HighConfidentVariants.gz",
+              'CaVEMaN': gtex_folder + "/GTEx_v8_finemapping_CaVEMaN/GTEx_v8_finemapping_CaVEMaN.txt.gz",
+              'DAP-G': gtex_folder + "/GTEx_v8_finemapping_DAPG/GTEx_v8_finemapping_DAPG.CS95.txt.gz"}
+for eqtl, file in eqtl_types.items():
+    out_file = out_folder + file.replace(gtex_folder, '')
+    print(out_file)
+    print(Path(out_file).parents[0])
+    if not os.path.isdir(Path(out_file).parents[0]):
+        os.mkdir(Path(out_file).parents[0])
+    with gzip.open(file, 'rt') as eqtl_in, gzip.open(out_file, 'wt') as eqtl_out:
+        hit_lines = 0
+        for i, line in enumerate(eqtl_in):
+            if 'chr21' in line or i == 0:
+                eqtl_out.write(line)
+                hit_lines += 1
+            if hit_lines > 1000:
+                break
 
