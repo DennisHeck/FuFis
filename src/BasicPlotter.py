@@ -11,7 +11,7 @@ from matplotlib.colors import to_hex
 from itertools import chain
 import upsetplot
 from collections import Counter
-from pandas.api.types import is_string_dtype
+from pandas.api.types import is_string_dtype, is_numeric_dtype
 from matplotlib.lines import Line2D
 import matplotlib.patches as mpatches
 from adjustText import adjust_text
@@ -549,7 +549,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
             colour_order = marker_order
 
     if colour_col:
-        if is_string_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool:
+        if not is_numeric_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool:
             if not palette:
                 if len(set(plot_df[colour_col])) > len(ColoursAndShapes.tol_vibrant):
                     palette = ColoursAndShapes.glasbey_palettes['glasbey']
