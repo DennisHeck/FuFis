@@ -81,7 +81,7 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
             if not os.path.isfile(bed):
                 print("ERROR can't find bed-file:", bed)
                 return
-            bed_paths.append(beds_to_plot)
+            bed_paths.append(beds_to_plot[b])
             filtered_labels.append(bed_labels[b])
 
     if not bed_paths:
@@ -92,6 +92,7 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
     # in the next step from the plotHeatmap function.
     matrix_out = out_dir + out_tag + "_" + mode + "_perGroup"*perGroup + '.gz'
     print('Computing matrix')
+    print(bed_paths)
     if mode == 'scale':
         matrix_cmd = "computeMatrix scale-regions -S "+' '.join(bigwigs)+" -R "+ ' '.join(["'"+b+"'" for b in bed_paths])+\
                         " -R " + ' '.join(["'"+b+"'" for b in bed_paths])+\
