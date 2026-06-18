@@ -9,7 +9,7 @@ import pandas as pd
 from multiprocess import Pool
 import scipy.stats
 import statsmodels.stats.multitest
-# import gseapy as gp  # TODO
+import gseapy as gp  # TODO
 import GTF_Processing
 import Various
 
@@ -327,6 +327,52 @@ def gsea_prerank(go_genes, weight=0, gsea_plot_out=None, out_tag='', title_tag='
             title_tag=title_tag, legend_out=legend_out, max_terms=max_terms, out_tag=out_tag, formats=formats)
 
     return df_fetcher
+
+
+def get_gmt_sets(gtf_file='', gmt_path_pattern="/projects/abcpp/work/base_data/GSEA_gmt/human/*.v2024.1.Hs.symbols.gmt",
+                 keywords=[], exact_match=False):
+    """Reads gmt-files, e.g. from GSEA, to create a nested dictionary with the sources and gene sets. Allows filtering
+    terms for keywords.
+
+    Args:
+        gtf_file: Path to a gtf-file, required to translate symbols to Ensembl IDs.
+        gmt_path_pattern: File system pattern to the gmt files.
+        keywords: A list or set to limit the terms to those containing any of them. String comparison is done on the lowered strings.
+        exact_match: Whether the keywords have to fully match the term names, not considering the prefix of the database (e.g. for GOBP_Methylation searching for methylation among the keywords.
+
+    Returns:
+        tuple:
+            - **gmt_sets**: Dict of {source: {term: set(gene names)}} for all found gmt files.
+            - **gmt_sets_ids**: Same as above but with mapped Ensembl IDs where possible.
+    """
+    keywords = [k.replace(' ', '_') for k in keywords]  # In the gmt files we have no spaces but underscores.
+
+    gmt_files = Various.fn_patternmatch(gmt_path_pattern)
+    gmt_sets = {}
+    for gmt_file, source in gmt_files.items():
+        source = '.'.join(source.split('.')[1:])  # We need to remove the prefix to be flexible across organisms.
+        gmt_sets[source] = {}
+
+        for entry in open(gmt_file).readlines():
+            term = entry.strip().split('\t')[0]
+            if keywords:
+                if exact_match:
+                    if not '_'.join(term.lower().split('_')[1:]) in keywords:
+                        continue
+                else:
+                    if not any([x.lower() in term.lower() for x in keywords]):
+                        continue
+            gmt_sets[source][term] = set(entry.strip().split('\t')[2:])
+
+    # Create a similar dictionary but with matched Ensembl IDs.
+    all_names = set.union(*[set.union(*val.values()) for val in gmt_sets.values()])
+    mapped_identifiers, misses = GTF_Processing.match_gene_identifiers(all_names, gtf_file=gtf_file,
+                                                                       scopes="symbol,alias",
+                                                                       fields="ensembl,symbol")
+    gmt_sets_ids = {s: {k: set([mapped_identifiers[n]['ensembl'] for n in names if n in mapped_identifiers])
+                        for k, names in terms.items()} for s, terms in gmt_sets.items()}
+
+    return gmt_sets, gmt_sets_ids
 
 
 def disgenet_enrichment(gene_sets, background='/projects/abcpp/work/base_data/gencode.v38.annotation.gtf',
