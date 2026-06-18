@@ -540,8 +540,6 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
             text label within the plot, and label_col giving the string of the label.
         adjust_labels: Whether to use the adjustText package to try to avoid overlap of text labels.
     """
-    main_list = plot_df[[x for x in score_cols+[colour_col, marker_col] if x is not None]].values.tolist()
-    main_idx = {x: i for i, x in enumerate([y for y in score_cols+[colour_col, marker_col] if y is not None])}
     if colour_col == marker_col:
         if colour_order:
             marker_order = colour_order
@@ -550,6 +548,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
 
     if colour_col:
         if not is_numeric_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool:
+            plot_df[colour_col] = plot_df[colour_col].fillna('NaN')
             if not palette:
                 if len(set(plot_df[colour_col])) > len(ColoursAndShapes.tol_vibrant):
                     palette = ColoursAndShapes.glasbey_palettes['glasbey']
@@ -573,11 +572,14 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
                 cmap = cm.get_cmap('viridis' if not palette else palette)
                 norm = plt.Normalize(plot_df[colour_col].min(), plot_df[colour_col].max())
 
+    main_list = plot_df[[x for x in score_cols+[colour_col, marker_col] if x is not None]].values.tolist()
+    main_idx = {x: i for i, x in enumerate([y for y in score_cols+[colour_col, marker_col] if y is not None])}
+    
     def give_colour(entry):
         """Takes the entry that is supposed to be plotted, and checks whether we have categorical colours, or numerical
         ones."""
         if colour_col:
-            if is_string_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool:
+            if not is_numeric_dtype(plot_df[colour_col]) or plot_df[colour_col].dtype == bool:
                 return colour_dict[entry[main_idx[colour_col]]]
             else:
                 if pd.isna(entry[2]):
@@ -646,7 +648,7 @@ def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output
         plt.axhline(pos, color="#a7a8a7", linestyle="--")
     for pos in vlines:
         plt.axvline(pos, color="#a7a8a7", linestyle="--")
-    if colour_col and not is_string_dtype(plot_df[colour_col]) and plot_df[colour_col].dtype != bool:
+    if colour_col and is_numeric_dtype(plot_df[colour_col]) and plot_df[colour_col].dtype != bool:
         cax = plt.colorbar(cm.ScalarMappable(norm=norm, cmap=cmap), ax=ax, shrink=0.8 if not marker_col else 0.6)
         cax.set_label(colour_col, size=font_s)
     if line_plot is not False and line_plot is not None:

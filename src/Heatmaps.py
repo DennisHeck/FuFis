@@ -146,9 +146,10 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
         main_space: How much space the main heatmap will be given. Reduce if the colourbar overlaps the heatmap.
     """
     if z_score is not None:  # Not using seaborns z_score flag as it messes with the separate colourbar.
-        plot_part = zscore(plot_df[columns], axis=z_score)
+        plot_part = zscore(plot_df[columns].astype(float), axis=z_score)
     else:
-        plot_part = plot_df[columns]
+        plot_part = plot_df[columns].astype(float)
+    
     if class_col and class_row:
         print("ERROR: having colours at both rows and columns is not implemented, because colourbars are fun")
         return
@@ -182,6 +183,7 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
         yticklabels = plot_df[row_column].values
     else:  # If row_columns is set to None, meaning no labels should be shown.
         yticklabels = False
+
     clustermap = sns.clustermap(plot_part, vmin=vmin, vmax=vmax, rasterized=True, cmap=cmap, center=centre,
                                 figsize=(x_size, y_size), annot=annot_mat, annot_kws={'size': 10}, fmt='',
                                 yticklabels=yticklabels,

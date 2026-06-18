@@ -22,12 +22,26 @@ def merge_bws(bw_files, wiggle_exe, wigToBigWig_exe, chromsize_file, bw_out):
     """
     start = clock()
     wig_out = '.'.join(bw_out.split('.')[:-1])+'.wig'
+    cleaned_wig_out = wig_out.replace(".wig", '_cleaned.wig')
+
     if not os.path.isfile(wig_out):
         subprocess.call("time {} write {} mean {}".format(wiggle_exe, wig_out, ' '.join(bw_files)), shell=True)
     else:
         print("WARNING: wig file already exists, trying conversion to bigwig:", wig_out)
     print("Converting the merged wig to bigwig")
-    subprocess.call("time {} {} {} {}".format(wigToBigWig_exe, wig_out, chromsize_file, wig_out.replace('.wig', '.bw')), shell=True)
-    if os.path.isfile(wig_out.replace('.wig', '.bw')):
-        os.remove(wig_out)
+    
+    # Check if the wig file has the chr-prefix, if not, add it, and remove odd scaffolds.
+    allowed_chr = ['X', 'Y']  # We also allow ints after chr-removal.
+    with open(wig_out) as wig_in, open(cleaned_wig_out, 'w') as chr_wig:
+        for line in wig_in:
+            # This is a rather ugly fix, but there can be many weird lines in wig files.
+            line_chr = line.split('\t')[0].replace('chr', '')
+            if line_chr in allowed_chr or line_chr.isdigit():
+                chr_wig.write('chr'+line.replace('chr', ''))
+    os.remove(wig_out)
+
+    subprocess.call(f"time {wigToBigWig_exe} {cleaned_wig_out} {chromsize_file} {bw_out}", shell=True)
+    if os.path.isfile(bw_out):
+        os.remove(cleaned_wig_out)
     print(clock() - start, "bigwigs merged")
+

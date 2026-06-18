@@ -92,7 +92,6 @@ def plotHeatmap(beds_to_plot, bed_labels, bigwigs, bw_labels, out_dir, out_tag, 
     # in the next step from the plotHeatmap function.
     matrix_out = out_dir + out_tag + "_" + mode + "_perGroup"*perGroup + '.gz'
     print('Computing matrix')
-    print(bed_paths)
     if mode == 'scale':
         matrix_cmd = "computeMatrix scale-regions -S "+' '.join(bigwigs)+" -R "+ ' '.join(["'"+b+"'" for b in bed_paths])+\
                         " -R " + ' '.join(["'"+b+"'" for b in bed_paths])+\
