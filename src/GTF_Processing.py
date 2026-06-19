@@ -119,7 +119,7 @@ def gene_window_bed(gtf_file, extend=200, gene_set=set(), tss_type='5', dict_onl
     return promoter_bed
 
 
-def gene_body_bed(gtf_file, gene_set=set(), dict_only=False):
+def gene_body_bed(gtf_file, gene_set=set(), dict_only=False, add_upstream=None, add_downstream=None):
     """
     From a gtf-file fetches the gene bodies, meaning start-end for the entries labelled as 'gene'.
 
@@ -129,6 +129,8 @@ def gene_body_bed(gtf_file, gene_set=set(), dict_only=False):
             genes in the annotation.
         dict_only: Returns a dict {Ensembl ID: [chr, start, end, Ensembl ID, '.', strand]. Else, returns a bedtool-
             object with the coordinates per gene.
+        add_upstream: If to extend the gene body by a certain number of base pairs upstream of the TSS.
+        add_downstream: If to extend the gene body by a certain number of base pairs downstream of the TES. 
     """
     if gene_set:
         gene_set = set([g.split('.')[0] for g in gene_set])
@@ -147,7 +149,20 @@ def gene_body_bed(gtf_file, gene_set=set(), dict_only=False):
                     line = line.strip().split('\t')
                     gene = line[8].split('gene_id "')[-1].split('"; ')[0].split('.')[0]
                     gene_name = line[8].split('gene_name "')[-1].split('"; ')[0].split('.')[0]
+                    strand = line[6]
+                
                     if not gene_set or gene in gene_set or gene_name in gene_set:
+                        if add_upstream:
+                            if strand == '+':
+                                line[3] = str(max([0, int(line[3]) - add_upstream]))
+                            else:
+                                line[4] = str(int(line[4]) + add_upstream)
+                        if add_downstream:
+                            if strand == '+':
+                                line[4] = str(int(line[4]) + add_downstream)
+                            else:
+                                line[3] = str(max([0, int(line[3]) - add_downstream]))
+
                         hits.append([line[0], line[3], line[4], gene, line[5], line[6]])
 
     if dict_only:
