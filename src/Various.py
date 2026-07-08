@@ -334,3 +334,109 @@ def gene_cre_overlap_fisher(interaction_df, overlap_col, peak_id_col='peak_id', 
     return fisher_df
 
 
+
+def median_of_ratios(base_matrix, external_matrix=None, method="ratio", keep_all_genes=True):
+    """
+    Perform DESeq-style median-of-ratio normalization. Optionally give an external matrix that uses the
+    geometric means from the base_matrix for its size factors. If base_matrix and external_matrix are given,
+    they are reduced to their shared genes.
+
+    Args:
+        base_matrix: Base count matrix with genes x samples.
+        external_matrix: Optional separate matrix that is normalized based on the geometric means from the base_matrix.
+        method: {"ratio", "poscounts"} Size-factor estimation mode:
+            - "ratio": Only genes with nonzero counts across all reference samples are used to compute geometric means.
+            - "poscounts": Geometric means are computed using only positive counts, allowing genes with some zeros to still contribute.
+        keep_all_genes: Whether to return matrices for all shared genes, or only genes used in size-factor estimation.
+
+    Returns:
+        tuple:
+            - **base_normalized**: Normalized base_matrix.
+            - **external_normalized**: Normalized external_matrix, empty if it was not provided.
+            - **base_size_factors**: Size factors for the base_matrix.
+            - **external_size_factors**: Size factors for the external_matrix, empty if it was not provided.
+    """
+
+    if method not in {"ratio", "poscounts"}:
+        raise ValueError("method must be one of {'ratio', 'poscounts'}")
+
+    base_matrix = base_matrix.copy().astype(float)
+
+    if external_matrix is not None:
+        external_matrix = external_matrix.copy().astype(float)
+
+        # Restrict to shared genes.
+        shared_genes = base_matrix.index.intersection(external_matrix.index)
+        if len(shared_genes) == 0:
+            raise ValueError("No shared genes between reference and target matrices.")
+
+        base_matrix = base_matrix.loc[shared_genes]
+        external_matrix = external_matrix.loc[shared_genes]
+    
+    else:
+        external_matrix = pd.DataFrame()
+
+    print("Getting geometric means.")
+    if method == "ratio":
+        valid_genes = (base_matrix > 0).all(axis=1)
+        base_matrix_for_sf = base_matrix.loc[valid_genes]
+        external_matrix_for_sf = external_matrix.loc[valid_genes]
+
+        if base_matrix_for_sf.shape[0] == 0:
+            raise ValueError("No genes with nonzero counts across all reference samples")
+        print("Number of genes used for size factor estimation:", base_matrix_for_sf.shape[0])
+
+        base_geo_means = scipy.stats.gmean(base_matrix_for_sf, axis=1)
+
+    else:  # method == "poscounts"
+        def geometric_mean_positive_only(values):
+            values = np.asarray(values, dtype=float)
+            values = values[values > 0]
+            if len(values) == 0:
+                return np.nan
+            return scipy.stats.gmean(values)
+
+        base_geo_means = base_matrix.apply(geometric_mean_positive_only, axis=1)
+        valid_genes = base_geo_means.notna()
+        base_geo_means = base_geo_means.loc[valid_genes]
+        base_matrix_for_sf = base_matrix.loc[valid_genes]
+        external_matrix_for_sf = external_matrix.loc[valid_genes]
+
+        if base_geo_means.shape[0] == 0:
+            raise ValueError("No genes with valid positive-count geometric means")
+
+    def median_ratio_size_factors(count_matrix, gene_geometric_means):
+        """
+        Compute size factors:
+            sf(sample) = median_g( count_g,sample / geo_mean_g )
+        """
+        sfs = {}
+        for sample in count_matrix.columns:
+            ratios = count_matrix[sample] / gene_geometric_means
+            ratios = ratios.replace([np.inf, -np.inf], np.nan)
+            ratios = ratios[ratios > 0].dropna()
+
+            if len(ratios) == 0:
+                raise ValueError(f"No valid positive ratios for sample '{sample}'.")
+
+            sfs[sample] = np.median(ratios)
+
+        return pd.Series(sfs, name="size_factor")
+
+    print("Getting size factors.")
+    base_size_factors = median_ratio_size_factors(base_matrix_for_sf, base_geo_means)
+    external_size_factors = median_ratio_size_factors(external_matrix_for_sf, base_geo_means)
+
+    # Choose which matrices to normalize for the output.
+    if keep_all_genes:
+        base_normalized = base_matrix.div(base_size_factors, axis=1)
+        external_normalized = external_matrix.div(external_size_factors, axis=1)
+    else:
+        base_normalized = base_matrix_for_sf.div(base_size_factors, axis=1)
+        external_normalized = external_matrix_for_sf.div(external_size_factors, axis=1)
+
+    return base_normalized, external_normalized, base_size_factors, external_size_factors
+
+
+
+
