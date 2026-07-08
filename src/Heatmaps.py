@@ -5,7 +5,7 @@ from scipy.stats import zscore
 from matplotlib import cm
 from itertools import chain
 import ColoursAndShapes
-from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.colors
 import matplotlib.gridspec
 from matplotlib import cm, colors, colorbar
 import pandas as pd
@@ -29,7 +29,7 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
         cmap_cols: Dictionary with one entry for each block. The keys don't matter as long as they are unique. E.g.
             {0: {'cols': ['Mean_Control_FM', 'Mean_FM_Mock_Ctrl', 'Mean_Tcf15_FM', 'Mean_FM_Tcf15_OE'],
                      'centre': 0, (optional)
-                     'cmap': 'mako',
+                     'cmap': 'mako',  # Allows a list of colours to create a custom colormap.
                      'cbar_label': 'TPM',
                      'vmax': 200, (optional)
                      'vmin': 0, (optional)
@@ -57,6 +57,9 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
         else:
             this_ax = axes[n]
         # this_cmap = cm.get_cmap(c_attrs['cmap'])
+
+        if isinstance(c_attrs['cmap'], list):
+            c_attrs['cmap'] = matplotlib.colors.LinearSegmentedColormap.from_list("custom_diverging", c_attrs['cmap'])
 
         value_mat = np.zeros([len(plot_df), len(c_attrs['cols'])])
         annot_mat = np.full([len(plot_df), len(c_attrs['cols'])], '', dtype=object)  # Numpy complains otherwise.
@@ -91,7 +94,7 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
             # Add the class bar as separate one-column heatmap to the left.
             class_to_int = {c: i for i, c in enumerate(set(plot_df[class_col]))}
             if len(class_to_int) == 2:
-                class_cmap = LinearSegmentedColormap.from_list("two_contrast", ColoursAndShapes.two_contrasts[0], N=2)
+                class_cmap = matplotlib.colorsLinearSegmentedColormap.from_list("two_contrast", ColoursAndShapes.two_contrasts[0], N=2)
             else:
                 class_cmap = cm.get_cmap("tab20", len(class_to_int))
             sns.heatmap([[class_to_int[c]] for c in plot_df[class_col].values], cmap=class_cmap, ax=axes[0],
@@ -132,6 +135,7 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
         class_col_colour: Allows a list that will be taken iteratively, or a dict with {label: colour}.
         class_row: Same as class_col but add a row instead.
         annot_cols: Dictionary {col: other-col} to add text into the entries from col taken from other_col.
+        cmap: Colourmap for the heatmap, or list of colour from which a custom colormap will be created.
         y_dendro: Whether to plot the dendrogram on y.
         x_dendro: Whether to plot the dendrogram on x.
         column_labels: List that will replace the names from columns if given.
@@ -149,7 +153,10 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
         plot_part = zscore(plot_df[columns].astype(float), axis=z_score)
     else:
         plot_part = plot_df[columns].astype(float)
-    
+
+    if isinstance(cmap, list):
+        cmap = matplotlib.colors.LinearSegmentedColormap.from_list("custom_diverging", cmap)
+
     if class_col and class_row:
         print("ERROR: having colours at both rows and columns is not implemented, because colourbars are fun")
         return
