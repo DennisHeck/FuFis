@@ -11,9 +11,9 @@ def harry_plotter(abc_folder, tag_order=None, plot_path='', same_enhancer=True, 
     """A collection of function plotting metrics for all ABCpp files in a folder.
     @param abc_folder: directory from which all gzipped files with the substring ABCpp_scoredInteractions will be taken.
     @param tag_order: Order of the prefixes of the interaction files. If not given take the order from os.listdir().
-    @param same_enhancer: If True will create a Jaccard heatmap of the interactions, if not an asymmetric heatmap to
+    @param same_enhancer: If True will create a Jaccard heatmap of the interactions, if not an asymmetric heatmap to account for multiple overlaps.
     @param colnaming: Whether the name tag for the files is at the column label position or the prefix to _ABCpp_.
-    account for multiple overlaps.
+    
     """
     if colnaming:
         abc_files = {x.split('_ABCpp_scoredInteractions_')[-1].split('.txt')[0]: abc_folder+'/'+x for x in os.listdir(abc_folder)
@@ -82,7 +82,7 @@ def harry_plotter(abc_folder, tag_order=None, plot_path='', same_enhancer=True, 
                               title="Number of enhancers per gene", output_path=plot_path+"EnhPerGene", font_s=15,
                               numerate=False, palette=palette, xsize=5+len(tag_order), ysize=8, rotation=90)
 
-    if not same_enhancer:
+    if not same_enhancer:  
         Heatmaps.interaction_intersection_diff_enhancer(abc_folder=abc_folder, tag_order=tag_order,
                                                         plot_path=plot_path, x_size=16, y_size=10, annot_s=15)
     else:

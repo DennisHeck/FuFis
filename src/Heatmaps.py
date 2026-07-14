@@ -250,7 +250,7 @@ def clustermap(plot_df, columns, row_column, cbar_label, class_col='', class_row
     # if return_linkage:
     #     return clustermap.linkage.dendrogram_row or clustermap.linkage.dendrogram_col
 
-
+# TODO currently not doing what intended?
 def interaction_intersection_diff_enhancer(abc_folder, tag_order=None, plot_path='', x_size=16, y_size=10, annot_s=15):
     """Plot an asymmetric heatmap of the ABC-interactions, for cases where we started with different enhancer sets.
     Takes care of cases with multiple overlaps.
@@ -276,6 +276,7 @@ def interaction_intersection_diff_enhancer(abc_folder, tag_order=None, plot_path
                     enh_gene[enh] = set()
                 enh_gene[enh].add(entry.strip().split('\t')[abc_head['Ensembl ID']])
         enh_gene_interactions[tag] = enh_gene
+    number_interactions = {t: sum([len(val) for val in enh_gene_interactions[t].values()]) for t in abc_files.keys()}
 
     # Now go through each pair of files and count the number of matches.
     # We need to do a pairwise comparison for each, to find which enhancers intersect and if they map to the same gene.
@@ -283,7 +284,7 @@ def interaction_intersection_diff_enhancer(abc_folder, tag_order=None, plot_path
     shared_frac = np.ones([len(abc_files), len(abc_files)])
     shared_inter = np.zeros([len(abc_files), len(abc_files)], dtype=object)
     for tag in tag_order:
-        shared_inter[mat_idx[tag]][mat_idx[tag]] = str(len(enh_gene_interactions[tag]))
+        shared_inter[mat_idx[tag]][mat_idx[tag]] = str(number_interactions[tag])
     tag_pairs = list(itertools.combinations(abc_files.keys(), 2))
     for pair in tag_pairs:
         print(pair)
@@ -311,12 +312,12 @@ def interaction_intersection_diff_enhancer(abc_folder, tag_order=None, plot_path
         for enh1, other_enh in enh1_inter.items():
             other_enh_genes = set.union(*[enh_gene_interactions[pair[0]][e] for e in other_enh])
             shared1 += len(enh_gene_interactions[pair[1]][enh1] & other_enh_genes)
-        shared_frac[mat_idx[pair[0]]][mat_idx[pair[1]]] = shared0 / len(enh_gene_interactions[pair[0]])
-        shared_frac[mat_idx[pair[1]]][mat_idx[pair[0]]] = shared1 / len(enh_gene_interactions[pair[1]])
+        shared_frac[mat_idx[pair[0]]][mat_idx[pair[1]]] = shared0 / number_interactions[pair[0]]
+        shared_frac[mat_idx[pair[1]]][mat_idx[pair[0]]] = shared1 / number_interactions[pair[1]]
         shared_inter[mat_idx[pair[0]]][mat_idx[pair[1]]] = str(shared0)
         shared_inter[mat_idx[pair[1]]][mat_idx[pair[0]]] = str(shared1)
 
-    total_inter = pd.DataFrame([len(enh_gene_interactions[t]) for t in tag_order], index=tag_order)
+    total_inter = pd.DataFrame([number_interactions[t] for t in tag_order], index=tag_order)
 
     f, axes = plt.subplots(nrows=1, ncols=3, figsize=(x_size, y_size), gridspec_kw={'width_ratios': [0.2, 0.4, 8]})
     sns.heatmap(total_inter, cmap="Blues", ax=axes[1], xticklabels=False,
@@ -340,3 +341,10 @@ def interaction_intersection_diff_enhancer(abc_folder, tag_order=None, plot_path
     plt.subplots_adjust(wspace=0.02)
     plt.savefig(sanitize_path(plot_path + "_ABCMultiIntersectHeat.pdf"), bbox_inches='tight')
     plt.close()
+
+
+
+
+
+
+
