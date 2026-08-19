@@ -11,6 +11,7 @@ from multiprocess import Pool
 import copy
 import scipy.stats
 import statsmodels.stats.multitest
+from sklearn.decomposition import PCA
 import os
 import fnmatch
 import re
@@ -342,7 +343,7 @@ def median_of_ratios(base_matrix, external_matrix=None, method="ratio", keep_all
     they are reduced to their shared genes.
 
     Args:
-        base_matrix: Base count matrix with genes x samples.
+        base_matrix: Base count matrix with genes x samples, both must be unique.
         external_matrix: Optional separate matrix that is normalized based on the geometric means from the base_matrix.
         method: {"ratio", "poscounts"} Size-factor estimation mode:
             - "ratio": Only genes with nonzero counts across all reference samples are used to compute geometric means.
@@ -356,6 +357,12 @@ def median_of_ratios(base_matrix, external_matrix=None, method="ratio", keep_all
             - **base_size_factors**: Size factors for the base_matrix.
             - **external_size_factors**: Size factors for the external_matrix, empty if it was not provided.
     """
+    if base_matrix.index.duplicated().any() or base_matrix.columns.duplicated().any():
+        raise IndexError("ERROR: Duplicated index or columns in base_matrix")
+    if external_matrix is not None:
+        if external_matrix.index.duplicated().any() or external_matrix.columns.duplicated().any():
+            raise IndexError("ERROR: Duplicated index or columns in base_matrix")
+            
 
     if method not in {"ratio", "poscounts"}:
         raise ValueError("method must be one of {'ratio', 'poscounts'}")
@@ -439,4 +446,17 @@ def median_of_ratios(base_matrix, external_matrix=None, method="ratio", keep_all
 
 
 
+def pca_coordinates(df, columns=[], n_components=2):
+    """Run a PCA on a DataFrame and return the coordinates of the columns, optionally only for the listed columns."""
+    if columns:
+        X = df[columns].copy().dropna()
+    else:
+        X = df.copy().dropna()
+    X = X.T
+    pca = PCA(n_components=n_components)
+    coords = pca.fit_transform(X.values)
 
+    pc_names = [f"PC{i+1} ({var*100:.1f}%)" for i, var in enumerate(pca.explained_variance_ratio_)]
+    coords_df = pd.DataFrame(coords, index=X.index, columns=pc_names)
+
+    return coords_df

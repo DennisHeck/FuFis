@@ -94,7 +94,7 @@ def heatmap_cols(plot_df, cmap_cols, plot_out, row_label_col=None, column_labels
             # Add the class bar as separate one-column heatmap to the left.
             class_to_int = {c: i for i, c in enumerate(set(plot_df[class_col]))}
             if len(class_to_int) == 2:
-                class_cmap = matplotlib.colorsLinearSegmentedColormap.from_list("two_contrast", ColoursAndShapes.two_contrasts[0], N=2)
+                class_cmap = matplotlib.colors.LinearSegmentedColormap.from_list("two_contrast", ColoursAndShapes.two_contrasts[0], N=2)
             else:
                 class_cmap = cm.get_cmap("tab20", len(class_to_int))
             sns.heatmap([[class_to_int[c]] for c in plot_df[class_col].values], cmap=class_cmap, ax=axes[0],

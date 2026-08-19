@@ -344,10 +344,16 @@ def get_gmt_sets(gtf_file='', gmt_path_pattern="/projects/abcpp/work/base_data/G
         tuple:
             - **gmt_sets**: Dict of {source: {term: set(gene names)}} for all found gmt files.
             - **gmt_sets_ids**: Same as above but with mapped Ensembl IDs where possible.
+            - **all_names**: Set of the gene names pooled across all found matching terms.
+            - **all_ensembl_ids**: Same as above but with the matched Ensembl IDs.
     """
-    keywords = [k.replace(' ', '_') for k in keywords]  # In the gmt files we have no spaces but underscores.
+    keywords = [k.replace(' ', '_').lower() for k in keywords]  # In the gmt files we have no spaces but underscores.
 
     gmt_files = Various.fn_patternmatch(gmt_path_pattern)
+    if len(gmt_files) == 0:
+        print("ERROR: No matching gmt files found")
+        return None, None
+    
     gmt_sets = {}
     for gmt_file, source in gmt_files.items():
         source = '.'.join(source.split('.')[1:])  # We need to remove the prefix to be flexible across organisms.
@@ -364,15 +370,20 @@ def get_gmt_sets(gtf_file='', gmt_path_pattern="/projects/abcpp/work/base_data/G
                         continue
             gmt_sets[source][term] = set(entry.strip().split('\t')[2:])
 
+    if len([i for i, x in gmt_sets.items() if x]) == 0:  # We have a key for every found gmt file.
+        print("WARNING: No matching terms found")
+        return None, None
+    
     # Create a similar dictionary but with matched Ensembl IDs.
-    all_names = set.union(*[set.union(*val.values()) for val in gmt_sets.values()])
+    all_names = set.union(*[set.union(*val.values()) for val in gmt_sets.values() if val])
     mapped_identifiers, misses = GTF_Processing.match_gene_identifiers(all_names, gtf_file=gtf_file,
                                                                        scopes="symbol,alias",
                                                                        fields="ensembl,symbol")
     gmt_sets_ids = {s: {k: set([mapped_identifiers[n]['ensembl'] for n in names if n in mapped_identifiers])
                         for k, names in terms.items()} for s, terms in gmt_sets.items()}
+    all_ensembl_ids = set([mapped_identifiers[n]['ensembl'] for n in all_names if n in mapped_identifiers])
 
-    return gmt_sets, gmt_sets_ids
+    return gmt_sets, gmt_sets_ids, all_names, all_ensembl_ids
 
 
 def disgenet_enrichment(gene_sets, background='/projects/abcpp/work/base_data/gencode.v38.annotation.gtf',

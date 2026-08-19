@@ -82,7 +82,7 @@ def interaction_fetcher_helper(args):
     File reader to fetch ABC interactions. In a separate function to enable parallelization.
     """
     file, file_tag, cutoff = args
-    file_interactions = set()
+    file_interactions = {}
     with gzip.open(file, 'rt') as abc_file:
         head = {x: i for i, x in enumerate(abc_file.readline().strip().split('\t'))}
         for entry in abc_file:
@@ -91,35 +91,48 @@ def interaction_fetcher_helper(args):
                           entry[head['Ensembl ID']].split('.')[0]
             score = float(entry[head['ABC-Score']])
             if score >= cutoff:
-                file_interactions.add(interaction)
+                file_interactions[interaction] = score
     return [file_tag, file_interactions]
 
 
-def interaction_fetcher(pattern, pooled=True, cutoff=0.02, n_cores=1):
+def interaction_fetcher(pattern, pooled=True, cutoff=0.02, get_score=False, n_cores=1):
     """
     Takes the path to a ABC-scoring file or a pattern to multiple ABC-scoring files to get the gABC interactions surpassing the threshold in the
     format chr-start-end#EnsemblID. The version from the Ensembl ID is cut.
 
     Args:
-        pattern: File path pattern e.g., ABC/ABCpp_scoredInteractions_*.bed, or the path to just one individual file.
+        pattern: File path pattern e.g., ABC/ABCpp_scoredInteractions_*.bed, or the path to just one individual file, or a dictionary of {file: tag}.
         pooled: If True return one set of interactions pooled across all files. Otherwise create a dictionary with an entry for each wildcard matching the pattern.
         cutoff: Threshold when to fetch a gABC interaction.
+        get_score: Whether to not just get the sets of interactions but a dictionary of the interactions with their ABC-score of {interaction: {tag: score}}. Doesn't work with pooled=True.
     """
     start = clock()
     if '*' in pattern:
         abc_files = Various.fn_patternmatch(pattern)
-    else:  # Assume we have just one file.
-        abc_files = {pattern: pattern.split('/')[-1]}
+    else:  
+        if isinstance(pattern, dict):
+            abc_files = pattern
+        else:
+            # Assume we have just one file.
+            abc_files = {pattern: pattern.split('/')[-1]}
 
     process_pool = Pool(processes=n_cores)
     pool_fetcher = process_pool.map(interaction_fetcher_helper,
                                     [[file, file_tag, cutoff] for file, file_tag in abc_files.items()])
     process_pool.close()
 
+    all_interactions = set.union(*[set(x[1].keys()) for x in pool_fetcher])
     if pooled:
-        inter_dict = set.union(*[x[1] for x in pool_fetcher])
+        return all_interactions
     else:
-        inter_dict = {x[0]: x[1] for x in pool_fetcher}
+        if get_score:
+            # This structure is more efficient when having many conditions.
+            inter_dict = {i: {} for i in all_interactions}
+            for tag, inter_scores in pool_fetcher:
+                for inter, score in inter_scores.items():
+                    inter_dict[inter][tag] = score
+        else:
+            inter_dict = {x[0]: set(x[1].keys()) for x in pool_fetcher}
 
     print(clock() - start, 'interactions fetched')
     return inter_dict

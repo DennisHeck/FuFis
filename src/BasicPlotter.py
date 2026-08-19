@@ -521,7 +521,7 @@ def basic_pie(plot_df, title='', palette=None, numerate=True, legend_perc=True, 
 
 def multi_mod_plot(plot_df, score_cols, colour_col=None, marker_col=None, output_path='', diagonal=False, title=None,
                    colour_order=None, marker_order=None, line_plot=False, alpha=0.7, xsize=8, ysize=6, palette=None,
-                   xlim=None, ylim=None, msize=30, vlines=[], hlines=[], add_corr=False, na_colour='black', grid=True,
+                   xlim=None, ylim=None, msize=30, vlines=[], hlines=[], add_corr='pearson', na_colour='black', grid=True,
                    label_dots=None, font_s=14, adjust_labels=True, formats=['pdf']):
     """
     Scatterplot that compares two scores. For each entry in plot_df plot one dot with [x,y] based on score_col and
