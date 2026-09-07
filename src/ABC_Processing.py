@@ -107,6 +107,9 @@ def interaction_fetcher(pattern, pooled=True, cutoff=0.02, get_score=False, n_co
         get_score: Whether to not just get the sets of interactions but a dictionary of the interactions with their ABC-score of {interaction: {tag: score}}. Doesn't work with pooled=True.
     """
     start = clock()
+    if pooled and get_score:
+        print("WARNING: get_score is not compatible with pooled=True, setting pooled=False")
+        pooled = False
     if '*' in pattern:
         abc_files = Various.fn_patternmatch(pattern)
     else:  
