@@ -141,7 +141,7 @@ def interaction_fetcher(pattern, pooled=True, cutoff=0.02, get_score=False, n_co
     return inter_dict
 
 
-def reformat_interaction_files(abc_pattern, out_folder, annotation, gene_set=None, max_distance=None, format='interact'):
+def reformat_interaction_files(abc_pattern, out_folder, annotation, gene_set=None, max_distance=None, format='interact', write_score=True):
     """
     Takes a gABC-scoring file or a path pattern to multiple and create either interact files or BEDPE files that can 
     be visualized in the UCSC genome browser, IGV or other tools.
@@ -151,6 +151,7 @@ def reformat_interaction_files(abc_pattern, out_folder, annotation, gene_set=Non
         gene_set: Optional set of genes to which the output will be limited to. Can be a mix of Ensembl IDs or gene names, will be matched to the gABC file entries.
         max_distance: If given, limit the files in the output to those spanning ≤ max_distance.
         format: Either 'interact' for UCSC's interact files or 'bedpe'.
+        write_score: Whether to add the ABC-score to the bedpe file or not. CARE: With bedpes and IGV there are very specific constellations where the score causes the file to fail to load. Not really sure why, but it does so for specific combinations of rows.
     """
     file_ending = ''
     if gene_set:
@@ -214,7 +215,7 @@ def reformat_interaction_files(abc_pattern, out_folder, annotation, gene_set=Non
                 elif format == 'bedpe':  # Bedpe doesn't care which position is first.
                     inter_out.write('\t'.join(['chr'+entry[abc_header['#chr']], entry[abc_header['start']], entry[abc_header['end']], 
                                                tss_pos[entry_gene]['chr'], str(next(iter(tss_pos[entry_gene]['tss']))-1), str(next(iter(tss_pos[entry_gene]['tss']))), 
-                                               inter_name, entry[abc_header['ABC-Score']], '.', '.']) + '\n')
+                                               inter_name, entry[abc_header['ABC-Score']] if write_score else '.', '.', '.']) + '\n')
 
         subprocess.call('gzip -f ' + str(out_file), shell=True)
         if n_f % 10 == 0 and n_f > 0:
